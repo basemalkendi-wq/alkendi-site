@@ -299,7 +299,7 @@
 
             <!-- Tools Dynamic Grid -->
             <div id="toolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Cards will be populated dynamically by JavaScript based on our local database -->
+                <!-- Cards will be populated dynamically by JavaScript based on our database -->
             </div>
 
         </div>
@@ -455,8 +455,8 @@
 
     <!-- JavaScript Section for Interactive Functionality -->
     <script>
-        // --- LOCAL DATABASE FOR TOOLS ---
-        const toolsDatabase = [
+        // --- LOCAL FALLBACK DATABASE FOR TOOLS ---
+        const localToolsDatabase = [
             {
                 id: 1,
                 name: "Al-Kendi Shield | فاحص الحسابات والروابط",
@@ -519,8 +519,8 @@
             }
         ];
 
-        // --- LOCAL DATABASE FOR PORTFOLIO PROJECTS ---
-        const portfolioDatabase = [
+        // --- LOCAL FALLBACK DATABASE FOR PORTFOLIO PROJECTS ---
+        const localPortfolioDatabase = [
             {
                 id: 1,
                 name: "Al-Kendi API Shield Guard",
@@ -547,7 +547,31 @@
             }
         ];
 
-        // --- STREAMING_CHUNK: Implementing DOM renderers... -->
+        // Global arrays to reference active filters
+        let activeToolsData = [];
+
+        // --- FETCH LIVE DATA FROM RENDER BACKEND ---
+        async function fetchLiveDatabase() {
+            try {
+                const response = await fetch('https://alkendi-site.onrender.com/api/data');
+                if (!response.isLive && response.status !== 200) {
+                    throw new Error("Backend server error");
+                }
+                const data = await response.json();
+                
+                // Set active arrays to values directly from backend custom databases
+                activeToolsData = data.tools || localToolsDatabase;
+                renderTools(activeToolsData);
+                renderPortfolio(data.projects || localPortfolioDatabase);
+                console.log("Live database injected successfully from Render server!");
+            } catch (error) {
+                console.warn("Using local fallback arrays. Reason: ", error.message);
+                activeToolsData = localToolsDatabase;
+                renderTools(localToolsDatabase);
+                renderPortfolio(localPortfolioDatabase);
+            }
+        }
+
         // --- RENDER DYNAMIC CARDS ---
         function renderTools(tools) {
             const grid = document.getElementById('toolsGrid');
@@ -570,14 +594,12 @@
                 
                 card.innerHTML = `
                     <div>
-                        <!-- Header Card Info -->
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-2xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-xl">
-                                <i class="fa-solid ${tool.icon}"></i>
+                                <i class="fa-solid ${tool.icon || 'fa-cubes'}"></i>
                             </div>
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 dark:bg-white/5 light:bg-gray-100 text-gray-400 dark:text-gray-400 light:text-gray-600">${tool.categoryLabel}</span>
                         </div>
-                        <!-- Core Details -->
                         <h3 class="text-md font-bold text-white dark:text-white light:text-gray-900 mb-2">${tool.name}</h3>
                         <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4">${tool.description}</p>
                     </div>
@@ -608,14 +630,12 @@
 
                 card.innerHTML = `
                     <div>
-                        <!-- Header with GitHub Icon -->
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-10 h-10 rounded-xl bg-white/5 dark:bg-white/5 light:bg-gray-100 flex items-center justify-center text-lg text-gray-300 dark:text-gray-300 light:text-gray-600">
                                 <i class="fa-brands fa-github-alt"></i>
                             </div>
                             <span class="text-[10px] text-yellow-500 font-semibold"><i class="fa-solid fa-star ml-1"></i> ${project.stars} Star</span>
                         </div>
-                        <!-- Core Details -->
                         <h3 class="text-md font-bold text-white dark:text-white light:text-gray-900 mb-2">${project.name}</h3>
                         <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4">${project.description}</p>
                     </div>
@@ -631,18 +651,15 @@
             });
         }
 
-        // --- STREAMING_CHUNK: Connecting UI event handlers and filters... -->
         // --- DYNAMIC SEARCH & FILTER CONTROLS ---
         const filterContainer = document.getElementById('filterContainer');
         const activeIndicator = document.getElementById('activeIndicator');
 
-        // Function to mathematically calculate and slide the purple pill background
         function updateIndicatorPosition(activeBtn) {
             if (!activeBtn || !activeIndicator || !filterContainer) return;
             const btnRect = activeBtn.getBoundingClientRect();
             const containerRect = filterContainer.getBoundingClientRect();
 
-            // Set dimensions and offset coordinates dynamically
             activeIndicator.style.width = `${btnRect.width}px`;
             activeIndicator.style.height = `${btnRect.height}px`;
             activeIndicator.style.left = `${btnRect.left - containerRect.left}px`;
@@ -653,13 +670,12 @@
             const val = e.target.value.toLowerCase();
             const activeFilter = document.querySelector('.filter-btn.active').dataset.category;
             
-            const filtered = toolsDatabase.filter(tool => {
+            const filtered = activeToolsData.filter(tool => {
                 const matchesSearch = tool.name.toLowerCase().includes(val) || tool.description.toLowerCase().includes(val);
                 const matchesCategory = activeFilter === 'all' || tool.category === activeFilter;
                 return matchesSearch && matchesCategory;
             });
             renderTools(filtered);
-            // Recalculate indicator position because layout might shift slightly
             setTimeout(() => {
                 updateIndicatorPosition(document.querySelector('.filter-btn.active'));
             }, 50);
@@ -668,23 +684,19 @@
         const filterBtns = document.querySelectorAll('.filter-btn');
         filterBtns.forEach(btn => {
             btn.addEventListener('click', function() {
-                // Clear active text color on all buttons
                 filterBtns.forEach(b => {
                     b.classList.remove('active', 'text-white');
                     b.classList.add('text-gray-400', 'dark:text-gray-400', 'light:text-gray-600');
                 });
                 
-                // Set active text color for clicked button
                 this.classList.add('active', 'text-white');
                 this.classList.remove('text-gray-400', 'dark:text-gray-400', 'light:text-gray-600');
-                
-                // Trigger smooth slide animation to this button
                 updateIndicatorPosition(this);
 
                 const category = this.dataset.category;
                 const searchVal = document.getElementById('toolSearch').value.toLowerCase();
                 
-                const filtered = toolsDatabase.filter(tool => {
+                const filtered = activeToolsData.filter(tool => {
                     const matchesCategory = category === 'all' || tool.category === category;
                     const matchesSearch = tool.name.toLowerCase().includes(searchVal) || tool.description.toLowerCase().includes(searchVal);
                     return matchesCategory && matchesSearch;
@@ -693,13 +705,11 @@
             });
         });
 
-        // Handle window resize dynamically to prevent displacement of active pill
         window.addEventListener('resize', () => {
             const activeBtn = document.querySelector('.filter-btn.active');
             updateIndicatorPosition(activeBtn);
         });
 
-        // --- STREAMING_CHUNK: Adding custom secure notifications system... -->
         // --- CUSTOM TOAST NOTIFICATIONS ---
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
@@ -718,13 +728,10 @@
             `;
             
             container.appendChild(toast);
-            
-            // Fade-In animation
             setTimeout(() => {
                 toast.classList.remove('opacity-0', 'translate-y-2');
             }, 10);
             
-            // Auto destroy
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => {
@@ -737,20 +744,18 @@
             showToast(`جاري تجهيز رابط التحميل الآمن لأداة: ${toolName}... يرجى الانتظار!`, 'success');
         }
 
-        // --- STREAMING_CHUNK: Integrating dark/light switcher and mobile panel actions... -->
         // --- CORE DARK/LIGHT THEME SWITCHER ---
         const themeToggle = document.getElementById('themeToggle');
         const themeIconContainer = document.getElementById('themeIconContainer');
         const htmlElement = document.documentElement;
 
-        // SVG Templates
         const moonSVG = `
             <svg class="w-5 h-5 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
             </svg>
         `;
         const sunSVG = `
-            <svg class="w-5 h-5 text-brand-purple animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-5 h-5 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"></path>
             </svg>
         `;
@@ -771,12 +776,10 @@
             }
         }
 
-        // Check stored theme or system preference
         const currentTheme = localStorage.getItem('theme') || 'dark';
         updateThemeUI(currentTheme);
 
         themeToggle.addEventListener('click', () => {
-            // Apply a nice click rotation effect
             themeIconContainer.classList.add('rotate-45');
             setTimeout(() => themeIconContainer.classList.remove('rotate-45'), 300);
 
@@ -791,7 +794,7 @@
             }
         });
 
-        // --- MOBILE MENU WITH DYNAMIC SVG ICON TOGGLE ---
+        // --- MOBILE MENU ---
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const menuIconContainer = document.getElementById('menuIconContainer');
         const mobileMenu = document.getElementById('mobileMenu');
@@ -819,7 +822,6 @@
             }
         });
 
-        // Close menu after clicking a link
         document.querySelectorAll('#mobileMenu a').forEach(link => {
             link.addEventListener('click', () => {
                 mobileMenu.classList.add('hidden');
@@ -831,14 +833,10 @@
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const nameValue = document.getElementById('name').value;
-            const emailValue = document.getElementById('email').value;
-            
-            // Simulate secure API delivery
             showToast(`شكراً لك يا ${nameValue}! تم إرسال رسالتك بأمان تام وسيتواصل معك فريق Al-Kendi Tech قريباً.`, 'success');
             this.reset();
         });
 
-        // --- STREAMING_CHUNK: Activating ScrollSpy active link visual tracking... -->
         // --- SCROLLSPY DYNAMIC ACTIVE NAVIGATION ---
         const sections = document.querySelectorAll('section[id]');
         const desktopLinks = document.querySelectorAll('#desktopNav .nav-link');
@@ -849,12 +847,10 @@
 
             sections.forEach(section => {
                 const sectionHeight = section.offsetHeight;
-                // Offset triggers change slightly before reaching the exact section boundary
                 const sectionTop = section.offsetTop - 160; 
                 const sectionId = section.getAttribute('id');
 
                 if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                    // Update Desktop Navigation Highlight
                     desktopLinks.forEach(link => {
                         link.classList.remove('text-brand-purple');
                         link.classList.add('text-gray-400', 'dark:text-gray-400', 'light:text-gray-600');
@@ -864,7 +860,6 @@
                         }
                     });
 
-                    // Update Mobile Navigation Highlight
                     mobileLinks.forEach(link => {
                         link.classList.remove('text-brand-purple', 'font-semibold');
                         link.classList.add('text-gray-400', 'dark:text-gray-400', 'light:text-gray-600');
@@ -877,19 +872,17 @@
             });
         }
 
-        // Bind scroll event to ScrollSpy function
         window.addEventListener('scroll', updateActiveNavOnScroll);
 
         // --- ON INITIAL LOAD ---
-        window.onload = function() {
-            renderTools(toolsDatabase);
-            renderPortfolio(portfolioDatabase);
+        window.onload = async function() {
+            // Trigger dynamic backend data loading
+            await fetchLiveDatabase();
             
-            // Allow layout to fully render before calculating active slider position
             setTimeout(() => {
                 const activeBtn = document.querySelector('.filter-btn.active');
                 updateIndicatorPosition(activeBtn);
-                updateActiveNavOnScroll(); // Trigger to set accurate active section on reload
+                updateActiveNavOnScroll(); 
             }, 150);
         };
     </script>
