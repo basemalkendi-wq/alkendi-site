@@ -1,0 +1,23 @@
+{
+  "admin_account": {
+    "email": "admin@alkendi.me",
+    "password": "$2b$10$Wlwq9A7eUyCvTrTFjcct1OMzHWnHeXZM6jCeO80Q2LbwXVU2cIzLC"
+  },
+  "profile": {
+    "name": "Al-Kendi Tech",
+    "avatar": ""
+  },
+  "links": {
+    "instagram": "#",
+    "tiktok": "#"
+  },
+  "tools": [
+    {
+      "id": 1,
+      "title": "أداة فحص الحماية",
+      "category": "security",
+      "description": "أداة متقدمة لفحص الأمان والحماية للأنظمة."
+    }
+  ],
+  "projects": []
+}

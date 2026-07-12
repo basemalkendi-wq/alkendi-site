@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | Al-Kendi Tech Admin</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#8B5CF6',
+                            purpleDark: '#6D28D9',
+                            purpleGlow: 'rgba(139, 92, 246, 0.15)',
+                            darkBg: '#09090E',
+                            darkCard: '#12121A',
+                            darkCardSelected: '#1C1C26',
+                            lightBg: '#F9FAFB',
+                            lightCard: '#FFFFFF',
+                            neonRed: '#EF4444',
+                            neonGreen: '#10B981'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts (Cairo & Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Tech Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Cairo', 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .custom-glass {
+            background: rgba(18, 18, 26, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-brand-darkBg text-gray-100 min-h-screen overflow-x-hidden selection:bg-brand-purple selection:text-white">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- Sidebar Navigation (Responsive - initially hidden with translate-x-full on mobile) -->
+        <aside id="adminSidebar" class="fixed inset-y-0 right-0 z-40 flex flex-col w-72 h-screen bg-brand-darkCard border-l border-white/5 transition-transform duration-300 transform translate-x-full lg:translate-x-0 lg:relative shrink-0">
+            <!-- Sidebar Header Brand -->
+            <div class="flex items-center justify-between px-6 h-20 border-b border-white/5 bg-[#0d0d14]">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center shadow-md shadow-brand-purple/10">
+                        <span class="text-md font-black text-brand-purple">K</span>
+                    </div>
+                    <div class="text-right">
+                        <h2 class="text-sm font-extrabold text-white">Al-Kendi Control Panel</h2>
+                        <p class="text-[10px] text-brand-purple font-mono">v3.0.0 Stable</p>
+                    </div>
+                </div>
+                
+                <!-- Native SVG Close Button inside sidebar on mobile to prevent layout blockages -->
+                <button onclick="toggleMobileSidebar(false)" class="lg:hidden w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition-colors" aria-label="إغلاق القائمة">
+                    <svg class="w-4 h-4 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Dynamic Tab Links Group -->
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
+                <!-- Tab Item: Main Overview -->
+                <button onclick="switchTab('profileTab', this)" class="tab-link active w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-brand-purple text-white text-sm font-bold transition-all duration-300">
+                    <i class="fa-solid fa-user-gear text-lg"></i>
+                    <span>البروفايل والروابط</span>
+                </button>
+
+                <!-- Tab Item: Stats & Metrics -->
+                <button onclick="switchTab('metricsTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
+                    <i class="fa-solid fa-chart-simple text-lg"></i>
+                    <span>الأرقام والإحصائيات</span>
+                </button>
+
+                <!-- Tab Item: Tools Manager -->
+                <button onclick="switchTab('toolsTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
+                    <i class="fa-solid fa-toolbox text-lg"></i>
+                    <span>إدارة الأدوات والتحميلات</span>
+                </button>
+
+                <!-- Tab Item: Projects -->
+                <button onclick="switchTab('portfolioTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
+                    <i class="fa-solid fa-folder-open text-lg"></i>
+                    <span>إدارة أعمالي ومشاريعي</span>
+                </button>
+
+                <!-- Tab Item: Advertising space -->
+                <button onclick="switchTab('adsTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
+                    <i class="fa-solid fa-rectangle-ad text-lg"></i>
+                    <span>الرعايات والإعلانات</span>
+                </button>
+
+                <!-- Tab Item: Messages logs -->
+                <button onclick="switchTab('messagesTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
+                    <i class="fa-solid fa-envelope-open-text text-lg"></i>
+                    <span>الرسائل والطلبات الواردة</span>
+                </button>
+            </nav>
+
+            <!-- Sidebar Footer Status Indicator -->
+            <div class="p-4 border-t border-white/5 bg-[#0d0d14]">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-brand-neonGreen animate-pulse"></span>
+                        <span class="text-xs text-gray-400 font-semibold">اتصال السيرفر مستقر</span>
+                    </div>
+                    <a href="/index.html" target="_blank" class="text-xs font-bold text-brand-purple hover:underline flex items-center gap-1">
+                        المعاينة <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Admin Work Area -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden bg-brand-darkBg">
+            
+            <!-- Admin Workspace Header -->
+            <header class="h-20 border-b border-white/5 bg-brand-darkCard/50 px-6 sm:px-10 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Menu toggler with SVG vector instead of FontAwesome for 100% loading guarantee -->
+                    <button onclick="toggleMobileSidebar()" class="lg:hidden w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-brand-purple shrink-0 transition-all duration-200" aria-label="فتح قائمة التحكم">
+                        <svg class="w-5 h-5 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div>
+                        <h1 class="text-lg font-black text-white">لوحة تحكم Al-Kendi Tech</h1>
+                        <p class="text-[11px] text-gray-500 hidden sm:block">تعديل ونشر وتطوير الموقع الفردي بشكل كامل ولحظي</p>
+                    </div>
+                </div>
+
+                <!-- Global Action Buttons -->
+                <div class="flex items-center gap-3">
+                    <button onclick="publishAllChanges()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-purple to-brand-purpleDark text-white text-xs font-bold hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-brand-purple/25">
+                        حفظ ونشر التعديلات <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dynamic Tabs Display Workspace Container -->
+            <div class="flex-1 overflow-y-auto p-6 sm:p-10 space-y-8 no-scrollbar">
+
+                <!-- ================== TAB 1: PROFILE & LINKS ================== -->
+                <section id="profileTab" class="tab-content block space-y-6">
+                    <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
+                        <div class="flex items-center gap-4 border-b border-white/5 pb-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-id-card"></i>
+                            </div>
+                            <h3 class="text-md font-bold text-white">بيانات الملف الشخصي والهوية</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">اسم المطور / العلامة التجارية</label>
+                                <input type="text" id="pName" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">الوصف التعريفي (التاغ لاين بالهيدر)</label>
+                                <input type="text" id="pTagline" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">رابط صورة الرمزية (Avatar Image URL)</label>
+                                <div class="flex gap-4">
+                                    <input type="text" id="pAvatar" oninput="previewAvatar(this.value)" class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="أدخل رابط صورة لتعيينها كبروفايل">
+                                    <div class="w-12 h-12 rounded-xl overflow-hidden border border-brand-purple/30 flex items-center justify-center bg-brand-purple/10 shrink-0">
+                                        <img id="avatarPreview" src="https://placehold.co/100" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/100/12121A/8B5CF6?text=Avatar'">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Network accounts -->
+                    <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
+                        <div class="flex items-center gap-4 border-b border-white/5 pb-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-share-nodes"></i>
+                            </div>
+                            <h3 class="text-md font-bold text-white">روابط وحسابات السوشيال ميديا</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2"><i class="fa-brands fa-tiktok text-xs ml-1"></i> حساب التيك توك (TikTok)</label>
+                                <input type="text" id="lTiktok" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="https://tiktok.com/@...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2"><i class="fa-brands fa-instagram text-xs ml-1"></i> حساب الإنستقرام (Instagram)</label>
+                                <input type="text" id="lInstagram" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="https://instagram.com/...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2"><i class="fa-brands fa-youtube text-xs ml-1"></i> قناة اليوتيوب (YouTube)</label>
+                                <input type="text" id="lYoutube" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="https://youtube.com/...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2"><i class="fa-brands fa-github text-xs ml-1"></i> حساب الجيت هب (GitHub)</label>
+                                <input type="text" id="lGithub" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="https://github.com/...">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- ================== TAB 2: METRICS & STATS ================== -->
+                <section id="metricsTab" class="tab-content hidden space-y-6">
+                    <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
+                        <div class="flex items-center gap-4 border-b border-white/5 pb-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                            <h3 class="text-md font-bold text-white">تعديل مقاييس وإحصائيات الموقع الأساسية</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">متابعين السوشيال ميديا النشطين</label>
+                                <input type="text" id="mFollowers" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="100K+">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">البرامج والأدوات المجانية</label>
+                                <input type="text" id="mTools" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="15+">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">المشاريع المفتوحة المصدر</label>
+                                <input type="text" id="mProjects" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="20+">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">نسبة أمان الروابط المتوفرة</label>
+                                <input type="text" id="mSafety" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="100%">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- ================== TAB 3: TOOLS MANAGER ================== -->
+                <section id="toolsTab" class="tab-content hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-md font-extrabold text-white flex items-center gap-3">
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand-purple"></span>
+                            <span>إدارة البرمجيات والأدوات المتوفرة بالمعرض</span>
+                        </h2>
+                        <button onclick="openToolModal()" class="px-4 py-2.5 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple hover:bg-brand-purple hover:text-white transition-all text-xs font-bold flex items-center gap-2">
+                            إضافة أداة جديدة <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Tools Grid -->
+                    <div id="adminToolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Placed dynamically via JS -->
+                    </div>
+                </section>
+
+
+                <!-- ================== TAB 4: PORTFOLIO MANAGER ================== -->
+                <section id="portfolioTab" class="tab-content hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-md font-extrabold text-white flex items-center gap-3">
+                            <span class="w-2.5 h-2.5 rounded-full bg-brand-purple"></span>
+                            <span>إدارة المشاريع وأعمال المطور البرمجية</span>
+                        </h2>
+                        <button onclick="openProjectModal()" class="px-4 py-2.5 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple hover:bg-brand-purple hover:text-white transition-all text-xs font-bold flex items-center gap-2">
+                            إضافة مشروع جديد <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Projects Grid -->
+                    <div id="adminProjectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Placed dynamically via JS -->
+                    </div>
+                </section>
+
+
+                <!-- ================== TAB 5: ADS BANNER MANAGER ================== -->
+                <section id="adsTab" class="tab-content hidden space-y-6">
+                    <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
+                        <div class="flex items-center gap-4 border-b border-white/5 pb-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-rectangle-ad"></i>
+                            </div>
+                            <h3 class="text-md font-bold text-white">تعديل معلومات بانر الرعاية والمساحة الإعلانية</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">العنوان الصغير (الشعار العلوي للرعاية)</label>
+                                <input type="text" id="adBadge" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="مساحة إعلانية شاغرة">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">العنوان الرئيسي للبانر الإعلاني</label>
+                                <input type="text" id="adTitle" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">وصف الخدمة أو العرض التفصيلي</label>
+                                <textarea id="adDesc" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">نص زر الاتصال بالإجراء (CTA Text)</label>
+                                <input type="text" id="adBtnText" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="احجز مساحتك الآن">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">رابط الزر (أو التوجيه التلقائي)</label>
+                                <input type="text" id="adBtnLink" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="#contact">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- ================== TAB 6: RECEIVED MESSAGES ================== -->
+                <section id="messagesTab" class="tab-content hidden space-y-6">
+                    <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
+                        <div class="flex items-center justify-between border-b border-white/5 pb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-envelope-open-text"></i>
+                                </div>
+                                <h3 class="text-md font-bold text-white">الرسائل البريدية والطلبات الواردة</h3>
+                            </div>
+                            <span class="text-xs bg-brand-purple/10 text-brand-purple px-2.5 py-1 rounded-full font-bold" id="msgCount">0 طلب وارد</span>
+                        </div>
+
+                        <!-- Messages Inbox Grid -->
+                        <div id="messagesInbox" class="space-y-4">
+                            <!-- Messages loads dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ================== MODAL: ADD/EDIT TOOL ================== -->
+    <div id="toolModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-darkBg/80 backdrop-blur-md hidden transition-opacity duration-300">
+        <div class="bg-brand-darkCard border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl">
+            <!-- Modal Header -->
+            <div class="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-[#0d0d14]">
+                <h3 id="toolModalTitle" class="text-md font-bold text-white">إضافة أداة أو برنامج جديد</h3>
+                <!-- Precise SVG Vector Close Button -->
+                <button onclick="closeToolModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors flex items-center justify-center" aria-label="إغلاق النافذة">
+                    <svg class="w-4 h-4 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Body Form -->
+            <form id="toolForm" onsubmit="saveTool(event)" class="p-6 space-y-6">
+                <input type="hidden" id="toolFormId">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">اسم الأداة أو البرنامج</label>
+                        <input type="text" id="tfName" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">تصنيف البرنامج</label>
+                        <select id="tfCategory" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            <option value="security" class="bg-brand-darkCard">الأمان والحماية</option>
+                            <option value="utility" class="bg-brand-darkCard">الإنتاجية والأدوات</option>
+                            <option value="creators" class="bg-brand-darkCard">صناعة المحتوى</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">الأيقونة (رمز FontAwesome)</label>
+                        <select id="tfIcon" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            <option value="fa-shield-halved" class="bg-brand-darkCard">Shield / درع حماية</option>
+                            <option value="fa-gauge-high" class="bg-brand-darkCard">Speedometer / مؤشر تسريع</option>
+                            <option value="fa-clapperboard" class="bg-brand-darkCard">Clapperboard / مونتاج وصناعة محتوى</option>
+                            <option value="fa-ban" class="bg-brand-darkCard">Ban / حظر ومنع إعلانات</option>
+                            <option value="fa-file-video" class="bg-brand-darkCard">Video File / ضغط فيديوهات</option>
+                            <option value="fa-code" class="bg-brand-darkCard">Code / برمجة وتطوير</option>
+                            <option value="fa-key" class="bg-brand-darkCard">Key / مفاتيح وتشفير</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">رقم الإصدار</label>
+                        <input type="text" id="tfVersion" required placeholder="v1.0" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">حجم الملف</label>
+                        <input type="text" id="tfSize" required placeholder="15.4 MB" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">رابط التحميل المباشر والآمن</label>
+                        <input type="text" id="tfLink" required placeholder="#" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">وصف توضيحي مختصر عن الأداة</label>
+                        <textarea id="tfDesc" required rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple resize-none"></textarea>
+                    </div>
+                </div>
+                <!-- Modal Footer Actions -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
+                    <button type="button" onclick="closeToolModal()" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-bold text-xs transition-colors">إلغاء</button>
+                    <button type="submit" class="px-5 py-3 rounded-xl bg-brand-purple text-white font-bold text-xs hover:opacity-90 transition-all shadow-md shadow-brand-purple/20">حفظ الأداة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================== MODAL: ADD/EDIT PROJECT ================== -->
+    <div id="projectModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-darkBg/80 backdrop-blur-md hidden transition-opacity duration-300">
+        <div class="bg-brand-darkCard border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl">
+            <!-- Modal Header -->
+            <div class="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-[#0d0d14]">
+                <h3 id="projectModalTitle" class="text-md font-bold text-white">إضافة مشروع برمجيات جديد</h3>
+                <!-- Precise SVG Vector Close Button -->
+                <button onclick="closeProjectModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors flex items-center justify-center" aria-label="إغلاق النافذة">
+                    <svg class="w-4 h-4 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <!-- Modal Body Form -->
+            <form id="projectForm" onsubmit="saveProject(event)" class="p-6 space-y-6">
+                <input type="hidden" id="projectFormId">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">عنوان المشروع</label>
+                        <input type="text" id="pfName" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">رابط المستودع (GitHub Link)</label>
+                        <input type="text" id="pfLink" required placeholder="https://github.com/..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">النجوم (GitHub Stars)</label>
+                        <input type="number" id="pfStars" required placeholder="12" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">التقنيات المستخدمة (افصل بينها بفاصلة ,)</label>
+                        <input type="text" id="pfTech" required placeholder="React.js, Node.js, TailwindCSS" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">شرح توضيحي مختصر للمشروع</label>
+                        <textarea id="pfDesc" required rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple resize-none"></textarea>
+                    </div>
+                </div>
+                <!-- Modal Footer Actions -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
+                    <button type="button" onclick="closeProjectModal()" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-bold text-xs transition-colors">إلغاء</button>
+                    <button type="submit" class="px-5 py-3 rounded-xl bg-brand-purple text-white font-bold text-xs hover:opacity-90 transition-all shadow-md shadow-brand-purple/20">حفظ المشروع</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================== MODAL: CUSTOM CONFIRMATION POPUP ================== -->
+    <div id="confirmModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-brand-darkBg/90 backdrop-blur-sm hidden">
+        <div class="bg-brand-darkCard border border-white/10 rounded-3xl w-full max-w-sm overflow-hidden p-6 text-center space-y-6 shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-brand-neonRed/10 border border-brand-neonRed/30 text-brand-neonRed flex items-center justify-center text-2xl mx-auto">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="space-y-2">
+                <h4 class="text-md font-extrabold text-white">هل أنت متأكد تماماً؟</h4>
+                <p class="text-xs text-gray-400 leading-relaxed" id="confirmModalText">عملية حذف هذا العنصر لا يمكن التراجع عنها وستختفي فوراً من سيرفر قاعدة البيانات.</p>
+            </div>
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="closeConfirmModal()" class="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-bold text-xs transition-colors">إلغاء</button>
+                <button id="confirmModalBtn" class="flex-1 py-3 rounded-xl bg-brand-neonRed text-white font-bold text-xs hover:opacity-90 transition-all">نعم، حذف نهائي</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-6 left-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <script>
+        // --- ADMIN CENTRAL STATE (LOCAL DATABASE) ---
+        let mainDatabase = {
+            profile: { name: "", tagline: "", avatar: "" },
+            links: { instagram: "", tiktok: "", youtube: "", github: "" },
+            metrics: { followers: "", tools: "", projects: "", safety: "" },
+            tools: [],
+            portfolio: [],
+            ads: { badge: "", title: "", description: "", btnText: "", btnLink: "" },
+            messages: []
+        };
+
+        let activeConfirmAction = null;
+
+        // --- FETCH ORIGINAL SOURCED DATABASE ---
+        async function fetchDatabaseFromServer() {
+            try {
+                const response = await fetch('/api/data');
+                if (!response.ok) throw new Error("فشل في استلام البيانات السحابية");
+                const data = await response.json();
+                
+                // Merge data nicely
+                mainDatabase = { ...mainDatabase, ...data };
+                
+                // Auto populate UI
+                populateDashboardForms();
+                renderAdminTools();
+                renderAdminProjects();
+                renderAdminMessages();
+            } catch (err) {
+                showToast(err.message, "error");
+                // Local fallback with mock data for local environments
+                showToast("جاري العمل بنظام المحاكاة للبيانات المحلية...", "success");
+                loadFallbackMockDatabase();
+            }
+        }
+
+        function loadFallbackMockDatabase() {
+            mainDatabase = {
+                profile: { 
+                    name: "Al-Kendi Tech", 
+                    tagline: "طالب هندسة تقنية المعلومات IT & صانع محتوى تقني", 
+                    avatar: "" 
+                },
+                links: { 
+                    instagram: "https://instagram.com/k__ndi", 
+                    tiktok: "https://tiktok.com/@k__ndi",
+                    youtube: "https://youtube.com",
+                    github: "https://github.com"
+                },
+                metrics: { followers: "100K+", tools: "15+", projects: "20+", safety: "100%" },
+                tools: [
+                    {
+                        id: 1,
+                        name: "Al-Kendi Shield | فاحص الحسابات والروابط",
+                        description: "أداة ذكية لفحص الروابط المشبوهة وحماية حسابات السوشيال ميديا الخاصة بك.",
+                        category: "security",
+                        categoryLabel: "الأمان والحماية",
+                        icon: "fa-shield-halved",
+                        version: "v2.4",
+                        size: "14.2 MB",
+                        downloadLink: "#"
+                    },
+                    {
+                        id: 2,
+                        name: "Kendi Cleaner | حزمة تسريع الويندوز والتنظيف",
+                        description: "سكريبت آمن يقوم بإزالة الملفات المؤقتة وحل مشاكل بطء إقلاع النظام بضغطة زر واحدة.",
+                        category: "utility",
+                        categoryLabel: "الإنتاجية والأدوات",
+                        icon: "fa-gauge-high",
+                        version: "v1.8",
+                        size: "4.1 MB",
+                        downloadLink: "#"
+                    }
+                ],
+                portfolio: [
+                    {
+                        id: 1,
+                        name: "Al-Kendi API Shield Guard",
+                        description: "نظام مصمم لحماية واجهات الـ APIs البرمجية من الهجمات التخريبية باستخدام الذكاء الاصطناعي.",
+                        tech: ["Python", "Flask", "TailwindCSS"],
+                        stars: "34",
+                        githubLink: "https://github.com"
+                    }
+                ],
+                ads: {
+                    badge: "مساحة إعلانية شاغرة",
+                    title: "هل ترغب في رعاية موقع وقناة Al-Kendi Tech؟",
+                    description: "اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.",
+                    btnText: "احجز مساحتك الآن",
+                    btnLink: "#contact"
+                },
+                messages: [
+                    { id: 1, name: "محمد علي", email: "mohammed@example.com", subject: "sponsor", message: "السلام عليكم، نرغب في حجز البانر الإعلاني لشهر كامل لتطبيقنا الجديد.", date: "2026-07-12" }
+                ]
+            };
+            populateDashboardForms();
+            renderAdminTools();
+            renderAdminProjects();
+            renderAdminMessages();
+        }
+
+        // --- POPULATE INPUTS ---
+        function populateDashboardForms() {
+            // Profile inputs
+            document.getElementById('pName').value = mainDatabase.profile.name || '';
+            document.getElementById('pTagline').value = mainDatabase.profile.tagline || '';
+            document.getElementById('pAvatar').value = mainDatabase.profile.avatar || '';
+            previewAvatar(mainDatabase.profile.avatar);
+
+            // Links inputs
+            document.getElementById('lTiktok').value = mainDatabase.links.tiktok || '';
+            document.getElementById('lInstagram').value = mainDatabase.links.instagram || '';
+            document.getElementById('lYoutube').value = mainDatabase.links.youtube || '';
+            document.getElementById('lGithub').value = mainDatabase.links.github || '';
+
+            // Metrics inputs
+            document.getElementById('mFollowers').value = mainDatabase.metrics.followers || '';
+            document.getElementById('mTools').value = mainDatabase.metrics.tools || '';
+            document.getElementById('mProjects').value = mainDatabase.metrics.projects || '';
+            document.getElementById('mSafety').value = mainDatabase.metrics.safety || '';
+
+            // Ad Space inputs
+            document.getElementById('adBadge').value = mainDatabase.ads.badge || '';
+            document.getElementById('adTitle').value = mainDatabase.ads.title || '';
+            document.getElementById('adDesc').value = mainDatabase.ads.description || '';
+            document.getElementById('adBtnText').value = mainDatabase.ads.btnText || '';
+            document.getElementById('adBtnLink').value = mainDatabase.ads.btnLink || '';
+        }
+
+        // --- PREVIEW PROFILE AVATAR ---
+        function previewAvatar(url) {
+            const preview = document.getElementById('avatarPreview');
+            if (url && url.trim() !== '') {
+                preview.src = url;
+            } else {
+                preview.src = 'https://placehold.co/100/12121A/8B5CF6?text=Avatar';
+            }
+        }
+
+        // --- SWITCH LAYOUT TABS ---
+        function switchTab(tabId, buttonElement) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+                tab.classList.remove('block');
+            });
+            
+            // Show active tab
+            const activeTab = document.getElementById(tabId);
+            activeTab.classList.remove('hidden');
+            activeTab.classList.add('block');
+
+            // Set link colors
+            document.querySelectorAll('.tab-link').forEach(link => {
+                link.classList.remove('bg-brand-purple', 'text-white', 'active');
+                link.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
+            });
+
+            buttonElement.classList.add('bg-brand-purple', 'text-white', 'active');
+            buttonElement.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
+
+            // Auto-close responsive mobile sidebar
+            if (window.innerWidth < 1024) {
+                toggleMobileSidebar(false);
+            }
+        }
+
+        // --- MOBILE SIDEBAR DRAWER CONTROL ---
+        function toggleMobileSidebar(forceShow = null) {
+            const sidebar = document.getElementById('adminSidebar');
+            if (forceShow !== null) {
+                if (forceShow) sidebar.classList.remove('translate-x-full');
+                else sidebar.classList.add('translate-x-full');
+            } else {
+                sidebar.classList.toggle('translate-x-full');
+            }
+        }
+
+        // ================== TOOLS CONTROLLER (CRUD) ==================
+        function renderAdminTools() {
+            const grid = document.getElementById('adminToolsGrid');
+            grid.innerHTML = '';
+
+            if (!mainDatabase.tools || mainDatabase.tools.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-brand-darkCard border border-white/5 p-12 text-center rounded-3xl text-gray-500">
+                        <i class="fa-regular fa-folder-open text-4xl mb-4"></i>
+                        <p class="text-xs font-bold">لم تقم بإضافة أي برمجيات أو أدوات بعد.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            mainDatabase.tools.forEach(tool => {
+                const card = document.createElement('div');
+                card.className = "bg-brand-darkCard border border-white/5 p-5 rounded-3xl flex flex-col justify-between";
+                
+                let catLabel = "الأمان والحماية";
+                if (tool.category === 'utility') catLabel = "الإنتاجية والأدوات";
+                if (tool.category === 'creators') catLabel = "صناعة المحتوى";
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                <i class="fa-solid ${tool.icon || 'fa-toolbox'}"></i>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 text-gray-400">${catLabel}</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white mb-2">${tool.name}</h3>
+                        <p class="text-[11px] text-gray-400 leading-relaxed mb-4 line-clamp-2">${tool.description}</p>
+                    </div>
+
+                    <div class="border-t border-white/5 pt-4">
+                        <div class="flex items-center justify-between text-[10px] text-gray-500 mb-4">
+                            <span><i class="fa-solid fa-code-commit text-brand-purple ml-1"></i> الإصدار: ${tool.version}</span>
+                            <span><i class="fa-solid fa-file-shield text-brand-purple ml-1"></i> الحجم: ${tool.size}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="editTool(${tool.id})" class="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-gray-300 transition-colors flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-pen-to-square"></i> تعديل
+                            </button>
+                            <button onclick="triggerDeleteTool(${tool.id})" class="py-2.5 px-3 rounded-xl bg-brand-neonRed/10 hover:bg-brand-neonRed text-brand-neonRed hover:text-white transition-all flex items-center justify-center">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Open modal to add a brand new Tool
+        function openToolModal() {
+            document.getElementById('toolFormId').value = "";
+            document.getElementById('toolForm').reset();
+            document.getElementById('toolModalTitle').innerText = "إضافة أداة أو برنامج جديد";
+            
+            const modal = document.getElementById('toolModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+        }
+
+        function closeToolModal() {
+            const modal = document.getElementById('toolModal');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function saveTool(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('toolFormId').value;
+            const name = document.getElementById('tfName').value;
+            const category = document.getElementById('tfCategory').value;
+            const icon = document.getElementById('tfIcon').value;
+            const version = document.getElementById('tfVersion').value;
+            const size = document.getElementById('tfSize').value;
+            const link = document.getElementById('tfLink').value;
+            const desc = document.getElementById('tfDesc').value;
+
+            let catLabel = "الأمان والحماية";
+            if (category === 'utility') catLabel = "الإنتاجية والأدوات";
+            if (category === 'creators') catLabel = "صناعة المحتوى";
+
+            const payload = {
+                id: id ? parseInt(id) : Date.now(),
+                name: name,
+                description: desc,
+                category: category,
+                categoryLabel: catLabel,
+                icon: icon,
+                version: version,
+                size: size,
+                downloadLink: link
+            };
+
+            if (id) {
+                // Update mode
+                const index = mainDatabase.tools.findIndex(t => t.id === parseInt(id));
+                if (index !== -1) mainDatabase.tools[index] = payload;
+                showToast("تم تحديث بيانات الأداة بنجاح", "success");
+            } else {
+                // Creation mode
+                mainDatabase.tools.push(payload);
+                showToast("تمت إضافة الأداة الجديدة بنجاح", "success");
+            }
+
+            closeToolModal();
+            renderAdminTools();
+        }
+
+        function editTool(id) {
+            const tool = mainDatabase.tools.find(t => t.id === id);
+            if (!tool) return;
+
+            document.getElementById('toolFormId').value = tool.id;
+            document.getElementById('tfName').value = tool.name;
+            document.getElementById('tfCategory').value = tool.category;
+            document.getElementById('tfIcon').value = tool.icon;
+            document.getElementById('tfVersion').value = tool.version;
+            document.getElementById('tfSize').value = tool.size;
+            document.getElementById('tfLink').value = tool.downloadLink;
+            document.getElementById('tfDesc').value = tool.description;
+
+            document.getElementById('toolModalTitle').innerText = "تعديل تفاصيل الأداة الحالية";
+
+            const modal = document.getElementById('toolModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+        }
+
+        function triggerDeleteTool(id) {
+            openConfirmModal("هل أنت متأكد من رغبتك في حذف هذه الأداة نهائياً من المعرض المتاح للتحميل؟", () => {
+                mainDatabase.tools = mainDatabase.tools.filter(t => t.id !== id);
+                renderAdminTools();
+                closeConfirmModal();
+                showToast("تم حذف الأداة من القائمة بنجاح", "success");
+            });
+        }
+
+
+        // ================== PORTFOLIO CONTROLLER (CRUD) ==================
+        function renderAdminProjects() {
+            const grid = document.getElementById('adminProjectsGrid');
+            grid.innerHTML = '';
+
+            if (!mainDatabase.portfolio || mainDatabase.portfolio.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-brand-darkCard border border-white/5 p-12 text-center rounded-3xl text-gray-500">
+                        <i class="fa-regular fa-folder-open text-4xl mb-4"></i>
+                        <p class="text-xs font-bold">لم تقم بإضافة أي أعمال أو مشاريع بعد.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            mainDatabase.portfolio.forEach(project => {
+                const card = document.createElement('div');
+                card.className = "bg-brand-darkCard border border-white/5 p-5 rounded-3xl flex flex-col justify-between";
+                
+                let techBadges = project.tech.map(t => `<span class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-brand-purple/10 text-brand-purple">${t}</span>`).join(' ');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg text-gray-300">
+                                <i class="fa-brands fa-github-alt"></i>
+                            </div>
+                            <span class="text-[10px] text-yellow-500 font-semibold"><i class="fa-solid fa-star ml-1"></i> ${project.stars} Star</span>
+                        </div>
+                        <h3 class="text-sm font-bold text-white mb-2">${project.name}</h3>
+                        <p class="text-[11px] text-gray-400 leading-relaxed mb-4 line-clamp-2">${project.description}</p>
+                    </div>
+
+                    <div class="border-t border-white/5 pt-4">
+                        <div class="flex flex-wrap gap-1.5 mb-4">${techBadges}</div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="editProject(${project.id})" class="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-gray-300 transition-colors flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-pen-to-square"></i> تعديل
+                            </button>
+                            <button onclick="triggerDeleteProject(${project.id})" class="py-2.5 px-3 rounded-xl bg-brand-neonRed/10 hover:bg-brand-neonRed text-brand-neonRed hover:text-white transition-all flex items-center justify-center">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openProjectModal() {
+            document.getElementById('projectFormId').value = "";
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectModalTitle').innerText = "إضافة مشروع برمجيات جديد";
+
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+        }
+
+        function closeProjectModal() {
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('opacity-100');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function saveProject(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('projectFormId').value;
+            const name = document.getElementById('pfName').value;
+            const link = document.getElementById('pfLink').value;
+            const stars = document.getElementById('pfStars').value;
+            const techStr = document.getElementById('pfTech').value;
+            const desc = document.getElementById('pfDesc').value;
+
+            // Split tech technologies array
+            const techArr = techStr.split(',').map(t => t.trim()).filter(t => t !== '');
+
+            const payload = {
+                id: id ? parseInt(id) : Date.now(),
+                name: name,
+                description: desc,
+                tech: techArr,
+                stars: stars || "0",
+                githubLink: link
+            };
+
+            if (id) {
+                const index = mainDatabase.portfolio.findIndex(p => p.id === parseInt(id));
+                if (index !== -1) mainDatabase.portfolio[index] = payload;
+                showToast("تم تحديث بيانات المشروع بنجاح", "success");
+            } else {
+                mainDatabase.portfolio.push(payload);
+                showToast("تمت إضافة المشروع الجديد بنجاح", "success");
+            }
+
+            closeProjectModal();
+            renderAdminProjects();
+        }
+
+        function editProject(id) {
+            const project = mainDatabase.portfolio.find(p => p.id === id);
+            if (!project) return;
+
+            document.getElementById('projectFormId').value = project.id;
+            document.getElementById('pfName').value = project.name;
+            document.getElementById('pfLink').value = project.githubLink;
+            document.getElementById('pfStars').value = project.stars;
+            document.getElementById('pfTech').value = project.tech.join(', ');
+            document.getElementById('pfDesc').value = project.description;
+
+            document.getElementById('projectModalTitle').innerText = "تعديل تفاصيل المشروع البرمجي";
+
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('opacity-100'), 10);
+        }
+
+        function triggerDeleteProject(id) {
+            openConfirmModal("هل أنت متأكد من رغبتك في حذف هذا المشروع نهائياً؟ سيختفي من المعرض الشخصي مباشرة.", () => {
+                mainDatabase.portfolio = mainDatabase.portfolio.filter(p => p.id !== id);
+                renderAdminProjects();
+                closeConfirmModal();
+                showToast("تم حذف المشروع بنجاح", "success");
+            });
+        }
+
+
+        // ================== MESSAGES/INQUIRIES MANAGER ==================
+        function renderAdminMessages() {
+            const container = document.getElementById('messagesInbox');
+            const countLabel = document.getElementById('msgCount');
+            
+            container.innerHTML = '';
+
+            const list = mainDatabase.messages || [];
+            countLabel.innerText = `${list.length} طلب وارد`;
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white/5 border border-white/5 p-12 text-center rounded-2xl text-gray-500">
+                        <i class="fa-regular fa-envelope-open text-4xl mb-4"></i>
+                        <p class="text-xs font-bold">صندوق الرسائل فارغ تماماً حالياً.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.forEach(msg => {
+                let badgeClass = "bg-brand-purple/10 text-brand-purple";
+                let typeText = "تعاون تجاري / رعاية إعلانية";
+
+                if (msg.subject === 'project') {
+                    badgeClass = "bg-blue-500/10 text-blue-400";
+                    typeText = "تطوير مشروع برمجيات";
+                } else if (msg.subject === 'help') {
+                    badgeClass = "bg-amber-500/10 text-amber-400";
+                    typeText = "مساعدة واستفسار تقني";
+                }
+
+                const block = document.createElement('div');
+                block.className = "bg-white/5 border border-white/5 p-6 rounded-2xl space-y-4 hover:border-brand-purple/20 transition-all";
+                block.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
+                        <div class="text-right">
+                            <h4 class="text-sm font-extrabold text-white">${msg.name}</h4>
+                            <a href="mailto:${msg.email}" class="text-xs text-gray-500 hover:text-brand-purple transition-colors">${msg.email}</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${badgeClass}">${typeText}</span>
+                            <button onclick="deleteMessage(${msg.id})" class="w-8 h-8 rounded-lg bg-brand-neonRed/10 hover:bg-brand-neonRed text-brand-neonRed hover:text-white flex items-center justify-center transition-all text-xs" title="حذف الرسالة">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-400 leading-relaxed text-right font-semibold">${msg.message}</p>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        function deleteMessage(id) {
+            openConfirmModal("هل أنت متأكد من رغبتك في مسح هذه الرسالة؟", () => {
+                mainDatabase.messages = mainDatabase.messages.filter(m => m.id !== id);
+                renderAdminMessages();
+                closeConfirmModal();
+                showToast("تم حذف الرسالة بنجاح", "success");
+            });
+        }
+
+
+        // ================== CUSTOM CONFIRM MODAL ==================
+        function openConfirmModal(text, confirmAction) {
+            document.getElementById('confirmModalText').innerText = text;
+            activeConfirmAction = confirmAction;
+
+            const modal = document.getElementById('confirmModal');
+            modal.classList.remove('hidden');
+            
+            // Set dynamic action button click event
+            document.getElementById('confirmModalBtn').onclick = function() {
+                if (activeConfirmAction) activeConfirmAction();
+            };
+        }
+
+        // --- STREAMING_CHUNK: Managing confirmation modal layers ... -->
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            activeConfirmAction = null;
+        }
+
+
+        // ================== GLOBAL STATE EXPORT & SAVE ==================
+        async function publishAllChanges() {
+            // Compile inputs into mainDatabase object
+            mainDatabase.profile.name = document.getElementById('pName').value;
+            mainDatabase.profile.tagline = document.getElementById('pTagline').value;
+            mainDatabase.profile.avatar = document.getElementById('pAvatar').value;
+
+            mainDatabase.links.tiktok = document.getElementById('lTiktok').value;
+            mainDatabase.links.instagram = document.getElementById('lInstagram').value;
+            mainDatabase.links.youtube = document.getElementById('lYoutube').value;
+            mainDatabase.links.github = document.getElementById('lGithub').value;
+
+            mainDatabase.metrics.followers = document.getElementById('mFollowers').value;
+            mainDatabase.metrics.tools = document.getElementById('mTools').value;
+            mainDatabase.metrics.projects = document.getElementById('mProjects').value;
+            mainDatabase.metrics.safety = document.getElementById('mSafety').value;
+
+            mainDatabase.ads.badge = document.getElementById('adBadge').value;
+            mainDatabase.ads.title = document.getElementById('adTitle').value;
+            mainDatabase.ads.description = document.getElementById('adDesc').value;
+            mainDatabase.ads.btnText = document.getElementById('adBtnText').value;
+            mainDatabase.ads.btnLink = document.getElementById('adBtnLink').value;
+
+            try {
+                // Post comprehensive database payload
+                const response = await fetch('/api/data/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(mainDatabase)
+                });
+
+                if (!response.ok) throw new Error("فشل السيرفر في معالجة طلب الحفظ");
+                const result = await response.json();
+                
+                showToast("تم الحفظ والمزامنة السحابية بنجاح! تم تحديث موقع المستخدمين تلقائياً.", "success");
+            } catch (err) {
+                showToast(`خطأ في الحفظ السحابي: ${err.message}. تم الحفظ محلياً بمتصفحك فقط مؤقتاً!`, "error");
+                // LocalStorage fallback for test simulations
+                localStorage.setItem('localMockDatabase', JSON.stringify(mainDatabase));
+            }
+        }
+
+
+        // ================== CUSTOM TOASTS ==================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = "flex items-center gap-3 px-5 py-4 rounded-2xl bg-brand-darkCard border border-white/10 shadow-2xl text-sm text-white pointer-events-auto transition-all duration-300 opacity-0 -translate-y-2 max-w-sm";
+            
+            const icon = type === 'success' ? 
+                '<i class="fa-solid fa-circle-check text-brand-neonGreen text-lg"></i>' : 
+                '<i class="fa-solid fa-circle-exclamation text-brand-neonRed text-lg"></i>';
+                
+            toast.innerHTML = `
+                ${icon}
+                <div class="text-right">
+                    <p class="font-bold text-xs">${message}</p>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Fade-In trigger
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', '-translate-y-2');
+                toast.classList.add('opacity-100', 'translate-y-0');
+            }, 10);
+            
+            // Self Destruct trigger
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // --- ON LAYOUT LOAD ---
+        window.onload = function() {
+            fetchDatabaseFromServer();
+        };
+    </script>
+</body>
+</html>
