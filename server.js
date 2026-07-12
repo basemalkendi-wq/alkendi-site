@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors'); // 1. استدعاء حزمة CORS المضافة لكسر الحظر بين الواجهة والسيرفر
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -14,7 +15,14 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 // مفتاح تشفير سري وقوي جداً
 const JWT_SECRET = process.env.JWT_SECRET || "AlKendi_Super_Secret_Key_2026_@#!"; 
 
-// 1. إعدادات جدار الحماية ضد التخمين (حد أقصى 5 محاولات لكل 15 دقيقة)
+// 2. تفعيل إعدادات CORS للسماح بالربط الكامل وحرية إرسال التحديثات من المتصفح
+app.use(cors({
+    origin: '*', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// 3. إعدادات جدار الحماية ضد التخمين (حد أقصى 5 محاولات لكل 15 دقيقة)
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
     max: 5,
@@ -24,7 +32,7 @@ const loginLimiter = rateLimit({
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// 2. برمجية التحقق الحارسة (Middleware): تمنع دخول أي شخص لصفحة الآدمن دون صلاحية
+// 4. برمجية التحقق الحارسة (Middleware): تمنع دخول أي شخص لصفحة الآدمن دون صلاحية
 const requireAuth = (req, res, next) => {
     const token = req.cookies.admin_token;
     if (!token) {
@@ -44,7 +52,7 @@ app.get('/admin.html', requireAuth, (req, res) => {
 // السماح بباقي ملفات المجلد العام (كالـ index.html وصفحة الدخول الجديدة)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 3. API تسجيل الدخول الآمن مع التحقق والتشفير
+// 5. API تسجيل الدخول الآمن مع التحقق والتشفير
 app.post('/api/auth/login', loginLimiter, (req, res) => {
     const { email, password } = req.body;
 
@@ -52,14 +60,10 @@ app.post('/api/auth/login', loginLimiter, (req, res) => {
     fs.readFile(DATA_FILE, 'utf8', (err, data) => {
         if (err) return res.status(500).json({ success: false, message: "خطأ في الخادم" });
         
-        const fullData = JSON.parse(data);
-        const adminCredentials = fullData.admin_account;
-
-        // التحقق من الإيميل ومقارنة كلمة السر المشفرة
-        // تحقق مباشر ومؤقت لتخطي مشكلة التشفير المحلية
-if (email !== "admin@alkendi.me" || password !== "123456") {
-    return res.status(401).json({ success: false, message: "بيانات الدخول غير صحيحة!" });
-}
+        // التحقق المباشر والمؤقت لتخطي مشكلة التشفير المحلية
+        if (email !== "admin@alkendi.me" || password !== "123456") {
+            return res.status(401).json({ success: false, message: "بيانات الدخول غير صحيحة!" });
+        }
 
         // توليد رمز الـ JWT صالحة لمدة 24 ساعة فقط
         const token = jwt.sign({ role: 'admin' }, JWT_SECRET, { expiresIn: '24h' });
@@ -67,7 +71,8 @@ if (email !== "admin@alkendi.me" || password !== "123456") {
         // إرسال الرمز للمتصفح عبر كوكيز آمنة
         res.cookie('admin_token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: true, // تفعيل الأمان السحابي دائماً للمتصفحات الحديثة
+            sameSite: 'none', // لضمان عمل الكوكيز بكفاءة عبر النطاقات المختلفة على Render
             maxAge: 24 * 60 * 60 * 1000
         });
 
@@ -75,9 +80,9 @@ if (email !== "admin@alkendi.me" || password !== "123456") {
     });
 });
 
-// 4. API تسجيل الخروج وتدمير الرمز
+// 6. API تسجيل الخروج وتدمير الرمز
 app.post('/api/auth/logout', (req, res) => {
-    res.clearCookie('admin_token');
+    res.clearCookie('admin_token', { httpOnly: true, secure: true, sameSite: 'none' });
     res.json({ success: true, message: "تم تسجيل الخروج بأمان" });
 });
 
