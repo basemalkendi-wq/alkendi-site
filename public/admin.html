@@ -406,7 +406,7 @@
                     </div>
                 </section>
 
-                <!-- TAB 5.5: FOOTER & CONTACT LABELS (صفحة تواصل معنا المحدثة) -->
+                <!-- TAB 5.5: FOOTER & CONTACT LABELS (صفحة تواصل معنا المحدثة بالكامل) -->
                 <section id="footerContactTab" class="tab-content hidden space-y-6">
                     <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
                         <div class="flex items-center gap-4 border-b border-white/5 pb-4">
@@ -946,8 +946,10 @@
                 tab.classList.remove('block');
             });
             const activeTab = document.getElementById(tabId);
-            activeTab.classList.remove('hidden');
-            activeTab.classList.add('block');
+            if (activeTab) {
+                activeTab.classList.remove('hidden');
+                activeTab.classList.add('block');
+            }
 
             document.querySelectorAll('.tab-link').forEach(link => {
                 link.classList.remove('bg-brand-purple', 'text-white', 'active');
@@ -1000,7 +1002,7 @@
             mainDatabase.metrics.toolsLabel = document.getElementById('mToolsLabel').value;
             mainDatabase.metrics.projects = document.getElementById('mProjects').value;
             mainDatabase.metrics.projectsLabel = document.getElementById('mProjectsLabel').value;
-            mainDatabase.metrics.safety = document.getElementById('mSafety').value;
+            mainDatabase.metrics.metricsSafety = document.getElementById('mSafety').value; // Modified strictly for normalization layer mappings
             mainDatabase.metrics.safetyLabel = document.getElementById('mSafetyLabel').value;
 
             mainDatabase.ads.badge = document.getElementById('adBadge').value;
