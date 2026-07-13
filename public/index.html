@@ -1014,7 +1014,7 @@
             }
         });
 
-        // --- محرك فحص وتحليل الروابط المشبوهة المباشر (Al-Kendi URL Scanner Engine) ---
+        // --- محرك فحص وتحليل الروابط المشبوهة المطور (3 حالات فحص) ---
         document.getElementById('urlScannerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -1026,10 +1026,9 @@
             const reportUrl = document.getElementById('reportAnalyzedUrl');
             const reportText = document.getElementById('reportSummaryText');
 
-            // إظهار منطقة النتائج وتفعيل شاشة الانتظار الحركية
             resultArea.classList.remove('hidden');
             loadingState.classList.remove('hidden');
-            reportBox.classList.add('hidden');
+            reportBox.className = "hidden";
 
             setTimeout(() => {
                 loadingState.classList.add('hidden');
@@ -1038,50 +1037,57 @@
                 reportUrl.innerText = urlInput;
                 let cleanUrl = urlInput.toLowerCase();
                 
-                // قائمة النطاقات الاحتيالية والصفحات المزورة الشائعة محلياً وعالمياً
                 const maliciousKeywords = ['signin', 'login-verify', 'update-account', 'netflix-free', 'pubg-free', 'gift-cards', 'free-money', 'whatsapp-gifts', 'telegram-bot-claim'];
                 const suspiciousShorteners = ['bit.ly', 'cutt.ly', 'tinyurl.com', 't.co', 'rb.gy'];
 
-                let isMalicious = false;
+                let status = 'secure'; // secure, suspicious, dangerous
                 let reason = '';
 
-                // 1. فحص الكلمات الاحتيالية الدلالية في المسار
-                maliciousKeywords.forEach(keyword => {
-                    if (cleanUrl.includes(keyword)) {
-                        isMalicious = true;
-                        reason = `يحتوي الرابط على كلمات دلالية مشبوهة وعالية الخطورة تهدف للتصيد الاحتيالي واختراق الحسابات (${keyword}).`;
-                    }
-                });
-
-                // 2. فحص روابط الاختصار غير الشفافة
+                // 1. فحص روابط الاختصار (حالة مشبوهة 🟡)
                 suspiciousShorteners.forEach(shortener => {
                     if (cleanUrl.includes(shortener)) {
-                        isMalicious = true;
-                        reason = "هذا الرابط تم إخفاؤه وتشفيره خلف خدمة اختصار روابط غير شفافة. غالباً ما يُستخدم هذا الأسلوب لإخفاء برمجيات خبيثة أو صفحات تصيد تسرق البيانات الشخصية.";
+                        status = 'suspicious';
+                        reason = "هذا الرابط يعتمد على خدمة اختصار روابط. لا يمكننا رؤية الوجهة النهائية مباشرة، لذا يُنصح بالحذر والتأكد من هوية المرسل قبل فتح الرابط.";
                     }
                 });
 
-                // 3. التحقق من سلامة وجود بروتوكول التشفير SSL الآمن
+                // 2. فحص الكلمات الاحتيالية الصريحة (حالة خطيرة 🔴)
+                maliciousKeywords.forEach(keyword => {
+                    if (cleanUrl.includes(keyword)) {
+                        status = 'dangerous';
+                        reason = `يحتوي الرابط على كلمات دلالية عالية الخطورة تستخدم في هجمات التصيد وسرقة الحسابات البرمجية (${keyword}).`;
+                    }
+                });
+
+                // 3. التحقق من SSL (حالة خطيرة 🔴)
                 if (!cleanUrl.startsWith('https://')) {
-                    isMalicious = true;
-                    reason = "الرابط لا يحتوي على بروتوكول التشفير الآمن (HTTPS). أي بيانات تُدخلها في هذا الموقع غير مشفرة ويمكن التجسس عليها وسرقتها فوراً.";
+                    status = 'dangerous';
+                    reason = "الرابط يستخدم بروتوكول اتصال غير مشفر (HTTP). أي بيانات أو كلمات مرور تدخلها داخل هذا النطاق يمكن اعتراضها وسرقتها فوراً.";
                 }
 
-                // تصيير وإخراج شكل التقرير بناءً على نتيجة الفحص والتفكيك النظيفة
-                if (isMalicious) {
+                // تصيير شكل التقرير بناءً على الحالات الثلاث
+                if (status === 'dangerous') {
                     reportBox.className = "rounded-2xl p-5 border border-red-500/20 bg-red-500/5 space-y-3";
                     reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-red-500/10 text-red-400";
-                    reportBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation ml-1"></i> غير آمن / خطر';
-                    reportText.innerHTML = `<span class="text-red-400 font-bold">تحذير أمني:</span> ${reason} ننصحك بشدة بعدم النقر عليه أو إدخال أي كلمات مرور بداخل هذا النطاق لحماية هويتك الرقمية.`;
-                    showToast("تنبيه: تم رصد مؤشرات خطورة في الرابط المفحوص!", "error");
-                } else {
+                    reportBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation ml-1"></i> غير آمن / خطر صريح';
+                    reportText.innerHTML = `<span class="text-red-400 font-bold">تحذير أمني خطير:</span> ${reason} تجنب التعامل مع الموقع تماماً.`;
+                    showToast("تنبيه: تم رصد تهديد أمني عالي الخطورة!", "error");
+                } 
+                else if (status === 'suspicious') {
+                    reportBox.className = "rounded-2xl p-5 border border-yellow-500/20 bg-yellow-500/5 space-y-3";
+                    reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-400";
+                    reportBadge.innerHTML = '<i class="fa-solid fa-circle-exclamation ml-1"></i> رابط مشبوه / تحذير';
+                    reportText.innerHTML = `<span class="text-yellow-400 font-bold">مؤشر اشتباه:</span> ${reason}`;
+                    showToast("ملاحظة: الرابط يحتاج إلى فحص إضافي من قبلك.", "success");
+                } 
+                else {
                     reportBox.className = "rounded-2xl p-5 border border-emerald-500/20 bg-emerald-500/5 space-y-3";
                     reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400";
                     reportBadge.innerHTML = '<i class="fa-solid fa-circle-check ml-1"></i> رابط آمن ومستقر';
-                    reportText.innerHTML = `<span class="text-emerald-400 font-bold">نتيجة التحليل:</span> بنية الرابط تبدو نظيفة ومستقرة، ولم يتم رصد أي محاولات تصيد أو نطاقات اختصار مشبوهة، كما أنه يستخدم بروتوكول اتصال مشفر وسليم.`;
-                    showToast("اكتمل التحليل: الرابط يبدو آمناً للاستخدام.", "success");
+                    reportText.innerHTML = `<span class="text-emerald-400 font-bold">نتيجة التحليل:</span> بنية الرابط تبدو نظيفة ومستقرة، ولم يتم رصد أي محاولات تصيد أو نطاقات اختصار مشبوهة.`;
+                    showToast("اكتمل التحليل: الرابط يبدو آمناً.", "success");
                 }
-            }, 1800); // محاكاة عملية الفحص الفعلي لمدة 1.8 ثانية لمنح المستخدم انطباع جاد بالتحليل
+            }, 1800);
         });
 
         // --- SCROLLSPY DYNAMIC ACTIVE NAVIGATION ---
