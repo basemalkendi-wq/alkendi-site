@@ -362,6 +362,53 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
+// مسار تحديث التقييم (النجوم) لأداة معينة
+app.post('/api/tools/rate', async (req, res) => {
+    try {
+        const { toolId, rating } = req.body || {};
+        if (!toolId || !rating) {
+            return res.status(400).json({ success: false, message: 'بيانات غير مكتملة' });
+        }
+
+        const data = await readDataFile();
+        const toolIndex = data.tools.findIndex(t => t.id == toolId);
+
+        if (toolIndex !== -1) {
+            // حساب التقييم الجديد (تبسيطاً سنقوم بتحديث القيمة الحالية)
+            data.tools[toolIndex].stars = Math.min(5, Math.max(1, Math.round(rating)));
+            await writeDataFile(data);
+            return res.json({ success: true, message: 'تم تسجيل تقييمك بنجاح!', stars: data.tools[toolIndex].stars });
+        }
+
+        return res.status(404).json({ success: false, message: 'الأداة غير موجودة' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'خطأ في الخادم' });
+    }
+});
+
+// مسار تسجيل تحميل جديد لأداة معينة
+app.post('/api/tools/download-click', async (req, res) => {
+    try {
+        const { toolId } = req.body || {};
+        const data = await readDataFile();
+        const toolIndex = data.tools.findIndex(t => t.id == toolId);
+
+        if (toolIndex !== -1) {
+            // سنقوم بزيادة عداد التحميلات (إذا لم يكن موجوداً سننشئه)
+            if (!data.tools[toolIndex].downloads) {
+                data.tools[toolIndex].downloads = 0;
+            }
+            data.tools[toolIndex].downloads += 1;
+            
+            await writeDataFile(data);
+            return res.json({ success: true, downloads: data.tools[toolIndex].downloads });
+        }
+        return res.status(404).json({ success: false, message: 'الأداة غير موجودة' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'خطأ في الخادم' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`السيرفر الآمن يعمل على المنفذ: ${PORT}`);
 });
