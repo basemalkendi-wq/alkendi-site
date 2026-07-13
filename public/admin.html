@@ -88,7 +88,12 @@
             <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
                 <button onclick="switchTab('profileTab', this)" class="tab-link active w-full flex items-center gap-4 px-4 py-3 rounded-2xl bg-brand-purple text-white text-sm font-bold transition-all duration-300">
                     <i class="fa-solid fa-user-gear text-lg"></i>
-                    <span>البروفايل والروابط</span>
+                    <span>البروفايل ونصوص الواجهة</span>
+                </button>
+
+                <button onclick="switchTab('heroCodeTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
+                    <i class="fa-solid fa-code text-lg"></i>
+                    <span>الشاشة البرمجية (Hero Code)</span>
                 </button>
 
                 <button onclick="switchTab('metricsTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
@@ -111,6 +116,11 @@
                     <span>الرعايات والإعلانات</span>
                 </button>
 
+                <button onclick="switchTab('footerContactTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
+                    <i class="fa-solid fa-address-book text-lg"></i>
+                    <span>بيانات الفوتر والتواصل</span>
+                </button>
+
                 <button onclick="switchTab('messagesTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
                     <i class="fa-solid fa-envelope-open-text text-lg"></i>
                     <span>الرسائل والطلبات الواردة</span>
@@ -124,7 +134,7 @@
                         <span class="text-xs text-gray-400 font-semibold">اتصال السيرفر مستقر</span>
                     </div>
                     <a href="/index.html" target="_blank" class="text-xs font-bold text-brand-purple hover:underline flex items-center gap-1">
-                        المعينة <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                        المعاينة <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
                     </a>
                 </div>
             </div>
@@ -163,7 +173,7 @@
                             <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
                                 <i class="fa-solid fa-id-card"></i>
                             </div>
-                            <h3 class="text-md font-bold text-white">بيانات الملف الشخصي والهوية</h3>
+                            <h3 class="text-md font-bold text-white">بيانات الملف الشخصي ونصوص الواجهة (Hero)</h3>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -172,8 +182,12 @@
                                 <input type="text" id="pName" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2">الوصف التعريفي (التاغ لاين بالهيدر)</label>
-                                <input type="text" id="pTagline" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">العنوان الصغير المميز (Badge Text)</label>
+                                <input type="text" id="pSubBadge" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="طالب هندسة تقنية المعلومات IT & صانع محتوى تقني">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">الوصف الترحيبي الرئيسي (Hero Paragraph)</label>
+                                <textarea id="pTagline" rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple resize-none"></textarea>
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-semibold text-gray-400 mb-2">رابط صورة الرمزية (Avatar Image URL)</label>
@@ -192,25 +206,102 @@
                             <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
                                 <i class="fa-solid fa-share-nodes"></i>
                             </div>
-                            <h3 class="text-md font-bold text-white">روابط وحسابات السوشيال ميديا</h3>
+                            <h3 class="text-md font-bold text-white">روابط السوشيال ميديا ونصوص الأزرار</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400"><i class="fa-brands fa-tiktok text-xs ml-1"></i> رابط التيك توك (TikTok URL)</label>
+                                <input type="text" id="lTiktok" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400"><i class="fa-brands fa-tiktok text-xs ml-1"></i> نص زر تيك توك (Button Text)</label>
+                                <input type="text" id="lTiktokText" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="TikTok">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400"><i class="fa-brands fa-instagram text-xs ml-1"></i> رابط الإنستقرام (Instagram URL)</label>
+                                <input type="text" id="lInstagram" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400"><i class="fa-brands fa-instagram text-xs ml-1"></i> نص زر إنستقرام (Button Text)</label>
+                                <input type="text" id="lInstagramText" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="Instagram">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400"><i class="fa-brands fa-youtube text-xs ml-1"></i> رابط اليوتيوب (YouTube URL)</label>
+                                <input type="text" id="lYoutube" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400"><i class="fa-brands fa-youtube text-xs ml-1"></i> نص زر يوتيوب (Button Text)</label>
+                                <input type="text" id="lYoutubeText" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="YouTube">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400"><i class="fa-brands fa-github text-xs ml-1"></i> رابط جيت هب (GitHub URL)</label>
+                                <input type="text" id="lGithub" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400"><i class="fa-brands fa-github text-xs ml-1"></i> نص زر جيت هب (Button Text)</label>
+                                <input type="text" id="lGithubText" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="GitHub">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 1.5: HERO CODE SIMULATION -->
+                <section id="heroCodeTab" class="tab-content hidden space-y-6">
+                    <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
+                        <div class="flex items-center gap-4 border-b border-white/5 pb-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-code"></i>
+                            </div>
+                            <h3 class="text-md font-bold text-white">تعديل الشاشة البرمجية التفاعلية (Hero Terminal)</h3>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2"><i class="fa-brands fa-tiktok text-xs ml-1"></i> حساب التيك توك (TikTok)</label>
-                                <input type="text" id="lTiktok" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="https://tiktok.com/@...">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">رابط السيرفر بالنافذة (Terminal Domain)</label>
+                                <input type="text" id="cTerminalDomain" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="alkendi.me">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2"><i class="fa-brands fa-instagram text-xs ml-1"></i> حساب الإنستقرام (Instagram)</label>
-                                <input type="text" id="lInstagram" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="https://instagram.com/...">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">اسم المتغير البرمجي (Object Name)</label>
+                                <input type="text" id="cObjName" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="developer">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2"><i class="fa-brands fa-youtube text-xs ml-1"></i> قناة اليوتيوب (YouTube)</label>
-                                <input type="text" id="lYoutube" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="https://youtube.com/...">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">حقل الاسم داخل الكود (Property Name)</label>
+                                <input type="text" id="cPropName" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="Al-Kendi">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2"><i class="fa-brands fa-github text-xs ml-1"></i> حساب الجيت هب (GitHub)</label>
-                                <input type="text" id="lGithub" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="https://github.com/...">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">حقل الحالة الوظيفية (Property Status)</label>
+                                <input type="text" id="cPropStatus" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="IT Student">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">المهارات والخبرات المكتوبة (تفصل بفاصلة ,)</label>
+                                <input type="text" id="cPropSkills" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="Security, Dev, Content">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">اسم مسار التحميل (Fetch Path Text)</label>
+                                <input type="text" id="cFetchPath" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="/api/tools">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">نص تعليق المطور الأخضر (Comment Text)</label>
+                                <input type="text" id="cComment" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="تفعيل النظام الديناميكي للتحميلات...">
+                            </div>
+                            
+                            <div class="md:col-span-2 border-t border-white/5 pt-4 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-400 mb-2">عنوان مربع التحميلات الطائر</label>
+                                    <input type="text" id="cBoxTitle" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="تحميلات اليوم">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-400 mb-2">الرقم المبدئي للمربع</label>
+                                    <input type="text" id="cBoxNumber" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="+1,420">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-400 mb-2">نسبة الصعود الخضراء</label>
+                                    <input type="text" id="cBoxPercent" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="+18%">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -223,25 +314,29 @@
                             <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
                                 <i class="fa-solid fa-chart-line"></i>
                             </div>
-                            <h3 class="text-md font-bold text-white">تعديل مقاييس وإحصائيات الموقع الأساسية</h3>
+                            <h3 class="text-md font-bold text-white">تعديل مقاييس وإحصائيات الموقع وتسمياتها الفرعية</h3>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2">متابعين السوشيال ميديا النشطين</label>
-                                <input type="text" id="mFollowers" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="100K+">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400">رقم المتابعين (Followers Number)</label>
+                                <input type="text" id="mFollowers" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                                <input type="text" id="mFollowersLabel" class="w-full px-3 py-2 bg-white/5 border border-white/5 rounded-lg text-xs text-gray-400 focus:outline-none" placeholder="متابع نشط على السوشيال">
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2">البرامج والأدوات المجانية</label>
-                                <input type="text" id="mTools" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="15+">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400">رقم الأدوات (Tools Number)</label>
+                                <input type="text" id="mTools" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                                <input type="text" id="mToolsLabel" class="w-full px-3 py-2 bg-white/5 border border-white/5 rounded-lg text-xs text-gray-400 focus:outline-none" placeholder="برنامج وأداة مجانية">
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2">المشاريع المفتوحة المصدر</label>
-                                <input type="text" id="mProjects" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="20+">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400">رقم المشاريع (Projects Number)</label>
+                                <input type="text" id="mProjects" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                                <input type="text" id="mProjectsLabel" class="w-full px-3 py-2 bg-white/5 border border-white/5 rounded-lg text-xs text-gray-400 focus:outline-none" placeholder="مشروع مفتوح المصدر">
                             </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-400 mb-2">نسبة أمان الروابط المتوفرة</label>
-                                <input type="text" id="mSafety" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="100%">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-gray-400">نسبة الأمان (Safety Number)</label>
+                                <input type="text" id="mSafety" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                                <input type="text" id="mSafetyLabel" class="w-full px-3 py-2 bg-white/5 border border-white/5 rounded-lg text-xs text-gray-400 focus:outline-none" placeholder="روابط آمنة وخالية من الإعلانات">
                             </div>
                         </div>
                     </div>
@@ -305,6 +400,41 @@
                             <div>
                                 <label class="block text-xs font-semibold text-gray-400 mb-2">رابط الزر (أو التوجيه التلقائي)</label>
                                 <input type="text" id="adBtnLink" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="#contact">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 5.5: FOOTER & CONTACT LABELS -->
+                <section id="footerContactTab" class="tab-content hidden space-y-6">
+                    <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
+                        <div class="flex items-center gap-4 border-b border-white/5 pb-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-address-book"></i>
+                            </div>
+                            <h3 class="text-md font-bold text-white">تعديل نصوص وعناوين الاتصال (Contact Blocks) والفوتر</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">العنوان الرئيسي لقسم التواصل</label>
+                                <input type="text" id="cContactTitle" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="هل لديك فكرة أو طلب تعاون؟">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">الوصف النصي لقسم التواصل</label>
+                                <input type="text" id="cContactDesc" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">البريد الإلكتروني المعلن للعمل</label>
+                                <input type="email" id="cContactEmail" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="work@alkendi.me">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">الموقع الجغرافي الحالي المعروض</label>
+                                <input type="text" id="cContactLocation" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple" placeholder="صنعاء، اليمن">
+                            </div>
+                            <div class="md:col-span-2 border-t border-white/5 pt-4">
+                                <label class="block text-xs font-semibold text-gray-400 mb-2">نص الحقوق أسفل الفوتر (Footer Copyright Statement)</label>
+                                <input type="text" id="fCopyright" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                             </div>
                         </div>
                     </div>
@@ -458,21 +588,21 @@
     <script>
         // --- ADMIN CENTRAL STATE ---
         let mainDatabase = {
-            profile: { name: "", tagline: "", avatar: "" },
-            links: { instagram: "", tiktok: "", youtube: "", github: "" },
-            metrics: { followers: "", tools: "", projects: "", safety: "" },
+            profile: { name: "", tagline: "", avatar: "", subBadge: "" },
+            links: { instagram: "", instagramText: "", tiktok: "", tiktokText: "", youtube: "", youtubeText: "", github: "", githubText: "" },
+            metrics: { followers: "", followersLabel: "", tools: "", toolsLabel: "", projects: "", projectsLabel: "", safety: "", safetyLabel: "" },
+            terminalCode: { domain: "", objName: "", propName: "", propStatus: "", propSkills: "", fetchPath: "", comment: "", boxTitle: "", boxNumber: "", boxPercent: "" },
             tools: [],
             portfolio: [],
             projects: [],
             ads: { badge: "", title: "", description: "", btnText: "", btnLink: "" },
+            footerContact: { contactTitle: "", contactDesc: "", contactEmail: "", contactLocation: "", copyright: "" },
             messages: []
         };
 
         let activeConfirmAction = null;
 
-        const API_BASE = window.location.origin && window.location.origin !== 'null'
-            ? window.location.origin
-            : 'http://localhost:3000';
+        const API_BASE = window.location.origin && window.location.origin !== 'null' ? window.location.origin : 'http://localhost:3000';
 
         function getApiUrl(pathname) {
             return new URL(pathname, API_BASE).toString();
@@ -486,38 +616,32 @@
 
         function normalizeAdminData(data) {
             const source = data && typeof data === 'object' ? data : {};
-            const portfolioItems = Array.isArray(source.portfolio)
-                ? source.portfolio
-                : Array.isArray(source.projects)
-                    ? source.projects
-                    : [];
+            const portfolioItems = Array.isArray(source.portfolio) ? source.portfolio : (Array.isArray(source.projects) ? source.projects : []);
 
             return {
-                profile: { name: '', tagline: '', avatar: '', ...(source.profile || {}) },
-                links: { instagram: '', tiktok: '', youtube: '', github: '', ...(source.links || {}) },
-                metrics: { followers: '', tools: '', projects: '', safety: '', ...(source.metrics || {}) },
+                profile: { name: '', tagline: '', avatar: '', subBadge: '', ...(source.profile || {}) },
+                links: { instagram: '', instagramText: '', tiktok: '', tiktokText: '', youtube: '', youtubeText: '', github: '', githubText: '', ...(source.links || {}) },
+                metrics: { followers: '', followersLabel: '', tools: '', toolsLabel: '', projects: '', projectsLabel: '', safety: '', safetyLabel: '', ...(source.metrics || {}) },
+                terminalCode: { domain: '', objName: '', propName: '', propStatus: '', propSkills: '', fetchPath: '', comment: '', boxTitle: '', boxNumber: '', boxPercent: '', ...(source.terminalCode || {}) },
                 tools: Array.isArray(source.tools) ? source.tools : [],
                 portfolio: portfolioItems,
                 projects: portfolioItems.map(project => ({ ...project })),
                 ads: { badge: '', title: '', description: '', btnText: '', btnLink: '', ...(source.ads || {}) },
+                footerContact: { contactTitle: '', contactDesc: '', contactEmail: '', contactLocation: '', copyright: '', ...(source.footerContact || {}) },
                 messages: Array.isArray(source.messages) ? source.messages : []
             };
         }
 
-        // --- FETCH ORIGINAL SOURCED DATABASE ---
         async function fetchDatabaseFromServer() {
             try {
                 const response = await fetch(getApiUrl('/api/data?ts=' + Date.now()), {
                     cache: 'no-store',
                     credentials: 'include',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
                 if (!response.ok) throw new Error("فشل في استلام البيانات السحابية");
                 const data = normalizeAdminData(await response.json());
                 
-                // Set data strictly from server
                 mainDatabase = data;
                 syncPortfolioCollections();
                 
@@ -528,26 +652,26 @@
                 console.log("Database initialized cleanly from cloud container!");
             } catch (err) {
                 showToast(err.message, "error");
-                // Local fallback mode only if server is completely offline
                 loadFallbackMockDatabase();
             }
         }
 
         function loadFallbackMockDatabase() {
-            // Check if there is already a local mock state saved by user
             const savedData = localStorage.getItem('localMockDatabase');
             if (savedData) {
                 mainDatabase = JSON.parse(savedData);
                 showToast("تم جلب آخر نسخة معدلة محلياً في متصفحك.", "success");
             } else {
                 mainDatabase = {
-                    profile: { name: "Al-Kendi Tech", tagline: "طالب هندسة تقنية المعلومات IT & صانع محتوى تقني", avatar: "" },
-                    links: { instagram: "https://instagram.com/k__ndi", tiktok: "https://tiktok.com/@k__ndi", youtube: "https://youtube.com", github: "https://github.com" },
-                    metrics: { followers: "100K+", tools: "15+", projects: "20+", safety: "100%" },
+                    profile: { name: "Al-Kendi Tech", tagline: "هنا بوابتك المفتوحة للحصول على أقوى برامج الحماية، والأدوات التقنية المفيدة...", avatar: "", subBadge: "طالب هندسة تقنية المعلومات IT & صانع محتوى تقني" },
+                    links: { instagram: "https://instagram.com/k__ndi", instagramText: "Instagram", tiktok: "https://tiktok.com/@k__ndi", tiktokText: "TikTok", youtube: "https://youtube.com", youtubeText: "YouTube", github: "https://github.com", githubText: "GitHub" },
+                    metrics: { followers: "100K+", followersLabel: "متابع نشط على السوشيال", tools: "15+", toolsLabel: "برنامج وأداة مجانية", projects: "20+", projectsLabel: "مشروع مفتوح المصدر", safety: "100%", safetyLabel: "روابط آمنة وخالية من الإعلانات" },
+                    terminalCode: { domain: "alkendi.me", objName: "developer", propName: "Al-Kendi", propStatus: "IT Student", propSkills: "Security, Dev, Content", fetchPath: "/api/tools", comment: "تفعيل النظام الديناميكي للتحميلات...", boxTitle: "تحميلات اليوم", boxNumber: "+1,420", boxPercent: "+18%" },
                     tools: [],
                     portfolio: [],
                     projects: [],
                     ads: { badge: "مساحة إعلانية شاغرة", title: "هل ترغب في رعاية موقع وقناة Al-Kendi Tech؟", description: "اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.", btnText: "احجز مساحتك الآن", btnLink: "#contact" },
+                    footerContact: { contactTitle: "هل لديك فكرة أو طلب تعاون؟", contactDesc: "سواء كنت ترغب في مناقشة مشروع برمجيات، رعاية إعلانية...", contactEmail: "work@alkendi.me", contactLocation: "صنعاء، اليمن", copyright: "© 2026 جميع الحقوق محفوظة لـ Al-Kendi Tech. تم تطوير الموقع بكل حب وشغف بالبرمجة." },
                     messages: []
                 };
                 syncPortfolioCollections();
@@ -559,106 +683,78 @@
             renderAdminMessages();
         }
 
-        // --- POPULATE INPUTS ---
         function populateDashboardForms() {
-            if(!mainDatabase.profile) mainDatabase.profile = {};
-            if(!mainDatabase.links) mainDatabase.links = {};
-            if(!mainDatabase.metrics) mainDatabase.metrics = {};
-            if(!mainDatabase.ads) mainDatabase.ads = {};
-
+            // Tab 1 Profile
             document.getElementById('pName').value = mainDatabase.profile.name || '';
             document.getElementById('pTagline').value = mainDatabase.profile.tagline || '';
             document.getElementById('pAvatar').value = mainDatabase.profile.avatar || '';
+            document.getElementById('pSubBadge').value = mainDatabase.profile.subBadge || '';
             previewAvatar(mainDatabase.profile.avatar);
 
+            // Tab 1 Links Text + URL
             document.getElementById('lTiktok').value = mainDatabase.links.tiktok || '';
+            document.getElementById('lTiktokText').value = mainDatabase.links.tiktokText || '';
             document.getElementById('lInstagram').value = mainDatabase.links.instagram || '';
+            document.getElementById('lInstagramText').value = mainDatabase.links.instagramText || '';
             document.getElementById('lYoutube').value = mainDatabase.links.youtube || '';
+            document.getElementById('lYoutubeText').value = mainDatabase.links.youtubeText || '';
             document.getElementById('lGithub').value = mainDatabase.links.github || '';
+            document.getElementById('lGithubText').value = mainDatabase.links.githubText || '';
 
+            // Tab 1.5 Terminal Config
+            document.getElementById('cTerminalDomain').value = mainDatabase.terminalCode.domain || '';
+            document.getElementById('cObjName').value = mainDatabase.terminalCode.objName || '';
+            document.getElementById('cPropName').value = mainDatabase.terminalCode.propName || '';
+            document.getElementById('cPropStatus').value = mainDatabase.terminalCode.propStatus || '';
+            document.getElementById('cPropSkills').value = mainDatabase.terminalCode.propSkills || '';
+            document.getElementById('cFetchPath').value = mainDatabase.terminalCode.fetchPath || '';
+            document.getElementById('cComment').value = mainDatabase.terminalCode.comment || '';
+            document.getElementById('cBoxTitle').value = mainDatabase.terminalCode.boxTitle || '';
+            document.getElementById('cBoxNumber').value = mainDatabase.terminalCode.boxNumber || '';
+            document.getElementById('cBoxPercent').value = mainDatabase.terminalCode.boxPercent || '';
+
+            // Tab 2 Metrics
             document.getElementById('mFollowers').value = mainDatabase.metrics.followers || '';
+            document.getElementById('mFollowersLabel').value = mainDatabase.metrics.followersLabel || '';
             document.getElementById('mTools').value = mainDatabase.metrics.tools || '';
+            document.getElementById('mToolsLabel').value = mainDatabase.metrics.toolsLabel || '';
             document.getElementById('mProjects').value = mainDatabase.metrics.projects || '';
+            document.getElementById('mProjectsLabel').value = mainDatabase.metrics.projectsLabel || '';
             document.getElementById('mSafety').value = mainDatabase.metrics.safety || '';
+            document.getElementById('mSafetyLabel').value = mainDatabase.metrics.safetyLabel || '';
 
+            // Tab 5 Ads
             document.getElementById('adBadge').value = mainDatabase.ads.badge || '';
             document.getElementById('adTitle').value = mainDatabase.ads.title || '';
             document.getElementById('adDesc').value = mainDatabase.ads.description || '';
             document.getElementById('adBtnText').value = mainDatabase.ads.btnText || '';
             document.getElementById('adBtnLink').value = mainDatabase.ads.btnLink || '';
+
+            // Tab 5.5 Footer & Contact Labels
+            if(!mainDatabase.footerContact) mainDatabase.footerContact = {};
+            document.getElementById('cContactTitle').value = mainDatabase.footerContact.contactTitle || '';
+            document.getElementById('cContactDesc').value = mainDatabase.footerContact.contactDesc || '';
+            document.getElementById('cContactEmail').value = mainDatabase.footerContact.contactEmail || '';
+            document.getElementById('cContactLocation').value = mainDatabase.footerContact.contactLocation || '';
+            document.getElementById('fCopyright').value = mainDatabase.footerContact.copyright || '';
         }
 
-        function previewAvatar(url) {
-            const preview = document.getElementById('avatarPreview');
-            if (url && url.trim() !== '') {
-                preview.src = url;
-            } else {
-                preview.src = 'https://placehold.co/100/12121A/8B5CF6?text=Avatar';
-            }
-        }
-
-        function switchTab(tabId, buttonElement) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-                tab.classList.remove('block');
-            });
-            
-            const activeTab = document.getElementById(tabId);
-            activeTab.classList.remove('hidden');
-            activeTab.classList.add('block');
-
-            document.querySelectorAll('.tab-link').forEach(link => {
-                link.classList.remove('bg-brand-purple', 'text-white', 'active');
-                link.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
-            });
-
-            buttonElement.classList.add('bg-brand-purple', 'text-white', 'active');
-            buttonElement.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
-
-            if (window.innerWidth < 1024) {
-                toggleMobileSidebar(false);
-            }
-        }
-
-        function toggleMobileSidebar(forceShow = null) {
-            const sidebar = document.getElementById('adminSidebar');
-            if (forceShow !== null) {
-                if (forceShow) sidebar.classList.remove('translate-x-full');
-                else sidebar.classList.add('translate-x-full');
-            } else {
-                sidebar.classList.toggle('translate-x-full');
-            }
-        }
-
-        // ================== TOOLS CONTROLLER ==================
+        // ================== TOOLS CONTROLLER (CRUD) ==================
         function renderAdminTools() {
             const grid = document.getElementById('adminToolsGrid');
             grid.innerHTML = '';
-
             if (!mainDatabase.tools || mainDatabase.tools.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full bg-brand-darkCard border border-white/5 p-12 text-center rounded-3xl text-gray-500">
-                        <i class="fa-regular fa-folder-open text-4xl mb-4"></i>
-                        <p class="text-xs font-bold">لم تقم بإضافة أي برمجيات أو أدوات بعد.</p>
-                    </div>
-                `;
+                grid.innerHTML = `<div class="col-span-full border border-white/5 p-12 text-center rounded-3xl text-gray-500"><p class="text-xs font-bold">لم تقم بإضافة أي برمجيات أو أدوات بعد.</p></div>`;
                 return;
             }
-
             mainDatabase.tools.forEach(tool => {
                 const card = document.createElement('div');
                 card.className = "bg-brand-darkCard border border-white/5 p-5 rounded-3xl flex flex-col justify-between";
-                
-                let catLabel = "الأمان والحماية";
-                if (tool.category === 'utility') catLabel = "الإنتاجية والأدوات";
-                if (tool.category === 'creators') catLabel = "صناعة المحتوى";
-
+                let catLabel = tool.category === 'utility' ? "الإنتاجية والأدوات" : (tool.category === 'creators' ? "صناعة المحتوى" : "الأمان والحماية");
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
-                                <i class="fa-solid ${tool.icon || 'fa-toolbox'}"></i>
-                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg"><i class="fa-solid ${tool.icon || 'fa-toolbox'}"></i></div>
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 text-gray-400">${catLabel}</span>
                         </div>
                         <h3 class="text-sm font-bold text-white mb-2">${tool.name}</h3>
@@ -666,77 +762,37 @@
                     </div>
                     <div class="border-t border-white/5 pt-4">
                         <div class="flex items-center justify-between text-[10px] text-gray-500 mb-4">
-                            <span><i class="fa-solid fa-code-commit text-brand-purple ml-1"></i> الإصدار: ${tool.version}</span>
-                            <span><i class="fa-solid fa-file-shield text-brand-purple ml-1"></i> الحجم: ${tool.size}</span>
+                            <span>الإصدار: ${tool.version}</span><span>الحجم: ${tool.size}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="editTool(${tool.id})" class="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-gray-300 transition-colors flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-pen-to-square"></i> تعديل
-                            </button>
-                            <button onclick="triggerDeleteTool(${tool.id})" class="py-2.5 px-3 rounded-xl bg-brand-neonRed/10 hover:bg-brand-neonRed text-brand-neonRed hover:text-white transition-all flex items-center justify-center">
-                                <i class="fa-solid fa-trash-can text-xs"></i>
-                            </button>
+                            <button onclick="editTool(${tool.id})" class="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-gray-300">تعديل</button>
+                            <button onclick="triggerDeleteTool(${tool.id})" class="py-2 px-3 rounded-xl bg-brand-neonRed/10 text-brand-neonRed"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 grid.appendChild(card);
             });
-        }
-
-        function openToolModal() {
-            document.getElementById('toolFormId').value = "";
-            document.getElementById('toolForm').reset();
-            document.getElementById('toolModalTitle').innerText = "إضافة أداة أو برنامج جديد";
-            
-            const modal = document.getElementById('toolModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('opacity-100'), 10);
-        }
-
-        function closeToolModal() {
-            const modal = document.getElementById('toolModal');
-            modal.classList.remove('opacity-100');
-            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
         function saveTool(event) {
             event.preventDefault();
             const id = document.getElementById('toolFormId').value;
-            const name = document.getElementById('tfName').value;
-            const category = document.getElementById('tfCategory').value;
-            const icon = document.getElementById('tfIcon').value;
-            const version = document.getElementById('tfVersion').value;
-            const size = document.getElementById('tfSize').value;
-            const link = document.getElementById('tfLink').value;
-            const desc = document.getElementById('tfDesc').value;
-
-            let catLabel = "الأمان والحماية";
-            if (category === 'utility') catLabel = "الإنتاجية والأدوات";
-            if (category === 'creators') catLabel = "صناعة المحتوى";
-
             const payload = {
                 id: id ? parseInt(id) : Date.now(),
-                name: name,
-                description: desc,
-                category: category,
-                categoryLabel: catLabel,
-                icon: icon,
-                version: version,
-                size: size,
-                downloadLink: link
+                name: document.getElementById('tfName').value,
+                description: document.getElementById('tfDesc').value,
+                category: document.getElementById('tfCategory').value,
+                categoryLabel: document.getElementById('tfCategory').options[document.getElementById('tfCategory').selectedIndex].text,
+                icon: document.getElementById('tfIcon').value,
+                version: document.getElementById('tfVersion').value,
+                size: document.getElementById('tfSize').value,
+                downloadLink: document.getElementById('tfLink').value
             };
-
-            if (!mainDatabase.tools) mainDatabase.tools = [];
-
             if (id) {
-                const index = mainDatabase.tools.findIndex(t => t.id === parseInt(id));
-                if (index !== -1) mainDatabase.tools[index] = payload;
-                showToast("تم تحديث بيانات الأداة محلياً بنجاح", "success");
+                const idx = mainDatabase.tools.findIndex(t => t.id === parseInt(id));
+                if (idx !== -1) mainDatabase.tools[idx] = payload;
             } else {
                 mainDatabase.tools.push(payload);
-                showToast("تمت إضافة الأداة محلياً بنجاح", "success");
             }
-
             closeToolModal();
             renderAdminTools();
         }
@@ -744,7 +800,6 @@
         function editTool(id) {
             const tool = mainDatabase.tools.find(t => t.id === id);
             if (!tool) return;
-
             document.getElementById('toolFormId').value = tool.id;
             document.getElementById('tfName').value = tool.name;
             document.getElementById('tfCategory').value = tool.category;
@@ -754,48 +809,32 @@
             document.getElementById('tfLink').value = tool.downloadLink;
             document.getElementById('tfDesc').value = tool.description;
             document.getElementById('toolModalTitle').innerText = "تعديل تفاصيل الأداة الحالية";
-
-            const modal = document.getElementById('toolModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('opacity-100'), 10);
+            document.getElementById('toolModal').classList.remove('hidden');
         }
 
         function triggerDeleteTool(id) {
-            openConfirmModal("هل أنت متأكد من رغبتك في حذف هذه الأداة نهائياً من المعرض؟", () => {
+            openConfirmModal("حذف هذه الأداة نهائياً؟", () => {
                 mainDatabase.tools = mainDatabase.tools.filter(t => t.id !== id);
-                renderAdminTools();
-                closeConfirmModal();
-                showToast("تم حذف الأداة من القائمة", "success");
+                renderAdminTools(); closeConfirmModal();
             });
         }
 
-        // ================== PORTFOLIO CONTROLLER ==================
+        // ================== PORTFOLIO CONTROLLER (CRUD) ==================
         function renderAdminProjects() {
             const grid = document.getElementById('adminProjectsGrid');
             grid.innerHTML = '';
-
             if (!mainDatabase.portfolio || mainDatabase.portfolio.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full bg-brand-darkCard border border-white/5 p-12 text-center rounded-3xl text-gray-500">
-                        <i class="fa-regular fa-folder-open text-4xl mb-4"></i>
-                        <p class="text-xs font-bold">لم تقم بإضافة أي أعمال أو مشاريع بعد.</p>
-                    </div>
-                `;
+                grid.innerHTML = `<div class="col-span-full border border-white/5 p-12 text-center rounded-3xl text-gray-500"><p class="text-xs font-bold">لم تقم بإضافة أي أعمال بعد.</p></div>`;
                 return;
             }
-
             mainDatabase.portfolio.forEach(project => {
                 const card = document.createElement('div');
                 card.className = "bg-brand-darkCard border border-white/5 p-5 rounded-3xl flex flex-col justify-between";
-                
                 let techBadges = project.tech.map(t => `<span class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-brand-purple/10 text-brand-purple">${t}</span>`).join(' ');
-
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg text-gray-300">
-                                <i class="fa-brands fa-github-alt"></i>
-                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-lg text-gray-300"><i class="fa-brands fa-github-alt"></i></div>
                             <span class="text-[10px] text-yellow-500 font-semibold"><i class="fa-solid fa-star ml-1"></i> ${project.stars} Star</span>
                         </div>
                         <h3 class="text-sm font-bold text-white mb-2">${project.name}</h3>
@@ -804,69 +843,32 @@
                     <div class="border-t border-white/5 pt-4">
                         <div class="flex flex-wrap gap-1.5 mb-4">${techBadges}</div>
                         <div class="flex items-center gap-2">
-                            <button onclick="editProject(${project.id})" class="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-gray-300 transition-colors flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-pen-to-square"></i> تعديل
-                            </button>
-                            <button onclick="triggerDeleteProject(${project.id})" class="py-2.5 px-3 rounded-xl bg-brand-neonRed/10 hover:bg-brand-neonRed text-brand-neonRed hover:text-white transition-all flex items-center justify-center">
-                                <i class="fa-solid fa-trash-can text-xs"></i>
-                            </button>
+                            <button onclick="editProject(${project.id})" class="flex-1 py-2 rounded-xl bg-white/5 text-xs text-gray-300">تعديل</button>
+                            <button onclick="triggerDeleteProject(${project.id})" class="py-2 px-3 rounded-xl bg-brand-neonRed/10 text-brand-neonRed"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 grid.appendChild(card);
             });
-        }
-
-        function openProjectModal() {
-            document.getElementById('projectFormId').value = "";
-            document.getElementById('projectForm').reset();
-            document.getElementById('projectModalTitle').innerText = "إضافة مشروع برمجيات جديد";
-
-            const modal = document.getElementById('projectModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('opacity-100'), 10);
-        }
-
-        // Close modal helper
-        function closeProjectModal() {
-            const modal = document.getElementById('projectModal');
-            modal.classList.remove('opacity-100');
-            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
         function saveProject(event) {
             event.preventDefault();
             const id = document.getElementById('projectFormId').value;
-            const name = document.getElementById('pfName').value;
-            const link = document.getElementById('pfLink').value;
-            const stars = document.getElementById('pfStars').value;
-            const techStr = document.getElementById('pfTech').value;
-            const desc = document.getElementById('pfDesc').value;
-
-            const techArr = techStr.split(',').map(t => t.trim()).filter(t => t !== '');
-
             const payload = {
                 id: id ? parseInt(id) : Date.now(),
-                name: name,
-                description: desc,
-                tech: techArr,
-                stars: stars || "0",
-                githubLink: link
+                name: document.getElementById('pfName').value,
+                githubLink: document.getElementById('pfLink').value,
+                stars: document.getElementById('pfStars').value || "0",
+                tech: document.getElementById('pfTech').value.split(',').map(t => t.trim()).filter(t => t !== ''),
+                description: document.getElementById('pfDesc').value
             };
-
-            if (!mainDatabase.portfolio) mainDatabase.portfolio = [];
-
             if (id) {
-                const index = mainDatabase.portfolio.findIndex(p => p.id === parseInt(id));
-                if (index !== -1) mainDatabase.portfolio[index] = payload;
-                showToast("تم تحديث بيانات المشروع محلياً", "success");
+                const idx = mainDatabase.portfolio.findIndex(p => p.id === parseInt(id));
+                if (idx !== -1) mainDatabase.portfolio[idx] = payload;
             } else {
                 mainDatabase.portfolio.push(payload);
-                showToast("تمت إضافة المشروع الجديد محلياً", "success");
             }
-
             syncPortfolioCollections();
-
             closeProjectModal();
             renderAdminProjects();
         }
@@ -874,7 +876,6 @@
         function editProject(id) {
             const project = mainDatabase.portfolio.find(p => p.id === id);
             if (!project) return;
-
             document.getElementById('projectFormId').value = project.id;
             document.getElementById('pfName').value = project.name;
             document.getElementById('pfLink').value = project.githubLink;
@@ -882,117 +883,88 @@
             document.getElementById('pfTech').value = project.tech.join(', ');
             document.getElementById('pfDesc').value = project.description;
             document.getElementById('projectModalTitle').innerText = "تعديل تفاصيل المشروع البرمجي";
-
-            const modal = document.getElementById('projectModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('opacity-100'), 10);
+            document.getElementById('projectModal').classList.remove('hidden');
         }
 
         function triggerDeleteProject(id) {
-            openConfirmModal("هل أنت متأكد من رغبتك في حذف هذا المشروع نهائياً؟", () => {
+            openConfirmModal("حذف هذا المشروع نهائياً؟", () => {
                 mainDatabase.portfolio = mainDatabase.portfolio.filter(p => p.id !== id);
-                syncPortfolioCollections();
-                renderAdminProjects();
-                closeConfirmModal();
-                showToast("تم حذف المشروع من المعرض محلياً", "success");
+                syncPortfolioCollections(); renderAdminProjects(); closeConfirmModal();
             });
         }
 
-        // ================== MESSAGES MANAGER ==================
+        // ================== MESSAGES & TOASTS ==================
         function renderAdminMessages() {
             const container = document.getElementById('messagesInbox');
-            const countLabel = document.getElementById('msgCount');
             container.innerHTML = '';
-
             const list = mainDatabase.messages || [];
-            countLabel.innerText = `${list.length} طلب وارد`;
-
+            document.getElementById('msgCount').innerText = `${list.length} طلب وارد`;
             if (list.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-white/5 border border-white/5 p-12 text-center rounded-2xl text-gray-500">
-                        <i class="fa-regular fa-envelope-open text-4xl mb-4"></i>
-                        <p class="text-xs font-bold">صندوق الرسائل فارغ تماماً حالياً.</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="p-12 text-center text-gray-500"><p class="text-xs font-bold">صندوق الرسائل فارغ حالياً.</p></div>`;
                 return;
             }
-
             list.forEach(msg => {
-                let badgeClass = "bg-brand-purple/10 text-brand-purple";
-                let typeText = "تعاون تجاري / رعاية إعلانية";
-
-                if (msg.subject === 'project') {
-                    badgeClass = "bg-blue-500/10 text-blue-400";
-                    typeText = "تطوير مشروع برمجيات";
-                } else if (msg.subject === 'help') {
-                    badgeClass = "bg-amber-500/10 text-amber-400";
-                    typeText = "مساعدة واستفسار تقني";
-                }
-
                 const block = document.createElement('div');
-                block.className = "bg-white/5 border border-white/5 p-6 rounded-2xl space-y-4 hover:border-brand-purple/20 transition-all";
+                block.className = "bg-white/5 border border-white/5 p-4 rounded-2xl space-y-2";
                 block.innerHTML = `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
-                        <div class="text-right">
-                            <h4 class="text-sm font-extrabold text-white">${msg.name}</h4>
-                            <a href="mailto:${msg.email}" class="text-xs text-gray-500 hover:text-brand-purple transition-colors">${msg.email}</a>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${badgeClass}">${typeText}</span>
-                            <button onclick="deleteMessage(${msg.id})" class="w-8 h-8 rounded-lg bg-brand-neonRed/10 hover:bg-brand-neonRed text-brand-neonRed hover:text-white flex items-center justify-center transition-all text-xs" title="حذف الرسالة">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
+                    <div class="flex items-center justify-between border-b border-white/5 pb-2">
+                        <div><h4 class="text-xs font-bold text-white">${msg.name}</h4><p class="text-[10px] text-gray-500">${msg.email}</p></div>
+                        <button onclick="deleteMessage(${msg.id})" class="text-brand-neonRed bg-brand-neonRed/10 p-2 rounded-lg text-xs"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
-                    <p class="text-xs text-gray-400 leading-relaxed text-right font-semibold">${msg.message}</p>
-                `;
+                    <p class="text-xs text-gray-400 text-right">${msg.message}</p>`;
                 container.appendChild(block);
             });
         }
 
         function deleteMessage(id) {
-            openConfirmModal("هل أنت متأكد من رغبتك في مسح هذه الرسالة؟", () => {
-                mainDatabase.messages = mainDatabase.messages.filter(m => m.id !== id);
-                renderAdminMessages();
-                closeConfirmModal();
-                showToast("تم حذف الرسالة بنجاح", "success");
-            });
+            mainDatabase.messages = mainDatabase.messages.filter(m => m.id !== id);
+            renderAdminMessages();
         }
 
-        // ================== CUSTOM CONFIRM MODAL ==================
         function openConfirmModal(text, confirmAction) {
             document.getElementById('confirmModalText').innerText = text;
-            activeConfirmAction = confirmAction;
-
-            const modal = document.getElementById('confirmModal');
-            modal.classList.remove('hidden');
-            
-            document.getElementById('confirmModalBtn').onclick = function() {
-                if (activeConfirmAction) activeConfirmAction();
-            };
+            document.getElementById('confirmModal').classList.remove('hidden');
+            document.getElementById('confirmModalBtn').onclick = confirmAction;
         }
-
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.add('hidden');
-            activeConfirmAction = null;
-        }
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); }
+        function closeToolModal() { document.getElementById('toolModal').classList.add('hidden'); }
+        function closeProjectModal() { document.getElementById('projectModal').classList.add('hidden'); }
 
         // ================== GLOBAL STATE EXPORT & SAVE ==================
         async function publishAllChanges() {
-            // Compile inputs safely into object arrays
             mainDatabase.profile.name = document.getElementById('pName').value;
             mainDatabase.profile.tagline = document.getElementById('pTagline').value;
             mainDatabase.profile.avatar = document.getElementById('pAvatar').value;
+            mainDatabase.profile.subBadge = document.getElementById('pSubBadge').value;
 
             mainDatabase.links.tiktok = document.getElementById('lTiktok').value;
+            mainDatabase.links.tiktokText = document.getElementById('lTiktokText').value;
             mainDatabase.links.instagram = document.getElementById('lInstagram').value;
+            mainDatabase.links.instagramText = document.getElementById('lInstagramText').value;
             mainDatabase.links.youtube = document.getElementById('lYoutube').value;
+            mainDatabase.links.youtubeText = document.getElementById('lYoutubeText').value;
             mainDatabase.links.github = document.getElementById('lGithub').value;
+            mainDatabase.links.githubText = document.getElementById('lGithubText').value;
+
+            mainDatabase.terminalCode.domain = document.getElementById('cTerminalDomain').value;
+            mainDatabase.terminalCode.objName = document.getElementById('cObjName').value;
+            mainDatabase.terminalCode.propName = document.getElementById('cPropName').value;
+            mainDatabase.terminalCode.propStatus = document.getElementById('cPropStatus').value;
+            mainDatabase.terminalCode.propSkills = document.getElementById('cPropSkills').value;
+            mainDatabase.terminalCode.fetchPath = document.getElementById('cFetchPath').value;
+            mainDatabase.terminalCode.comment = document.getElementById('cComment').value;
+            mainDatabase.terminalCode.boxTitle = document.getElementById('cBoxTitle').value;
+            mainDatabase.terminalCode.boxNumber = document.getElementById('cBoxNumber').value;
+            mainDatabase.terminalCode.boxPercent = document.getElementById('cBoxPercent').value;
 
             mainDatabase.metrics.followers = document.getElementById('mFollowers').value;
+            mainDatabase.metrics.followersLabel = document.getElementById('mFollowersLabel').value;
             mainDatabase.metrics.tools = document.getElementById('mTools').value;
+            mainDatabase.metrics.toolsLabel = document.getElementById('mToolsLabel').value;
             mainDatabase.metrics.projects = document.getElementById('mProjects').value;
+            mainDatabase.metrics.projectsLabel = document.getElementById('mProjectsLabel').value;
             mainDatabase.metrics.safety = document.getElementById('mSafety').value;
+            mainDatabase.metrics.safetyLabel = document.getElementById('mSafetyLabel').value;
 
             mainDatabase.ads.badge = document.getElementById('adBadge').value;
             mainDatabase.ads.title = document.getElementById('adTitle').value;
@@ -1000,69 +972,39 @@
             mainDatabase.ads.btnText = document.getElementById('adBtnText').value;
             mainDatabase.ads.btnLink = document.getElementById('adBtnLink').value;
 
+            mainDatabase.footerContact.contactTitle = document.getElementById('cContactTitle').value;
+            mainDatabase.footerContact.contactDesc = document.getElementById('cContactDesc').value;
+            mainDatabase.footerContact.contactEmail = document.getElementById('cContactEmail').value;
+            mainDatabase.footerContact.contactLocation = document.getElementById('cContactLocation').value;
+            mainDatabase.footerContact.copyright = document.getElementById('fCopyright').value;
+
             syncPortfolioCollections();
 
             try {
                 const response = await fetch(getApiUrl('/api/data/update'), {
                     method: 'POST',
                     credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(mainDatabase)
                 });
-
                 if (!response.ok) throw new Error("فشل السيرفر في معالجة طلب الحفظ");
-                const result = await response.json();
-                if (result.updatedAt) {
-                    mainDatabase.updatedAt = result.updatedAt;
-                }
-                
                 showToast("تم الحفظ والمزامنة السحابية بنجاح! تم تحديث موقع المستخدمين تلقائياً.", "success");
             } catch (err) {
-                showToast(`خطأ في الحفظ السحابي: ${err.message}. تم الحفظ محلياً مؤقتاً!`, "error");
+                showToast(`خطأ في الحفظ السحابي: ${err.message}`, "error");
                 localStorage.setItem('localMockDatabase', JSON.stringify(mainDatabase));
             }
         }
 
-        // ================== CUSTOM TOASTS ==================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            toast.className = "flex items-center gap-3 px-5 py-4 rounded-2xl bg-brand-darkCard border border-white/10 shadow-2xl text-sm text-white pointer-events-auto transition-all duration-300 opacity-0 -translate-y-2 max-w-sm";
-            
-            const icon = type === 'success' ? 
-                '<i class="fa-solid fa-circle-check text-brand-neonGreen text-lg"></i>' : 
-                '<i class="fa-solid fa-circle-exclamation text-brand-neonRed text-lg"></i>';
-                
-            toast.innerHTML = `
-                ${icon}
-                <div class="text-right">
-                    <p class="font-bold text-xs">${message}</p>
-                </div>
-            `;
-            
+            toast.className = "flex items-center gap-3 px-5 py-4 rounded-2xl bg-brand-darkCard border border-white/10 shadow-2xl text-sm text-white transition-all duration-300";
+            toast.innerHTML = `<p class="font-bold text-xs">${message}</p>`;
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('opacity-0', '-translate-y-2');
-                toast.classList.add('opacity-100', 'translate-y-0');
-            }, 10);
-            
-            setTimeout(() => {
-                toast.classList.add('opacity-0', '-translate-y-2');
-                toast.classList.remove('opacity-100', 'translate-y-0');
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, 5000);
+            setTimeout(() => toast.remove(), 4000);
         }
 
-        // --- ON LAYOUT LOAD ---
-        window.onload = function() {
-            fetchDatabaseFromServer();
-        };
+        window.onload = function() { fetchDatabaseFromServer(); };
     </script>
 </body>
 </html>
