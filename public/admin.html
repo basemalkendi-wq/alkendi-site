@@ -463,21 +463,63 @@
             metrics: { followers: "", tools: "", projects: "", safety: "" },
             tools: [],
             portfolio: [],
+            projects: [],
             ads: { badge: "", title: "", description: "", btnText: "", btnLink: "" },
             messages: []
         };
 
         let activeConfirmAction = null;
 
+        const API_BASE = window.location.origin && window.location.origin !== 'null'
+            ? window.location.origin
+            : 'http://localhost:3000';
+
+        function getApiUrl(pathname) {
+            return new URL(pathname, API_BASE).toString();
+        }
+
+        function syncPortfolioCollections() {
+            const portfolioItems = Array.isArray(mainDatabase.portfolio) ? mainDatabase.portfolio : [];
+            mainDatabase.portfolio = portfolioItems;
+            mainDatabase.projects = portfolioItems.map(project => ({ ...project }));
+        }
+
+        function normalizeAdminData(data) {
+            const source = data && typeof data === 'object' ? data : {};
+            const portfolioItems = Array.isArray(source.portfolio)
+                ? source.portfolio
+                : Array.isArray(source.projects)
+                    ? source.projects
+                    : [];
+
+            return {
+                profile: { name: '', tagline: '', avatar: '', ...(source.profile || {}) },
+                links: { instagram: '', tiktok: '', youtube: '', github: '', ...(source.links || {}) },
+                metrics: { followers: '', tools: '', projects: '', safety: '', ...(source.metrics || {}) },
+                tools: Array.isArray(source.tools) ? source.tools : [],
+                portfolio: portfolioItems,
+                projects: portfolioItems.map(project => ({ ...project })),
+                ads: { badge: '', title: '', description: '', btnText: '', btnLink: '', ...(source.ads || {}) },
+                messages: Array.isArray(source.messages) ? source.messages : []
+            };
+        }
+
         // --- FETCH ORIGINAL SOURCED DATABASE ---
         async function fetchDatabaseFromServer() {
             try {
-                const response = await fetch('https://alkendi-site.onrender.com/api/data');
+                const response = await fetch(getApiUrl('/api/data?ts=' + Date.now()), {
+                    cache: 'no-store',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
                 if (!response.ok) throw new Error("فشل في استلام البيانات السحابية");
-                const data = await response.json();
+                const data = normalizeAdminData(await response.json());
                 
                 // Set data strictly from server
                 mainDatabase = data;
+                syncPortfolioCollections();
                 
                 populateDashboardForms();
                 renderAdminTools();
@@ -504,9 +546,11 @@
                     metrics: { followers: "100K+", tools: "15+", projects: "20+", safety: "100%" },
                     tools: [],
                     portfolio: [],
+                    projects: [],
                     ads: { badge: "مساحة إعلانية شاغرة", title: "هل ترغب في رعاية موقع وقناة Al-Kendi Tech؟", description: "اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.", btnText: "احجز مساحتك الآن", btnLink: "#contact" },
                     messages: []
                 };
+                syncPortfolioCollections();
                 showToast("جاري العمل بنظام المحاكاة للبيانات الافتراضية.", "success");
             }
             populateDashboardForms();
@@ -821,6 +865,8 @@
                 showToast("تمت إضافة المشروع الجديد محلياً", "success");
             }
 
+            syncPortfolioCollections();
+
             closeProjectModal();
             renderAdminProjects();
         }
@@ -845,6 +891,7 @@
         function triggerDeleteProject(id) {
             openConfirmModal("هل أنت متأكد من رغبتك في حذف هذا المشروع نهائياً؟", () => {
                 mainDatabase.portfolio = mainDatabase.portfolio.filter(p => p.id !== id);
+                syncPortfolioCollections();
                 renderAdminProjects();
                 closeConfirmModal();
                 showToast("تم حذف المشروع من المعرض محلياً", "success");
@@ -953,16 +1000,24 @@
             mainDatabase.ads.btnText = document.getElementById('adBtnText').value;
             mainDatabase.ads.btnLink = document.getElementById('adBtnLink').value;
 
+            syncPortfolioCollections();
+
             try {
-                // Fixed syntax layout rendering bug for API routes delivery
-                const response = await fetch('https://alkendi-site.onrender.com/api/data/update', {
+                const response = await fetch(getApiUrl('/api/data/update'), {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify(mainDatabase)
                 });
 
                 if (!response.ok) throw new Error("فشل السيرفر في معالجة طلب الحفظ");
                 const result = await response.json();
+                if (result.updatedAt) {
+                    mainDatabase.updatedAt = result.updatedAt;
+                }
                 
                 showToast("تم الحفظ والمزامنة السحابية بنجاح! تم تحديث موقع المستخدمين تلقائياً.", "success");
             } catch (err) {
