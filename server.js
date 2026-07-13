@@ -331,6 +331,37 @@ app.post('/api/data/update', requireAuth, async (req, res) => {
     }
 });
 
+// مسار مفتوح مخصص لاستقبال رسائل الزوار وحفظها بأمان
+app.post('/api/contact', async (req, res) => {
+    try {
+        const { name = '', email = '', subject = '', message = '' } = req.body || {};
+        
+        if (!name || !email || !message) {
+            return res.status(400).json({ success: false, message: 'يرجى تعبئة جميع الحقول المطلوبة' });
+        }
+
+        const data = await readDataFile();
+        if (!data.messages) data.messages = [];
+
+        // إنشاء كائن الرسالة الجديد وضخه
+        const newMessage = {
+            id: Date.now(),
+            name,
+            email,
+            subject,
+            message,
+            date: new Date().toISOString().split('T')[0]
+        };
+
+        data.messages.push(newMessage);
+        await writeDataFile(data);
+
+        return res.json({ success: true, message: 'تم إرسال رسالتك وتخزينها بنجاح!' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'خطأ في الخادم أثناء حفظ الرسالة' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`السيرفر الآمن يعمل على المنفذ: ${PORT}`);
 });

@@ -926,12 +926,37 @@
             });
         });
 
-        // --- FORM HANDLING ---
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
+       // --- تفعيل إرسال الرسائل عبر المسار المخصص الجديد ---
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const nameValue = document.getElementById('name').value;
-            showToast(`شكراً لك يا ${nameValue}! تم إرسال رسالتك بأمان تام وسيتواصل معك فريق Al-Kendi Tech قريباً.`, 'success');
-            this.reset();
+            const nameVal = document.getElementById('name').value;
+            const emailVal = document.getElementById('email').value;
+            const subjectVal = document.getElementById('subject').value;
+            const messageVal = document.getElementById('message').value;
+
+            try {
+                const response = await fetch(getApiUrl('/api/contact'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: nameVal,
+                        email: emailVal,
+                        subject: subjectVal,
+                        message: messageVal
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showToast(`شكراً لك يا ${nameVal}! تم إرسال رسالتك وتخزينها بنجاح.`, 'success');
+                    this.reset();
+                } else {
+                    showToast(result.message || "حدث خطأ أثناء الإرسال", "error");
+                }
+            } catch (err) {
+                showToast("عذراً، تعذر الاتصال بالسيرفر حالياً", "error");
+            }
         });
 
         // --- SCROLLSPY DYNAMIC ACTIVE NAVIGATION ---
