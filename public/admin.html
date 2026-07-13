@@ -116,9 +116,10 @@
                     <span>الرعايات والإعلانات</span>
                 </button>
 
+                <!-- قسم تواصل معنا الجديد المضاف للقائمة الجانبية بناءً على طلبك -->
                 <button onclick="switchTab('footerContactTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
                     <i class="fa-solid fa-address-book text-lg"></i>
-                    <span>بيانات الفوتر والتواصل</span>
+                    <span>تعديل صفحة تواصل معنا</span>
                 </button>
 
                 <button onclick="switchTab('messagesTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
@@ -405,14 +406,14 @@
                     </div>
                 </section>
 
-                <!-- TAB 5.5: FOOTER & CONTACT LABELS -->
+                <!-- TAB 5.5: FOOTER & CONTACT LABELS (صفحة تواصل معنا المحدثة) -->
                 <section id="footerContactTab" class="tab-content hidden space-y-6">
                     <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
                         <div class="flex items-center gap-4 border-b border-white/5 pb-4">
                             <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
                                 <i class="fa-solid fa-address-book"></i>
                             </div>
-                            <h3 class="text-md font-bold text-white">تعديل نصوص وعناوين الاتصال (Contact Blocks) والفوتر</h3>
+                            <h3 class="text-md font-bold text-white">تعديل نصوص وعناوين صفحة "تواصل معنا" بالكامل</h3>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -670,7 +671,7 @@
                     tools: [],
                     portfolio: [],
                     projects: [],
-                    ads: { badge: "مساحة إعلانية شاغرة", title: "هل ترغب في رعاية موقع وقناة Al-Kendi Tech؟", description: "اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.", btnText: "احجز مساحتك الآن", btnLink: "#contact" },
+                    ads: { badge: "مساحة إعلانية شاغرة", title: "هل ترغب في رعاية موقع وقناة Al-Kendi Tech？", description: "اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.", btnText: "احجز مساحتك الآن", btnLink: "#contact" },
                     footerContact: { contactTitle: "هل لديك فكرة أو طلب تعاون؟", contactDesc: "سواء كنت ترغب في مناقشة مشروع برمجيات، رعاية إعلانية...", contactEmail: "work@alkendi.me", contactLocation: "صنعاء، اليمن", copyright: "© 2026 جميع الحقوق محفوظة لـ Al-Kendi Tech. تم تطوير الموقع بكل حب وشغف بالبرمجة." },
                     messages: []
                 };
@@ -739,7 +740,7 @@
             document.getElementById('fCopyright').value = mainDatabase.footerContact.copyright || '';
         }
 
-        // ================== TOOLS CONTROLLER (CRUD) ==================
+        // ================== TOOLS CONTROLLER ==================
         function renderAdminTools() {
             const grid = document.getElementById('adminToolsGrid');
             grid.innerHTML = '';
@@ -787,6 +788,7 @@
                 size: document.getElementById('tfSize').value,
                 downloadLink: document.getElementById('tfLink').value
             };
+            if (!mainDatabase.tools) mainDatabase.tools = [];
             if (id) {
                 const idx = mainDatabase.tools.findIndex(t => t.id === parseInt(id));
                 if (idx !== -1) mainDatabase.tools[idx] = payload;
@@ -819,7 +821,7 @@
             });
         }
 
-        // ================== PORTFOLIO CONTROLLER (CRUD) ==================
+        // ================== PORTFOLIO CONTROLLER ==================
         function renderAdminProjects() {
             const grid = document.getElementById('adminProjectsGrid');
             grid.innerHTML = '';
@@ -862,6 +864,7 @@
                 tech: document.getElementById('pfTech').value.split(',').map(t => t.trim()).filter(t => t !== ''),
                 description: document.getElementById('pfDesc').value
             };
+            if (!mainDatabase.portfolio) mainDatabase.portfolio = [];
             if (id) {
                 const idx = mainDatabase.portfolio.findIndex(p => p.id === parseInt(id));
                 if (idx !== -1) mainDatabase.portfolio[idx] = payload;
@@ -893,7 +896,7 @@
             });
         }
 
-        // ================== MESSAGES & TOASTS ==================
+        // ================== MESSAGES MANAGER ==================
         function renderAdminMessages() {
             const container = document.getElementById('messagesInbox');
             container.innerHTML = '';
@@ -905,13 +908,13 @@
             }
             list.forEach(msg => {
                 const block = document.createElement('div');
-                block.className = "bg-white/5 border border-white/5 p-4 rounded-2xl space-y-2";
+                block.className = "bg-white/5 border border-white/5 p-4 rounded-2xl space-y-4";
                 block.innerHTML = `
                     <div class="flex items-center justify-between border-b border-white/5 pb-2">
                         <div><h4 class="text-xs font-bold text-white">${msg.name}</h4><p class="text-[10px] text-gray-500">${msg.email}</p></div>
                         <button onclick="deleteMessage(${msg.id})" class="text-brand-neonRed bg-brand-neonRed/10 p-2 rounded-lg text-xs"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
-                    <p class="text-xs text-gray-400 text-right">${msg.message}</p>`;
+                    <p class="text-xs text-gray-400 text-right font-semibold">${msg.message}</p>`;
                 container.appendChild(block);
             });
         }
@@ -921,14 +924,48 @@
             renderAdminMessages();
         }
 
+        function previewAvatar(url) {
+            const preview = document.getElementById('avatarPreview');
+            if (url && url.trim() !== '') preview.src = url;
+            else preview.src = 'https://placehold.co/100/12121A/8B5CF6?text=Avatar';
+        }
+
         function openConfirmModal(text, confirmAction) {
             document.getElementById('confirmModalText').innerText = text;
             document.getElementById('confirmModal').classList.remove('hidden');
             document.getElementById('confirmModalBtn').onclick = confirmAction;
         }
         function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); }
+        document.getElementById('confirmModal').addEventListener('click', function(e) { if(e.target === this) closeConfirmModal(); });
         function closeToolModal() { document.getElementById('toolModal').classList.add('hidden'); }
         function closeProjectModal() { document.getElementById('projectModal').classList.add('hidden'); }
+
+        function switchTab(tabId, buttonElement) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+                tab.classList.remove('block');
+            });
+            const activeTab = document.getElementById(tabId);
+            activeTab.classList.remove('hidden');
+            activeTab.classList.add('block');
+
+            document.querySelectorAll('.tab-link').forEach(link => {
+                link.classList.remove('bg-brand-purple', 'text-white', 'active');
+                link.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
+            });
+            buttonElement.classList.add('bg-brand-purple', 'text-white', 'active');
+            buttonElement.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
+
+            if (window.innerWidth < 1024) toggleMobileSidebar(false);
+        }
+
+        function toggleMobileSidebar(forceShow = null) {
+            const sidebar = document.getElementById('adminSidebar');
+            if (forceShow !== null) {
+                if (forceShow) sidebar.classList.remove('translate-x-full');
+                else sidebar.classList.add('translate-x-full');
+            } else sidebar.classList.toggle('translate-x-full');
+        }
 
         // ================== GLOBAL STATE EXPORT & SAVE ==================
         async function publishAllChanges() {
