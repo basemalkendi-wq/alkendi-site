@@ -5,19 +5,42 @@
   },
   "profile": {
     "name": "Al-Kendi Tech",
+    "tagline": "طالب هندسة تقنية المعلومات IT & صانع محتوى تقني",
     "avatar": ""
   },
   "links": {
-    "instagram": "#",
-    "tiktok": "#"
+    "instagram": "https://instagram.com/k__ndi",
+    "tiktok": "https://tiktok.com/@k__ndi",
+    "youtube": "https://youtube.com",
+    "github": "https://github.com"
+  },
+  "metrics": {
+    "followers": "+100K",
+    "tools": "66+",
+    "projects": "+60",
+    "safety": "100%"
   },
   "tools": [
     {
       "id": 1,
-      "title": "أداة فحص الحماية",
+      "name": "Al-Kendi Shield | فاحص الحسابات والروابط",
+      "description": "أداة ذكية لفحص الروابط المشبوهة وحماية حسابات السوشيال ميديا الخاصة بك من الهجمات الاحتيالية.",
       "category": "security",
-      "description": "أداة متقدمة لفحص الأمان والحماية للأنظمة."
+      "categoryLabel": "الأمان والحماية",
+      "icon": "fa-shield-halved",
+      "version": "v2.4",
+      "size": "14.2 MB",
+      "downloadLink": "#"
     }
   ],
-  "projects": []
+  "projects": [],
+  "portfolio": [],
+  "ads": {
+    "badge": "مساحة إعلانية شاغرة",
+    "title": "هل ترغب في رعاية موقع وقناة Al-Kendi Tech؟",
+    "description": "اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.",
+    "btnText": "احجز مساحتك الآن",
+    "btnLink": "#contact"
+  },
+  "messages": []
 }
