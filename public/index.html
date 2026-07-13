@@ -242,19 +242,19 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 <div class="space-y-1">
-                    <p class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-fuchsia-500">100K+</p>
+                    <p id="stat-followers" class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-fuchsia-500">100K+</p>
                     <p class="text-xs md:text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 font-semibold">متابع نشط على السوشيال</p>
                 </div>
                 <div class="space-y-1">
-                    <p class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-fuchsia-500">15+</p>
+                    <p id="stat-tools" class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-fuchsia-500">15+</p>
                     <p class="text-xs md:text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 font-semibold">برنامج وأداة مجانية</p>
                 </div>
                 <div class="space-y-1">
-                    <p class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-fuchsia-500">20+</p>
+                    <p id="stat-projects" class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-fuchsia-500">20+</p>
                     <p class="text-xs md:text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 font-semibold">مشروع مفتوح المصدر</p>
                 </div>
                 <div class="space-y-1">
-                    <p class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-fuchsia-500">100%</p>
+                    <p id="stat-safety" class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-fuchsia-500">100%</p>
                     <p class="text-xs md:text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 font-semibold">روابط آمنة وخالية من الإعلانات</p>
                 </div>
             </div>
@@ -581,6 +581,13 @@
             };
         }
 
+        function updateMetricsDisplay(metrics) {
+            document.getElementById('stat-followers').innerText = metrics?.followers || '100K+';
+            document.getElementById('stat-tools').innerText = metrics?.tools || '15+';
+            document.getElementById('stat-projects').innerText = metrics?.projects || '20+';
+            document.getElementById('stat-safety').innerText = metrics?.safety || '100%';
+        }
+
         // Global arrays to reference active filters
         let activeToolsData = [];
         let lastDatabaseSignature = '';
@@ -623,6 +630,7 @@
                 activeToolsData = data.tools || localToolsDatabase;
                 renderTools(activeToolsData);
                 renderPortfolio(data.projects || localPortfolioDatabase);
+                updateMetricsDisplay(data.metrics);
                 console.log('Live database refreshed from backend.');
                 return true;
             } catch (error) {
@@ -634,6 +642,7 @@
                     activeToolsData = localToolsDatabase;
                     renderTools(localToolsDatabase);
                     renderPortfolio(localPortfolioDatabase);
+                    updateMetricsDisplay(null);
                 }
 
                 return false;
