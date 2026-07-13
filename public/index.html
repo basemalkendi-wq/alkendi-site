@@ -92,6 +92,7 @@
                 <a href="#tools" class="nav-link text-gray-400 hover:text-brand-purple dark:text-gray-400 light:text-gray-600 transition-colors">الأدوات والبرامج</a>
                 <a href="#portfolio" class="nav-link text-gray-400 hover:text-brand-purple dark:text-gray-400 light:text-gray-600 transition-colors">أعمالي ومشاريعي</a>
                 <a href="#contact" class="nav-link text-gray-400 hover:text-brand-purple dark:text-gray-400 light:text-gray-600 transition-colors">تواصل معي</a>
+                <a href="#tech-blog" class="nav-link text-gray-400 hover:text-brand-purple transition-colors">المدونة</a>
             </nav>
 
             <!-- Control Actions (Theme & Contact button) -->
@@ -128,6 +129,7 @@
             <a href="#tools" class="mobile-nav-link block px-3 py-2 rounded-lg text-gray-400 dark:text-gray-400 light:text-gray-600 hover:bg-brand-purple/5">الأدوات والبرامج</a>
             <a href="#portfolio" class="mobile-nav-link block px-3 py-2 rounded-lg text-gray-400 dark:text-gray-400 light:text-gray-600 hover:bg-brand-purple/5">أعمالي ومشاريعي</a>
             <a href="#contact" class="mobile-nav-link block px-3 py-2 rounded-lg text-gray-400 dark:text-gray-400 light:text-gray-600 hover:bg-brand-purple/5">تواصل معي</a>
+            <a href="#tech-blog" class="mobile-nav-link block px-3 py-2 rounded-lg text-gray-400 hover:bg-brand-purple/5">المدونة</a>
         </div>
     </header>
 
@@ -377,6 +379,32 @@
                 <a href="#contact" class="px-5 py-3 rounded-xl bg-white text-brand-darkBg hover:bg-gray-200 dark:bg-white dark:text-brand-darkBg light:bg-brand-darkBg light:text-white font-bold text-sm transition-all shadow-lg shrink-0">
                     احجز مساحتك الآن
                 </a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Tech Blog Section -->
+    <section id="tech-blog" class="py-20 relative bg-brand-darkBg">
+        <div class="absolute bottom-1/4 left-10 w-80 h-80 bg-fuchsia-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <div class="inline-flex items-center px-2.5 py-1 rounded-md bg-brand-purple/10 text-brand-purple text-xs font-bold gap-1.5">
+                    <i class="fa-solid fa-newspaper"></i> مقالات ونصائح تقنية
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white dark:text-white light:text-gray-900">
+                    مدونة <span class="text-brand-purple">Al-Kendi Tech</span> المصغرة
+                </h2>
+                <p class="text-sm text-gray-400 dark:text-gray-400 light:text-gray-600">
+                    تابع آخر النصائح الأمنية، شروحات الحماية، وحلول تقنية المعلومات المباشرة لرفع مستوى وعيك الأمني لحماية حساباتك وأجهزتك.
+                </p>
+            </div>
+
+            <!-- Blog Dynamic Grid -->
+            <div id="blogArticlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- سيتم توليد مقالات المدونة ديناميكياً بواسطة الجافاسكريبت بالأسفل -->
             </div>
         </div>
     </section>
@@ -1149,10 +1177,74 @@
             }
         });
 
-        // --- ON INITIAL LOAD ---
+
+        // --- مصفوفة مقالات المدونة التقنية الافتراضية ---
+        const localBlogArticles = [
+            {
+                id: 1,
+                title: "أفضل 5 ممارسات لحماية حساباتك من التصيد الاحتيالي",
+                summary: "تتعرض الحسابات يومياً لمحاولات اختراق عبر روابط وهمية مزيفة. في هذا المقال نكشف لك كيف تتعرف على هذه الأساليب وتصدها فوراً لحماية هويتك الرقمية.",
+                date: "2026-07-12",
+                tag: "أمن سيبراني",
+                icon: "fa-user-shield"
+            },
+            {
+                id: 2,
+                title: "لماذا يجب عليك تجنب استخدام شبكات Wi-Fi العامة؟",
+                summary: "الاتصال بشبكات المقهى أو المطار العامة بدون تشفير قد يعرض كافة بياناتك وجلسات تسجيل دخولك لخطر الاعتراض أو هجمات (Man-in-the-Middle). اكتشف طرق الوقاية.",
+                date: "2026-07-05",
+                tag: "حماية الشبكات",
+                icon: "fa-wifi"
+            },
+            {
+                id: 3,
+                title: "دليلك البرمجي الشامل لفهم بروتوكول HTTPS والتشفير",
+                summary: "شرح مبسط لطلاب الـ IT والمطورين حول آليات عمل شهادات SSL وكيف يحمي بروتوكول الاتصال المشفر نصوص وبيانات المستخدمين من التجسس عبر مسار البيانات.",
+                date: "2026-06-28",
+                tag: "تطوير ويب / IT",
+                icon: "fa-lock"
+            }
+        ];
+
+        // --- دالة تصيير مقالات المدونة في الشبكة الواجهية ---
+        function renderTechBlog(articles) {
+            const grid = document.getElementById('blogArticlesGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            articles.forEach(article => {
+                const card = document.createElement('div');
+                card.className = "bg-brand-darkCard dark:bg-brand-darkCard light:bg-white border border-white/5 dark:border-white/5 light:border-gray-200 p-6 rounded-3xl hover:border-brand-purple/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between";
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-md">
+                                <i class="fa-solid ${article.icon}"></i>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-brand-purple/10 text-brand-purple">${article.tag}</span>
+                        </div>
+                        <h3 class="text-md font-bold text-white dark:text-white light:text-gray-900 mb-3 leading-snug">${article.title}</h3>
+                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4 line-clamp-3">${article.summary}</p>
+                    </div>
+                    <div class="border-t border-white/5 dark:border-white/5 light:border-gray-100 pt-4 mt-2 flex items-center justify-between text-[11px] text-gray-500">
+                        <span><i class="fa-regular fa-calendar ml-1"></i> ${article.date}</span>
+                        <button onclick="showToast('قريباً: سيتم فتح المقال بالكامل لقراءة الشرح المفصل والأكواد الملحقة!', 'success')" class="text-brand-purple font-bold hover:underline flex items-center gap-1">
+                            اقرأ المزيد <i class="fa-solid fa-arrow-left text-[9px] mt-0.5"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+       // --- ON INITIAL LOAD ---
         window.onload = async function() {
             await fetchLiveDatabase();
             await startLiveRefreshLoop();
+            
+            // استدعاء دالة تصيير المقالات فور تحميل الصفحة
+            renderTechBlog(localBlogArticles);
             
             setTimeout(() => {
                 const activeBtn = document.querySelector('.filter-btn.active');
