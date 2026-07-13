@@ -51,7 +51,7 @@ const loginLimiter = rateLimit({
 
 app.set('trust proxy', 1);
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(cookieParser());
 
