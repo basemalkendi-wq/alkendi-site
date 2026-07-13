@@ -34,7 +34,6 @@ const corsOptions = {
         if (!origin || allowedOrigins.has(origin)) {
             return callback(null, true);
         }
-
         return callback(null, false);
     },
     credentials: true,
@@ -55,6 +54,7 @@ app.options(/.*/, cors(corsOptions));
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(cookieParser());
 
+// تحديث الهيكل الافتراضي ليشمل كافة الحقول الجديدة للشاشة البرمجية والفوتر وصفحة التواصل
 function createDefaultData() {
     return {
         admin_account: {
@@ -63,20 +63,41 @@ function createDefaultData() {
         },
         profile: {
             name: 'Al-Kendi Tech',
-            tagline: 'طالب هندسة تقنية المعلومات IT & صانع محتوى تقني',
-            avatar: ''
+            tagline: 'هنا بوابتك المفتوحة للحصول على أقوى برامج الحماية، والأدوات التقنية المفيدة...',
+            avatar: '',
+            subBadge: 'طالب هندسة تقنية المعلومات IT & صانع محتوى تقني'
         },
         links: {
-            instagram: '#',
-            tiktok: '#',
-            youtube: '#',
-            github: '#'
+            instagram: 'https://instagram.com/k__ndi',
+            instagramText: 'Instagram',
+            tiktok: 'https://tiktok.com/@k__ndi',
+            tiktokText: 'TikTok',
+            youtube: 'https://youtube.com',
+            youtubeText: 'YouTube',
+            github: 'https://github.com',
+            githubText: 'GitHub'
         },
         metrics: {
             followers: '100K+',
+            followersLabel: 'متابع نشط على السوشيال',
             tools: '15+',
+            toolsLabel: 'برنامج وأداة مجانية',
             projects: '20+',
-            safety: '100%'
+            projectsLabel: 'مشروع مفتوح المصدر',
+            safety: '100%',
+            safetyLabel: 'روابط آمنة وخالية من الإعلانات'
+        },
+        terminalCode: {
+            domain: 'alkendi.me',
+            objName: 'developer',
+            propName: 'Al-Kendi',
+            propStatus: 'IT Student',
+            propSkills: 'Security, Dev, Content',
+            fetchPath: '/api/tools',
+            comment: 'تفعيل النظام الديناميكي للتحميلات...',
+            boxTitle: 'تحميلات اليوم',
+            boxNumber: '+1,420',
+            boxPercent: '+18%'
         },
         tools: [],
         portfolio: [],
@@ -87,6 +108,13 @@ function createDefaultData() {
             description: 'اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.',
             btnText: 'احجز مساحتك الآن',
             btnLink: '#contact'
+        },
+        footerContact: {
+            contactTitle: 'هل لديك فكرة أو طلب تعاون؟',
+            contactDesc: 'سواء كنت ترغب في مناقشة مشروع برمجيات، رعاية إعلانية...',
+            contactEmail: 'work@alkendi.me',
+            contactLocation: 'صنعاء، اليمن',
+            copyright: '© 2026 جميع الحقوق محفوظة لـ Al-Kendi Tech. تم تطوير الموقع بكل حب وشغف بالبرمجة.'
         },
         messages: [],
         updatedAt: null
@@ -101,7 +129,6 @@ function deriveCategoryLabel(category) {
 
 function normalizeTool(tool = {}) {
     const category = tool.category || 'security';
-
     return {
         id: tool.id ?? Date.now(),
         name: tool.name || tool.title || '',
@@ -129,13 +156,18 @@ function normalizeProject(project = {}) {
     };
 }
 
+// تعديل مصفوفة الفحص الشامل لمنع السيرفر من مسح البيانات الجديدة المرسلة من الأدمن
 function normalizeData(rawData = {}) {
     const defaultData = createDefaultData();
     const source = rawData && typeof rawData === 'object' ? rawData : {};
+    
     const profile = { ...defaultData.profile, ...(source.profile || {}) };
     const links = { ...defaultData.links, ...(source.links || {}) };
     const metrics = { ...defaultData.metrics, ...(source.metrics || {}) };
+    const terminalCode = { ...defaultData.terminalCode, ...(source.terminalCode || {}) };
     const ads = { ...defaultData.ads, ...(source.ads || {}) };
+    const footerContact = { ...defaultData.footerContact, ...(source.footerContact || {}) };
+    
     const messages = Array.isArray(source.messages) ? source.messages : defaultData.messages;
     const tools = Array.isArray(source.tools) ? source.tools.map(normalizeTool) : [];
     const projectsSource = Array.isArray(source.portfolio)
@@ -146,20 +178,21 @@ function normalizeData(rawData = {}) {
     const portfolio = projectsSource.map(normalizeProject);
     const adminAccount = {
         ...defaultData.admin_account,
-        ...(source.admin_account || {})
+        ...({ ...source.admin_account, password: source.admin_account?.password || source.password } || {})
     };
 
     return {
         ...defaultData,
-        ...source,
         admin_account: adminAccount,
         profile,
         links,
         metrics,
+        terminalCode,
         tools,
         portfolio,
         projects: portfolio,
         ads,
+        footerContact,
         messages,
         updatedAt: source.updatedAt || null
     };
@@ -196,22 +229,18 @@ function sendUnauthorizedResponse(req, res) {
     if (req.path.startsWith('/api/')) {
         return res.status(401).json({ success: false, message: 'غير مصرح بالوصول' });
     }
-
     return res.redirect('/login.html');
 }
 
 const requireAuth = (req, res, next) => {
     const token = req.cookies.admin_token;
-
     if (!token) {
         return sendUnauthorizedResponse(req, res);
     }
-
     jwt.verify(token, JWT_SECRET, (error) => {
         if (error) {
             return sendUnauthorizedResponse(req, res);
         }
-
         return next();
     });
 };
