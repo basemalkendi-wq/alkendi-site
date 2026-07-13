@@ -1002,7 +1002,7 @@
             mainDatabase.metrics.toolsLabel = document.getElementById('mToolsLabel').value;
             mainDatabase.metrics.projects = document.getElementById('mProjects').value;
             mainDatabase.metrics.projectsLabel = document.getElementById('mProjectsLabel').value;
-            mainDatabase.metrics.metricsSafety = document.getElementById('mSafety').value; // Modified strictly for normalization layer mappings
+            mainDatabase.metrics.safety = document.getElementById('mSafety').value;
             mainDatabase.metrics.safetyLabel = document.getElementById('mSafetyLabel').value;
 
             mainDatabase.ads.badge = document.getElementById('adBadge').value;
@@ -1027,6 +1027,20 @@
                     body: JSON.stringify(mainDatabase)
                 });
                 if (!response.ok) throw new Error("فشل السيرفر في معالجة طلب الحفظ");
+                const result = await response.json();
+                if (result?.data) {
+                    mainDatabase = normalizeAdminData(result.data);
+                    syncPortfolioCollections();
+                    populateDashboardForms();
+                    renderAdminTools();
+                    renderAdminProjects();
+                    renderAdminMessages();
+                }
+
+                if (result?.updatedAt) {
+                    localStorage.setItem('alkendi-data-version', result.updatedAt);
+                }
+
                 showToast("تم الحفظ والمزامنة السحابية بنجاح! تم تحديث موقع المستخدمين تلقائياً.", "success");
             } catch (err) {
                 showToast(`خطأ في الحفظ السحابي: ${err.message}`, "error");

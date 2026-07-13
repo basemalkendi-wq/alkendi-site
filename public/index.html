@@ -372,7 +372,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">البريد الإلكتروني للعمل والرعايات</p>
-                                <a href="mailto:work@alkendi.me" class="text-sm font-bold text-white dark:text-white light:text-gray-900 hover:text-brand-purple transition-colors">work@alkendi.me</a>
+                                <a id="contactEmailLink" href="mailto:work@alkendi.me" class="text-sm font-bold text-white dark:text-white light:text-gray-900 hover:text-brand-purple transition-colors">work@alkendi.me</a>
                             </div>
                         </div>
 
@@ -382,7 +382,7 @@
                             </div>
                             <div>
                                 <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600">الموقع الحالي للعمل والدراسة</p>
-                                <p class="text-sm font-bold text-white dark:text-white light:text-gray-900">صنعاء، اليمن</p>
+                                <p id="contactLocationText" class="text-sm font-bold text-white dark:text-white light:text-gray-900">صنعاء، اليمن</p>
                             </div>
                         </div>
                     </div>
@@ -588,6 +588,23 @@
             document.getElementById('stat-safety').innerText = metrics?.safety || '100%';
         }
 
+        function updateFooterContactDisplay(footerContact) {
+            const contactEmail = footerContact?.contactEmail || 'work@alkendi.me';
+            const contactLocation = footerContact?.contactLocation || 'صنعاء، اليمن';
+
+            const emailLink = document.getElementById('contactEmailLink');
+            const locationText = document.getElementById('contactLocationText');
+
+            if (emailLink) {
+                emailLink.href = `mailto:${contactEmail}`;
+                emailLink.innerText = contactEmail;
+            }
+
+            if (locationText) {
+                locationText.innerText = contactLocation;
+            }
+        }
+
         // Global arrays to reference active filters
         let activeToolsData = [];
         let lastDatabaseSignature = '';
@@ -631,6 +648,7 @@
                 renderTools(activeToolsData);
                 renderPortfolio(data.projects || localPortfolioDatabase);
                 updateMetricsDisplay(data.metrics);
+                updateFooterContactDisplay(data.footerContact);
                 console.log('Live database refreshed from backend.');
                 return true;
             } catch (error) {
@@ -643,6 +661,7 @@
                     renderTools(localToolsDatabase);
                     renderPortfolio(localPortfolioDatabase);
                     updateMetricsDisplay(null);
+                    updateFooterContactDisplay(null);
                 }
 
                 return false;
@@ -964,6 +983,12 @@
 
         window.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
+                fetchLiveDatabase({ quiet: true });
+            }
+        });
+
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'alkendi-data-version') {
                 fetchLiveDatabase({ quiet: true });
             }
         });

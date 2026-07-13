@@ -312,6 +312,7 @@ app.post('/api/data/update', requireAuth, async (req, res) => {
         });
 
         await writeDataFile(mergedData);
+        const { admin_account: _adminAccount, ...publicData } = mergedData;
 
         res.set({
             'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
@@ -322,7 +323,8 @@ app.post('/api/data/update', requireAuth, async (req, res) => {
         return res.json({
             success: true,
             message: 'تم تحديث البيانات بنجاح!',
-            updatedAt: mergedData.updatedAt
+            updatedAt: mergedData.updatedAt,
+            data: publicData
         });
     } catch (error) {
         return res.status(500).json({ success: false, message: 'خطأ في حفظ التعديلات' });
