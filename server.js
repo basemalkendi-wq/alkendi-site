@@ -140,7 +140,8 @@ function normalizeTool(tool = {}) {
         version: tool.version || 'v1.0',
         size: tool.size || '0 MB',
         downloadLink: tool.downloadLink || tool.link || '#',
-        stars: tool.stars ?? 0
+        stars: tool.stars ?? 0,
+        downloads: tool.downloads ?? 0
     };
 }
 

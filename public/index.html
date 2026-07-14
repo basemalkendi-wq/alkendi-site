@@ -641,8 +641,11 @@
         function normalizePublicData(data) {
             const source = data && typeof data === 'object' ? data : {};
             const tools = Array.isArray(source.tools)
-                ? source.tools.map((tool) => ({
+                ? source.tools.map((tool, index) => ({
                     ...tool,
+                    id: Number.isFinite(Number(tool.id)) ? Number(tool.id) : index + 1,
+                    stars: Number.isFinite(Number(tool.stars)) ? Number(tool.stars) : 0,
+                    downloads: Number.isFinite(Number(tool.downloads)) ? Number(tool.downloads) : 0,
                     name: tool.name || tool.title || 'أداة بدون اسم',
                     categoryLabel: tool.categoryLabel || (tool.category === 'utility'
                         ? 'الإنتاجية والأدوات'
@@ -755,21 +758,47 @@
         function renderTools(tools) {
             const grid = document.getElementById('toolsGrid');
             if (!grid) return;
+
+            const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[character]));
+
+            const toSafeInt = (value, fallback) => {
+                const parsedValue = Number.parseInt(value, 10);
+                return Number.isFinite(parsedValue) ? parsedValue : fallback;
+            };
+
+            const toSafeToolId = (value, index) => {
+                const parsedValue = Number.parseInt(value, 10);
+                return Number.isFinite(parsedValue) ? parsedValue : index + 1;
+            };
             
             grid.innerHTML = '';
-            if (!tools || tools.length === 0) {
+            if (!Array.isArray(tools) || tools.length === 0) {
                 grid.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-12 text-gray-500"><p class="text-sm">لم يتم العثور على أي أداة مطابقة لبحثك.</p></div>`;
                 return;
             }
 
-            tools.forEach(tool => {
+            tools.forEach((tool, index) => {
+                const safeTool = tool && typeof tool === 'object' ? tool : {};
                 const card = document.createElement('div');
                 card.className = "tool-card bg-brand-darkCard dark:bg-brand-darkCard light:bg-white border border-white/5 dark:border-white/5 light:border-gray-200 p-6 rounded-3xl hover:border-brand-purple/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between";
                 
                 // 1. حماية وتأمين الـ ID والبيانات الأساسية لمنع انهيار الجافاسكريبت
-                const toolId = tool.id ? parseInt(tool.id) : Date.now();
-                const activeStars = (typeof tool.stars !== 'undefined' && tool.stars !== null) ? parseInt(tool.stars) : 5;
-                const downloadCount = (typeof tool.downloads !== 'undefined' && tool.downloads !== null) ? parseInt(tool.downloads) : 140;
+                const toolId = toSafeToolId(safeTool.id, index);
+                const activeStars = Math.min(5, Math.max(0, toSafeInt(safeTool.stars, 5)));
+                const downloadCount = Math.max(0, toSafeInt(safeTool.downloads, 140));
+                const toolName = escapeHtml(safeTool.name || 'أداة جديدة');
+                const toolDescription = escapeHtml(safeTool.description || '');
+                const toolCategoryLabel = escapeHtml(safeTool.categoryLabel || 'أداة عامة');
+                const toolIcon = escapeHtml(safeTool.icon || 'fa-cubes');
+                const toolVersion = escapeHtml(safeTool.version || 'v1.0');
+                const toolSize = escapeHtml(safeTool.size || '0 MB');
+                const toolDownloadLink = safeTool.downloadLink || '#';
 
                 // 2. توليد النجوم تفاعلياً بشكل آمن تماماً
                 let starsHTML = '';
@@ -785,20 +814,20 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-2xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-xl">
-                                <i class="fa-solid ${tool.icon || 'fa-cubes'}"></i>
+                                <i class="fa-solid ${toolIcon}"></i>
                             </div>
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 dark:bg-white/5 light:bg-gray-100 text-gray-400">
-                                ${tool.categoryLabel || 'أداة عامة'}
+                                ${toolCategoryLabel}
                             </span>
                         </div>
-                        <h3 class="text-md font-bold text-white dark:text-white light:text-gray-900 mb-2">${tool.name || 'أداة جديدة'}</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4">${tool.description || ''}</p>
+                        <h3 class="text-md font-bold text-white dark:text-white light:text-gray-900 mb-2">${toolName}</h3>
+                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4">${toolDescription}</p>
                     </div>
                     
                     <div class="border-t border-white/5 dark:border-white/5 light:border-gray-100 pt-4 mt-2">
                         <div class="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-400 light:text-gray-600 mb-3">
-                            <span>الإصدار: ${tool.version || 'v1.0'}</span>
-                            <span>الحجم: ${tool.size || '0 MB'}</span>
+                            <span>الإصدار: ${toolVersion}</span>
+                            <span>الحجم: ${toolSize}</span>
                         </div>
                         
                         <!-- صندوق التقييم بالنجوم وعداد التحميلات التفاعلي -->
@@ -812,7 +841,7 @@
                             </span>
                         </div>
 
-                        <button onclick="registerDownloadClick(${toolId}, '${tool.name || 'أداة'}', '${tool.downloadLink || '#'}')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-brand-purple hover:text-white dark:bg-white/5 dark:hover:bg-brand-purple dark:hover:text-white light:bg-gray-100 light:hover:bg-brand-purple light:hover:text-white text-brand-purple text-xs font-bold transition-all flex items-center justify-center gap-2">
+                        <button onclick='registerDownloadClick(${toolId}, ${JSON.stringify(safeTool.name || "أداة")}, ${JSON.stringify(toolDownloadLink)})' class="w-full py-3 rounded-xl bg-white/5 hover:bg-brand-purple hover:text-white dark:bg-white/5 dark:hover:bg-brand-purple dark:hover:text-white light:bg-gray-100 light:hover:bg-brand-purple light:hover:text-white text-brand-purple text-xs font-bold transition-all flex items-center justify-center gap-2">
                             تحميل مباشر وآمن <i class="fa-solid fa-download"></i>
                         </button>
                     </div>`;
