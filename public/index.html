@@ -754,54 +754,65 @@
         // --- RENDER DYNAMIC CARDS ---
         function renderTools(tools) {
             const grid = document.getElementById('toolsGrid');
+            if (!grid) return;
+            
             grid.innerHTML = '';
-            if (tools.length === 0) {
+            if (!tools || tools.length === 0) {
                 grid.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-12 text-gray-500"><p class="text-sm">لم يتم العثور على أي أداة مطابقة لبحثك.</p></div>`;
                 return;
             }
+
             tools.forEach(tool => {
                 const card = document.createElement('div');
                 card.className = "tool-card bg-brand-darkCard dark:bg-brand-darkCard light:bg-white border border-white/5 dark:border-white/5 light:border-gray-200 p-6 rounded-3xl hover:border-brand-purple/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between";
                 
-                // توليد النجوم بناءً على تقييم الأداة الحالي
+                // 1. حماية وتأمين الـ ID والبيانات الأساسية لمنع انهيار الجافاسكريبت
+                const toolId = tool.id ? parseInt(tool.id) : Date.now();
+                const activeStars = (typeof tool.stars !== 'undefined' && tool.stars !== null) ? parseInt(tool.stars) : 5;
+                const downloadCount = (typeof tool.downloads !== 'undefined' && tool.downloads !== null) ? parseInt(tool.downloads) : 140;
+
+                // 2. توليد النجوم تفاعلياً بشكل آمن تماماً
                 let starsHTML = '';
-                const activeStars = tool.stars ?? 5;
                 for (let i = 1; i <= 5; i++) {
                     starsHTML += `
-                        <button onclick="rateTool(${tool.id}, ${i})" class="focus:outline-none transition-transform hover:scale-125">
+                        <button onclick="rateTool(${toolId}, ${i})" class="focus:outline-none transition-transform hover:scale-125 p-0.5" title="تقييم ${i} نجوم">
                             <i class="fa-solid fa-star ${i <= activeStars ? 'text-yellow-500' : 'text-gray-600'} text-[11px]"></i>
                         </button>
                     `;
                 }
 
-                // جلب عدد التحميلات أو وضع رقم افتراضي أنيق إذا كان فارغاً
-                const downloadCount = tool.downloads ?? (Math.floor(Math.random() * 400) + 120);
-
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-xl"><i class="fa-solid ${tool.icon || 'fa-cubes'}"></i></div>
-                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 dark:bg-white/5 light:bg-gray-100 text-gray-400">${tool.categoryLabel}</span>
+                            <div class="w-12 h-12 rounded-2xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-xl">
+                                <i class="fa-solid ${tool.icon || 'fa-cubes'}"></i>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 dark:bg-white/5 light:bg-gray-100 text-gray-400">
+                                ${tool.categoryLabel || 'أداة عامة'}
+                            </span>
                         </div>
-                        <h3 class="text-md font-bold text-white dark:text-white light:text-gray-900 mb-2">${tool.name}</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4">${tool.description}</p>
+                        <h3 class="text-md font-bold text-white dark:text-white light:text-gray-900 mb-2">${tool.name || 'أداة جديدة'}</h3>
+                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4">${tool.description || ''}</p>
                     </div>
                     
                     <div class="border-t border-white/5 dark:border-white/5 light:border-gray-100 pt-4 mt-2">
                         <div class="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-400 light:text-gray-600 mb-3">
-                            <span>الإصدار: ${tool.version}</span>
-                            <span>الحجم: ${tool.size}</span>
+                            <span>الإصدار: ${tool.version || 'v1.0'}</span>
+                            <span>الحجم: ${tool.size || '0 MB'}</span>
                         </div>
                         
-                        <!-- نظام التقييم والتحميلات المباشر -->
-                        <div class="flex items-center justify-between text-[11px] text-gray-500 mb-4 bg-white/2 p-2 rounded-xl border border-white/5">
-                            <div class="flex items-center gap-1">
+                        <!-- صندوق التقييم بالنجوم وعداد التحميلات التفاعلي -->
+                        <div class="flex items-center justify-between text-[11px] text-gray-500 mb-4 bg-white/5 p-2.5 rounded-xl border border-white/5">
+                            <div class="flex items-center gap-0.5">
                                 ${starsHTML}
                             </div>
-                            <span><i class="fa-solid fa-download ml-1 text-brand-purple"></i> <span id="download-count-${tool.id}">${downloadCount}</span> تحميلة</span>
+                            <span class="text-gray-400">
+                                <i class="fa-solid fa-download ml-1 text-brand-purple"></i> 
+                                <span id="download-count-${toolId}">${downloadCount}</span> تحميلة
+                            </span>
                         </div>
 
-                        <button onclick="registerDownloadClick(${tool.id}, '${tool.name}', '${tool.downloadLink || '#'}')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-brand-purple hover:text-white dark:bg-white/5 dark:hover:bg-brand-purple dark:hover:text-white light:bg-gray-100 light:hover:bg-brand-purple light:hover:text-white text-brand-purple text-xs font-bold transition-all flex items-center justify-center gap-2">
+                        <button onclick="registerDownloadClick(${toolId}, '${tool.name || 'أداة'}', '${tool.downloadLink || '#'}')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-brand-purple hover:text-white dark:bg-white/5 dark:hover:bg-brand-purple dark:hover:text-white light:bg-gray-100 light:hover:bg-brand-purple light:hover:text-white text-brand-purple text-xs font-bold transition-all flex items-center justify-center gap-2">
                             تحميل مباشر وآمن <i class="fa-solid fa-download"></i>
                         </button>
                     </div>`;
