@@ -94,6 +94,7 @@
                 <a href="#contact" class="nav-link text-gray-400 hover:text-brand-purple dark:text-gray-400 light:text-gray-600 transition-colors">تواصل معي</a>
                 <a href="#tech-blog" class="nav-link text-gray-400 hover:text-brand-purple transition-colors">المدونة</a>
                 <a href="#password-security" class="nav-link text-gray-400 hover:text-brand-purple transition-colors">أمان كلمات المرور</a>
+                <a href="#crypto-suite" class="nav-link text-gray-400 hover:text-brand-purple transition-colors">محلل التشفير</a>
             </nav>
 
             <!-- Control Actions (Theme & Contact button) -->
@@ -132,6 +133,7 @@
             <a href="#contact" class="mobile-nav-link block px-3 py-2 rounded-lg text-gray-400 dark:text-gray-400 light:text-gray-600 hover:bg-brand-purple/5">تواصل معي</a>
             <a href="#tech-blog" class="mobile-nav-link block px-3 py-2 rounded-lg text-gray-400 hover:bg-brand-purple/5">المدونة</a>
             <a href="#password-security" class="mobile-nav-link block px-3 py-2 rounded-lg text-gray-400 hover:bg-brand-purple/5">أمان كلمات المرور</a>
+            <a href="#crypto-suite" class="mobile-nav-link block px-3 py-2 rounded-lg text-gray-400 hover:bg-brand-purple/5">محلل التشفير</a>
         </div>
     </header>
 
@@ -384,6 +386,141 @@
             </div>
         </div>
     </section>
+
+
+    <!-- Cryptography & Cipher Suite Section -->
+    <section id="crypto-suite" class="py-20 relative bg-brand-darkBg/50 border-t border-b border-white/5">
+        <div class="absolute bottom-1/4 left-10 w-80 h-80 bg-brand-purple/5 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+                <div class="inline-flex items-center px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-400 text-xs font-bold gap-1.5">
+                    <i class="fa-solid fa-user-secret"></i> علم التشفير وحماية البيانات
+                </div>
+                <h2 class="text-3xl font-extrabold text-white">
+                    محاكي <span class="text-brand-purple">تشفير وفك تشفير الرسائل</span>
+                </h2>
+                <p class="text-sm text-gray-400">
+                    جرب بنفسك كيف تتحول البيانات الحساسة والنصوص العادية إلى رموز معقدة وغير مفهومة لحمايتها من المتلصصين وأمن الاتصالات.
+                </p>
+            </div>
+
+            <!-- Grid: Encoder on Left, Decoder on Right -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- 1. Data Encoder Card (التشفير) -->
+                <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col justify-between">
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-lock"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-md font-bold text-white">تشفير رسالة جديدة (Encode)</h3>
+                                    <p class="text-[11px] text-gray-400">حوّل نصك العادي إلى شفرة أمنية معقدة</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selector for Algorithm -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-400">اختر خوارزمية التشفير:</label>
+                            <select id="encoderAlgo" onchange="runEncoder()" class="w-full px-3 py-2.5 bg-white/2 border border-white/5 rounded-xl text-xs text-white focus:outline-none focus:border-brand-purple">
+                                <option value="base64">Base64 Encoding</option>
+                                <option value="caesar">Caesar Cipher (تشفير القيصر)</option>
+                                <option value="hex">Hexadecimal (الترميز الست عشري)</option>
+                            </select>
+                        </div>
+
+                        <!-- Caesar Cipher Key Shift (Hidden by default, shown only when Caesar selected) -->
+                        <div id="caesarKeyContainer" class="hidden space-y-2 transition-all">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-400">مفتاح الإزاحة (Shift Key): <span id="caesarKeyVal" class="text-brand-purple font-bold">3</span></span>
+                            </div>
+                            <input type="range" id="caesarKeyRange" min="1" max="25" value="3" oninput="document.getElementById('caesarKeyVal').innerText = this.value; runEncoder();" class="w-full accent-brand-purple h-1 bg-white/5 rounded-lg appearance-none cursor-pointer">
+                        </div>
+
+                        <!-- Input Field -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-400">النص الأصلي (Plain Text):</label>
+                            <textarea id="encoderInput" oninput="runEncoder()" placeholder="اكتب الرسالة السرية هنا..." rows="3" class="w-full p-4 bg-white/2 border border-white/5 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all resize-none"></textarea>
+                        </div>
+
+                        <!-- Output Field -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-400">النص المشفّر الناتج (Cipher Text):</span>
+                                <button onclick="copyCryptoText('encoderOutput')" class="text-brand-purple hover:text-white transition-colors flex items-center gap-1">
+                                    <i class="fa-regular fa-copy text-[11px]"></i> نسخ الشفرة
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <textarea id="encoderOutput" readonly placeholder="سيتولد النص المشفر هنا تلقائياً..." rows="3" class="w-full p-4 bg-white/5 border border-white/5 rounded-xl text-xs text-cyan-400 font-mono resize-none focus:outline-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Data Decoder Card (فك التشفير) -->
+                <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl shadow-2xl flex flex-col justify-between">
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-lock-open"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-md font-bold text-white">فك تشفير رسالة (Decode)</h3>
+                                    <p class="text-[11px] text-gray-400">ترجم الرموز والشفرات وأعد قراءة الرسالة الأصلية</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selector for Algorithm -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-400">اختر خوارزمية فك التشفير الحالية:</label>
+                            <select id="decoderAlgo" onchange="runDecoder()" class="w-full px-3 py-2.5 bg-white/2 border border-white/5 rounded-xl text-xs text-white focus:outline-none focus:border-brand-purple">
+                                <option value="base64">Base64 Decoding</option>
+                                <option value="caesar">Caesar Cipher (تشفير القيصر)</option>
+                                <option value="hex">Hexadecimal (فك ترميز الست عشري)</option>
+                            </select>
+                        </div>
+
+                        <!-- Caesar Cipher Decrypt Key Shift (Hidden by default) -->
+                        <div id="caesarDecryptKeyContainer" class="hidden space-y-2 transition-all">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-400">مفتاح فك الإزاحة (Decrypt Shift Key): <span id="caesarDecryptKeyVal" class="text-brand-purple font-bold">3</span></span>
+                            </div>
+                            <input type="range" id="caesarDecryptKeyRange" min="1" max="25" value="3" oninput="document.getElementById('caesarDecryptKeyVal').innerText = this.value; runDecoder();" class="w-full accent-brand-purple h-1 bg-white/5 rounded-lg appearance-none cursor-pointer">
+                        </div>
+
+                        <!-- Input Field -->
+                        <div class="space-y-2">
+                            <label class="text-xs text-gray-400">النص المشفّر المُراد فكه (Cipher Text):</label>
+                            <textarea id="decoderInput" oninput="runDecoder()" placeholder="ضع النص المشفر هنا لفك طلاسمه..." rows="3" class="w-full p-4 bg-white/2 border border-white/5 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple transition-all resize-none"></textarea>
+                        </div>
+
+                        <!-- Output Field -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-400">الرسالة الأصلية المفكوكة (Plain Text):</span>
+                                <button onclick="copyCryptoText('decoderOutput')" class="text-brand-purple hover:text-white transition-colors flex items-center gap-1">
+                                    <i class="fa-regular fa-copy text-[11px]"></i> نسخ النص
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <textarea id="decoderOutput" readonly placeholder="ستظهر الرسالة الأصلية المفكوكة هنا..." rows="3" class="w-full p-4 bg-white/5 border border-white/5 rounded-xl text-xs text-emerald-400 resize-none focus:outline-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
 
     <!-- Password Security Suite Section -->
     <section id="password-security" class="py-20 relative bg-brand-darkBg/30 border-t border-b border-white/5">
@@ -1634,6 +1771,127 @@
             });
         }
         
+
+        // --- محرك التشفير الرئيسي (Encoder Engine) ---
+        function runEncoder() {
+            const algo = document.getElementById('encoderAlgo').value;
+            const input = document.getElementById('encoderInput').value;
+            const outputField = document.getElementById('encoderOutput');
+            const caesarContainer = document.getElementById('caesarKeyContainer');
+
+            // إظهار أو إخفاء حقل مفتاح تشفير القيصر بناءً على الخيار المحدد
+            if (algo === 'caesar') {
+                caesarContainer.classList.remove('hidden');
+            } else {
+                caesarContainer.classList.add('hidden');
+            }
+
+            if (!input) {
+                outputField.value = '';
+                return;
+            }
+
+            try {
+                if (algo === 'base64') {
+                    // التشفير بـ Base64 مع دعم الحروف العربية والرموز (UTF-8)
+                    outputField.value = btoa(unescape(encodeURIComponent(input)));
+                } else if (algo === 'caesar') {
+                    const shift = parseInt(document.getElementById('caesarKeyRange').value);
+                    outputField.value = caesarCipher(input, shift);
+                } else if (algo === 'hex') {
+                    // التحويل للنظام الست عشري (Hex)
+                    outputField.value = textToHex(input);
+                }
+            } catch (e) {
+                outputField.value = "خطأ أثناء معالجة التشفير!";
+            }
+        }
+
+        // --- محرك فك التشفير الرئيسي (Decoder Engine) ---
+        function runDecoder() {
+            const algo = document.getElementById('decoderAlgo').value;
+            const input = document.getElementById('decoderInput').value;
+            const outputField = document.getElementById('decoderOutput');
+            const caesarContainer = document.getElementById('caesarDecryptKeyContainer');
+
+            if (algo === 'caesar') {
+                caesarContainer.classList.remove('hidden');
+            } else {
+                caesarContainer.classList.add('hidden');
+            }
+
+            if (!input) {
+                outputField.value = '';
+                return;
+            }
+
+            try {
+                if (algo === 'base64') {
+                    // فك تشفير Base64 مع معالجة الحروف العربية
+                    outputField.value = decodeURIComponent(escape(atob(input)));
+                } else if (algo === 'caesar') {
+                    const shift = parseInt(document.getElementById('caesarDecryptKeyRange').value);
+                    // لفك تشفير القيصر نقوم بعمل إزاحة عكسية (26 - Shift)
+                    outputField.value = caesarCipher(input, 26 - shift);
+                } else if (algo === 'hex') {
+                    outputField.value = hexToText(input);
+                }
+            } catch (e) {
+                outputField.value = "الرمز المدخل غير صالح لفك التشفير!";
+            }
+        }
+
+        // --- خوارزمية تشفير وفك تشفير القيصر (Caesar Cipher Algorithm) ---
+        function caesarCipher(str, shift) {
+            return str.split('').map(char => {
+                const code = char.charCodeAt(0);
+                // الحروف الكبيرة بالإنجليزية
+                if (code >= 65 && code <= 90) {
+                    return String.fromCharCode(((code - 65 + shift) % 26) + 65);
+                }
+                // الحروف الصغيرة بالإنجليزية
+                if (code >= 97 && code <= 122) {
+                    return String.fromCharCode(((code - 97 + shift) % 26) + 97);
+                }
+                // إرجاع الرموز والمسافات واللغة العربية كما هي
+                return char;
+            }).join('');
+        }
+
+        // --- تحويل النصوص العادية إلى ترميز Hex ---
+        function textToHex(str) {
+            let arr = [];
+            for (let i = 0; i < str.length; i++) {
+                arr.push(str.charCodeAt(i).toString(16).padStart(2, '0'));
+            }
+            return arr.join(' ');
+        }
+
+        // --- فك ترميز Hex وإرجاعه لنص عادي ---
+        function hexToText(hexStr) {
+            let cleanedHex = hexStr.trim().replace(/\s+/g, '');
+            let str = '';
+            for (let i = 0; i < cleanedHex.length; i += 2) {
+                str += String.fromCharCode(parseInt(cleanedHex.substr(i, 2), 16));
+            }
+            return str;
+        }
+
+        // --- دالة نسخ النص التشفيري ---
+        function copyCryptoText(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (!field.value) {
+                showToast("لا يوجد نص لنسخه!", "error");
+                return;
+            }
+            navigator.clipboard.writeText(field.value).then(() => {
+                showToast("تم النسخ إلى الحافظة بأمان 📋", "success");
+            }).catch(() => {
+                showToast("فشل النسخ التلقائي", "error");
+            });
+        }
+
+
        // --- ON INITIAL LOAD ---
         window.onload = async function() {
             await fetchLiveDatabase();
