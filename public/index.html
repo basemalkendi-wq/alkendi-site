@@ -73,6 +73,57 @@
 </head>
 <body class="bg-brand-darkBg text-gray-100 min-h-screen selection:bg-brand-purple selection:text-white transition-colors duration-300">
 
+    <!-- ==================== EXCLUSIVE AL-KENDI TECH PRELOADER ==================== -->
+    <div id="kendi-preloader" class="fixed inset-0 z-[9999] bg-[#03000a] flex flex-col items-center justify-center overflow-hidden transition-all duration-1000 select-none">
+        <!-- Canvas for Interactive Particle Field -->
+        <canvas id="preloaderCanvas" class="absolute inset-0 w-full h-full pointer-events-auto"></canvas>
+
+        <!-- Loading Interface -->
+        <div class="relative z-10 flex flex-col items-center text-center space-y-6 px-4">
+            <!-- Quantum Core Logo Icon -->
+            <div class="relative w-24 h-24 flex items-center justify-center">
+                <!-- Glowing Outer Rings -->
+                <div class="absolute inset-0 rounded-full border-2 border-dashed border-brand-purple/20 animate-[spin_15s_linear_infinite]"></div>
+                <div class="absolute inset-2 rounded-full border border-cyan-500/30 animate-[spin_10s_linear_infinite_reverse]"></div>
+                <!-- Glowing Core -->
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-brand-purple to-cyan-500 flex items-center justify-center shadow-[0_0_30px_rgba(139,92,246,0.6)] animate-pulse">
+                    <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+                </div>
+            </div>
+
+            <!-- Decoding Typography (العربية و الإنجليزية) -->
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold tracking-widest text-cyan-400 font-mono animate-pulse uppercase">
+                    Initializing Secure Handshake...
+                </h3>
+                <h1 id="matrix-brand-text" class="text-3xl sm:text-5xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-brand-purple via-fuchsia-500 to-cyan-400 drop-shadow-[0_0_20px_rgba(139,92,246,0.4)] font-mono">
+                    AL-KENDI TECH
+                </h1>
+                <p class="text-[11px] text-gray-500 font-medium max-w-xs mx-auto leading-relaxed">
+                    حرك مؤشر الماوس للتفاعل مع الحقل المغناطيسي لدرع الكندي الواقي...
+                </p>
+            </div>
+
+            <!-- Progressive Loading Bar -->
+            <div class="w-56 h-[3px] bg-white/5 rounded-full overflow-hidden relative border border-white/5">
+                <div id="preloaderProgressBar" class="h-full w-0 bg-gradient-to-r from-brand-purple via-fuchsia-500 to-cyan-400 rounded-full transition-all duration-300"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preloader CSS Base -->
+    <style>
+        #kendi-preloader {
+            cursor: radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%);
+        }
+        /* منع التمرير أثناء ظهور شاشة التحميل */
+        body.preloader-active {
+            overflow: hidden !important;
+            height: 100vh !important;
+        }
+    </style>
+
+
     <!-- Header / Navigation -->
     <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b border-white/10 dark:border-white/10 light:border-gray-200 glass-header bg-brand-darkBg/80 dark:bg-brand-darkBg/80 light:bg-white/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -1927,6 +1978,202 @@
                 updateActiveNavOnScroll(); 
             }, 150);
         };
+
+
+        // ==================== AL-KENDI QUANTUM PRELOADER ENGINE ====================
+        document.body.classList.add('preloader-active');
+
+        const canvas = document.getElementById('preloaderCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+
+        // ضبط قياسات الكانفاس لتلائم حجم الشاشة بالكامل
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // تتبع حركة الماوس أو اللمس
+        const mouse = { x: null, y: null, radius: 120 };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+            }
+        }, { passive: true });
+        window.addEventListener('mouseleave', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        // مصفوفة الجزيئات المضيئة المغناطيسية
+        const particlesArray = [];
+        const numberOfParticles = Math.min(120, (window.innerWidth * window.innerHeight) / 10000); // كثافة متوازنة
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 10;
+                this.color = Math.random() > 0.5 ? 'rgba(139, 92, 246, 0.4)' : 'rgba(6, 182, 212, 0.4)'; // بنفسجي أو سيان
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 10;
+                ctx.fill();
+            }
+            update() {
+                // تصفير تأثير التوهج للعمليات العادية لتجنب بطء المعالج
+                ctx.shadowBlur = 0;
+
+                // حساب المسافة بين الماوس والجزيء
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                let forceDirectionX = dx / distance;
+                let forceDirectionY = dy / distance;
+
+                // تحويل القوة لحركة تفاعلية مغناطيسية تنجذب أو تبتعد بناء على المسافة
+                let maxDistance = mouse.radius;
+                let force = (maxDistance - distance) / maxDistance;
+                let directionX = forceDirectionX * force * this.density;
+                let directionY = forceDirectionY * force * this.density;
+
+                if (distance < mouse.radius) {
+                    // تنجذب الجزيئات للموس لتعطي انطباع المغناطيسية
+                    this.x += directionX;
+                    this.y += directionY;
+                } else {
+                    // تعود لمكانها الأصلي بمرونة فائقة
+                    if (this.x !== this.baseX) {
+                        let dxBase = this.x - this.baseX;
+                        this.x -= dxBase / 15;
+                    }
+                    if (this.y !== this.baseY) {
+                        let dyBase = this.y - this.baseY;
+                        this.y -= dyBase / 15;
+                    }
+                }
+            }
+        }
+
+        // بناء مصفوفة الجزيئات
+        function initParticles() {
+            particlesArray.length = 0;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+        initParticles();
+
+        // رسم وتحديث الخطوط المغناطيسية الرابطة بين الجزيئات والماوس
+        function connectParticles() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let dx = particlesArray[a].x - particlesArray[b].x;
+                    let dy = particlesArray[a].y - particlesArray[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 110) {
+                        ctx.strokeStyle = `rgba(139, 92, 246, ${0.15 - (distance / 110) * 0.15})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // حلقة التحديث المستمر للرسوم (Animation Loop)
+        function animatePreloader() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connectParticles();
+            animationFrameId = requestAnimationFrame(animatePreloader);
+        }
+        animatePreloader();
+
+        // تأثير فك تشفير مصفوفة الاسم ديناميكياً (Matrix Text Decoder)
+        const brandTextElement = document.getElementById('matrix-brand-text');
+        const finalBrandName = "AL-KENDI TECH";
+        const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+{}";
+        let decodingProgress = 0;
+
+        const brandDecoderInterval = setInterval(() => {
+            let currentDisplay = "";
+            for (let i = 0; i < finalBrandName.length; i++) {
+                if (finalBrandName[i] === " ") {
+                    currentDisplay += " ";
+                    continue;
+                }
+                if (i < decodingProgress) {
+                    currentDisplay += finalBrandName[i];
+                } else {
+                    currentDisplay += matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                }
+            }
+            brandTextElement.innerText = currentDisplay;
+
+            if (decodingProgress < finalBrandName.length) {
+                decodingProgress += 0.3; // سرعة فك التشفير
+            } else {
+                clearInterval(brandDecoderInterval);
+            }
+        }, 45);
+
+        // محاكاة شريط التقدم الفعلي ليتجاوب مع سرعة استجابة السيرفر
+        const progressBar = document.getElementById('preloaderProgressBar');
+        let progressWidth = 0;
+
+        const progressInterval = setInterval(() => {
+            if (progressWidth < 85) {
+                progressWidth += Math.random() * 8; // يتقدم بسرعة عشوائية حتى 85%
+            } else {
+                // ينتظر عند الـ 85% حتى يكتمل تحميل الملفات الخلفية والاتصال
+                clearInterval(progressInterval);
+            }
+            progressBar.style.width = Math.min(progressWidth, 100) + '%';
+        }, 150);
+
+        // عندما تكتمل الصفحة بالكامل وتصبح حية:
+        window.addEventListener('load', () => {
+            progressBar.style.width = '100%';
+            
+            setTimeout(() => {
+                // إغلاق الأنيميشن وتأثير الفيد أوت الأنيق
+                cancelAnimationFrame(animationFrameId);
+                const preloader = document.getElementById('kendi-preloader');
+                preloader.classList.add('opacity-0', 'pointer-events-none');
+                document.body.classList.remove('preloader-active');
+
+                // إزالة الشاشة بالكامل من الـ DOM بعد دقيقة واحدة للحفاظ على الذاكرة
+                setTimeout(() => {
+                    preloader.remove();
+                }, 1000);
+            }, 800);
+        });
+
+        
     </script>
+    
+
+    
 </body>
 </html>
