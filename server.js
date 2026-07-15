@@ -54,7 +54,7 @@ app.options(/.*/, cors(corsOptions));
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(cookieParser());
 
-// تحديث الهيكل الافتراضي ليشمل كافة الحقول الجديدة للشاشة البرمجية والفوتر وصفحة التواصل
+// تحديث الهيكل الافتراضي ليعتمد بشكل صلب ومستمر على بيانات الأدمن الرسمية
 function createDefaultData() {
     return {
         admin_account: {
@@ -111,9 +111,9 @@ function createDefaultData() {
         },
         footerContact: {
             contactTitle: 'هل لديك فكرة أو طلب تعاون؟',
-            contactDesc: 'سواء كنت ترغب في مناقشة مشروع برمجيات، رعاية إعلانية...',
-            contactEmail: 'work@alkendi.me',
-            contactLocation: 'صنعاء، اليمن',
+            contactDesc: 'سواء كنت ترغب في مناقشة مشروع برمجيات، رعاية إعلانية على قنواتي الاجتماعية، أو استشارة تقنية بمجال الـ IT، اترك رسالتك وسأرد عليك بأقرب وقت.',
+            contactEmail: 'work@alkendi.me', // بريدك الرسمي المعتمد للأبد
+            contactLocation: 'صنعاء، اليمن',   // موقعك الرسمي المعتمد للأبد
             copyright: '© 2026 جميع الحقوق محفوظة لـ Al-Kendi Tech. تم تطوير الموقع بكل حب وشغف بالبرمجة.'
         },
         messages: [],
@@ -157,7 +157,7 @@ function normalizeProject(project = {}) {
     };
 }
 
-// تعديل مصفوفة الفحص الشامل لمنع السيرفر من مسح البيانات الجديدة المرسلة من الأدمن
+// دمج وتأمين مصفوفة الفحص لمنع السيرفر من استرجاع أي بيانات تجريبية أو قديمة
 function normalizeData(rawData = {}) {
     const defaultData = createDefaultData();
     const source = rawData && typeof rawData === 'object' ? rawData : {};
@@ -332,7 +332,6 @@ app.post('/api/data/update', requireAuth, async (req, res) => {
     }
 });
 
-// مسار مفتوح مخصص لاستقبال رسائل الزوار وحفظها بأمان
 app.post('/api/contact', async (req, res) => {
     try {
         const { name = '', email = '', subject = '', message = '' } = req.body || {};
@@ -344,7 +343,6 @@ app.post('/api/contact', async (req, res) => {
         const data = await readDataFile();
         if (!data.messages) data.messages = [];
 
-        // إنشاء كائن الرسالة الجديد وضخه
         const newMessage = {
             id: Date.now(),
             name,
@@ -363,7 +361,6 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// مسار تحديث التقييم (النجوم) لأداة معينة
 app.post('/api/tools/rate', async (req, res) => {
     try {
         const { toolId, rating } = req.body || {};
@@ -375,7 +372,6 @@ app.post('/api/tools/rate', async (req, res) => {
         const toolIndex = data.tools.findIndex(t => t.id == toolId);
 
         if (toolIndex !== -1) {
-            // حساب التقييم الجديد (تبسيطاً سنقوم بتحديث القيمة الحالية)
             data.tools[toolIndex].stars = Math.min(5, Math.max(1, Math.round(rating)));
             await writeDataFile(data);
             return res.json({ success: true, message: 'تم تسجيل تقييمك بنجاح!', stars: data.tools[toolIndex].stars });
@@ -387,7 +383,6 @@ app.post('/api/tools/rate', async (req, res) => {
     }
 });
 
-// مسار تسجيل تحميل جديد لأداة معينة
 app.post('/api/tools/download-click', async (req, res) => {
     try {
         const { toolId } = req.body || {};
@@ -395,7 +390,6 @@ app.post('/api/tools/download-click', async (req, res) => {
         const toolIndex = data.tools.findIndex(t => t.id == toolId);
 
         if (toolIndex !== -1) {
-            // سنقوم بزيادة عداد التحميلات (إذا لم يكن موجوداً سننشئه)
             if (!data.tools[toolIndex].downloads) {
                 data.tools[toolIndex].downloads = 0;
             }

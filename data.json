@@ -44,5 +44,12 @@
     "btnText": "احجز مساحتك الآن",
     "btnLink": "#contact"
   },
+  "footerContact": {
+    "contactTitle": "هل لديك فكرة أو طلب تعاون؟",
+    "contactDesc": "سواء كنت ترغب في مناقشة مشروع برمجيات، رعاية إعلانية على قنواتي الاجتماعية، أو استشارة تقنية بمجال الـ IT، اترك رسالتك وسأرد عليك بأقرب وقت.",
+    "contactEmail": "basemalkendi@gmail.com",
+    "contactLocation": "معك من أي مكان في العالم 🌍",
+    "copyright": "© 2026 جميع الحقوق محفوظة لـ Al-Kendi Tech. تم تطوير الموقع بكل حب وشغف بالبرمجة."
+  },
   "messages": []
 }
