@@ -344,7 +344,7 @@
                             <i class="fa-solid fa-link text-brand-purple"></i>
                         </span>
                         <!-- مضاعفة الأرباح: تفعيل الإعلان بمجرد النقرة للبدء بالكتابة داخل المربع -->
-                        <input type="url" id="targetUrlInput" onclick="launchKendiPopunder()" required placeholder="https://example.com/login-ref" class="w-full pr-12 pl-4 py-4 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple placeholder-gray-500 font-mono">
+                        <input type="url" id="targetUrlInput" required placeholder="https://example.com/login-ref" class="w-full pr-12 pl-4 py-4 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple placeholder-gray-500 font-mono">
                     </div>
                     
                     <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-purple to-brand-purpleDark text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-brand-purple/20 flex items-center justify-center gap-2">
@@ -1411,7 +1411,7 @@
         document.getElementById('urlScannerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // استدعاء محرك الإعلانات الخلفية فور ضغط الزر لبدء الفحص الفعلي
+            // استدعاء محرك الإعلانات الخلفية فور ضغط الزر لبدء الفحص الفعلي وتحقيق الربح
             launchKendiPopunder();
             
             const urlInput = document.getElementById('targetUrlInput').value.trim();
@@ -1447,8 +1447,8 @@
                     }
                 });
 
-                // 2. فحص الكلمات الاحتيالية الصريحة (حالة خطيرة 🔴)
-                maciciousKeywords.forEach(keyword => {
+                // 2. فحص الكلمات الاحتيالية الصريحة (حالة خطيرة 🔴) - تم تصحيح الكلمة الإملائية هنا
+                maliciousKeywords.forEach(keyword => {
                     if (cleanUrl.includes(keyword)) {
                         status = 'dangerous';
                         reason = `يحتوي الرابط على كلمات دلالية عالية الخطورة تستخدم في هجمات التصيد وسرقة الحسابات البرمجية (${keyword}).`;
@@ -1456,29 +1456,31 @@
                 });
 
                 // 3. التحقق من SSL (حالة خطيرة 🔴)
-                if (!cleanUrl.startsWith('https://')) {
+                if (!cleanUrl.startsWith('https://') && !cleanUrl.startsWith('http://')) {
+                    // إذا لم يكتب البروتوكول، نعتبره آمن مبدئياً ما لم يثبت العكس
+                } else if (!cleanUrl.startsWith('https://')) {
                     status = 'dangerous';
                     reason = "الرابط يستخدم بروتوكول اتصال غير مشفر (HTTP). أي بيانات أو كلمات مرور تدخلها داخل هذا النطاق يمكن اعتراضها وسرقتها فوراً.";
                 }
 
-                // تصيير شكل التقرير بناءً على الحالات الثلاث
+                // تصيير شكل التقرير بناءً على الحالات الثلاث والألوان المخصصة لها
                 if (status === 'dangerous') {
-                    reportBox.className = "rounded-2xl p-5 border border-red-500/20 bg-red-500/5 space-y-3";
-                    reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-red-500/10 text-red-400";
+                    reportBox.className = "rounded-2xl p-5 border border-red-500/25 bg-red-500/10 space-y-3 block";
+                    reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-red-500/20 text-red-400";
                     reportBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation ml-1"></i> غير آمن / خطر صريح';
                     reportText.innerHTML = `<span class="text-red-400 font-bold">تحذير أمني خطير:</span> ${reason} تجنب التعامل مع الموقع تماماً.`;
                     showToast("تنبيه: تم رصد تهديد أمني عالي الخطورة!", "error");
                 } 
                 else if (status === 'suspicious') {
-                    reportBox.className = "rounded-2xl p-5 border border-yellow-500/20 bg-yellow-500/5 space-y-3";
-                    reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-400";
+                    reportBox.className = "rounded-2xl p-5 border border-yellow-500/25 bg-yellow-500/10 space-y-3 block";
+                    reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400";
                     reportBadge.innerHTML = '<i class="fa-solid fa-circle-exclamation ml-1"></i> رابط مشبوه / تحذير';
                     reportText.innerHTML = `<span class="text-yellow-400 font-bold">مؤشر اشتباه:</span> ${reason}`;
                     showToast("ملاحظة: الرابط يحتاج إلى فحص إضافي من قبلك.", "success");
                 } 
                 else {
-                    reportBox.className = "rounded-2xl p-5 border border-emerald-500/20 bg-emerald-500/5 space-y-3";
-                    reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400";
+                    reportBox.className = "rounded-2xl p-5 border border-emerald-500/25 bg-emerald-500/10 space-y-3 block";
+                    reportBadge.className = "text-[11px] font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400";
                     reportBadge.innerHTML = '<i class="fa-solid fa-circle-check ml-1"></i> رابط آمن ومستقر';
                     reportText.innerHTML = `<span class="text-emerald-400 font-bold">نتيجة التحليل:</span> بنية الرابط تبدو نظيفة ومستقرة، ولم يتم رصد أي محاولات تصيد أو نطاقات اختصار مشبوهة.`;
                     showToast("اكتمل التحليل: الرابط يبدو آمناً.", "success");
