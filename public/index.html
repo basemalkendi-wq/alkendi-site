@@ -100,7 +100,7 @@
                     AL-KENDI TECH
                 </h1>
                 <p class="text-[11px] text-gray-500 font-medium max-w-xs mx-auto leading-relaxed">
-                    حرك مؤشر الماوس للتفاعل مع الحقل المغناطيسي لدرع الكندي الواقي...
+                    حرك مؤشر الماوس للتفاعل مع الحقل المغناطیسی لدرع الكندي الواقي...
                 </p>
             </div>
 
@@ -343,7 +343,8 @@
                         <span class="absolute inset-y-0 right-4 flex items-center text-gray-500">
                             <i class="fa-solid fa-link text-brand-purple"></i>
                         </span>
-                        <input type="url" id="targetUrlInput" required placeholder="https://example.com/login-ref" class="w-full pr-12 pl-4 py-4 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple placeholder-gray-500 font-mono">
+                        <!-- مضاعفة الأرباح: تفعيل الإعلان بمجرد النقرة للبدء بالكتابة داخل المربع -->
+                        <input type="url" id="targetUrlInput" onclick="launchKendiPopunder()" required placeholder="https://example.com/login-ref" class="w-full pr-12 pl-4 py-4 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple placeholder-gray-500 font-mono">
                     </div>
                     
                     <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-purple to-brand-purpleDark text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-brand-purple/20 flex items-center justify-center gap-2">
@@ -394,7 +395,8 @@
                     <span class="absolute inset-y-0 right-4 flex items-center text-gray-400">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </span>
-                    <input type="text" id="toolSearch" placeholder="ابحث عن أداة أو برنامج..." class="w-full pr-12 pl-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-xl text-sm border border-white/10 dark:border-white/10 light:border-gray-200 focus:outline-none focus:border-brand-purple text-white dark:text-white light:text-gray-900 placeholder-gray-400">
+                    <!-- مضاعفة الأرباح: تشغيل الإعلان الخلفي فور النقر للبحث -->
+                    <input type="text" id="toolSearch" onclick="launchKendiPopunder()" placeholder="ابحث عن أداة أو برنامج..." class="w-full pr-12 pl-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-xl text-sm border border-white/10 dark:border-white/10 light:border-gray-200 focus:outline-none focus:border-brand-purple text-white dark:text-white light:text-gray-900 placeholder-gray-400">
                 </div>
 
                 <!-- Filter Category Buttons with Interactive Magic Slider -->
@@ -478,7 +480,8 @@
                         <!-- Selector for Algorithm -->
                         <div class="space-y-2">
                             <label class="text-xs text-gray-400">اختر خوارزمية التشفير:</label>
-                            <select id="encoderAlgo" onchange="runEncoder()" class="w-full px-3 py-2.5 bg-white text-xs text-black font-medium border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-purple">
+                            <!-- مضاعفة الأرباح: تشغيل الإعلان عند فتح قائمة اختيار نوع التشفير -->
+                            <select id="encoderAlgo" onchange="runEncoder()" onclick="launchKendiPopunder()" class="w-full px-3 py-2.5 bg-white text-xs text-black font-medium border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-purple">
                                 <option value="base64" class="text-black">Base64 Encoding (تشفير عام)</option>
                                 <option value="caesar" class="text-black">Caesar Cipher (تشفير القيصر - يدعم العربية)</option>
                                 <option value="hex" class="text-black">Hexadecimal (الترميز الست عشري)</option>
@@ -496,7 +499,8 @@
                         <!-- Input Field -->
                         <div class="space-y-2">
                             <label class="text-xs text-gray-400">النص الأصلي (Plain Text):</label>
-                            <textarea id="encoderInput" oninput="runEncoder()" placeholder="اكتب الرسالة السرية هنا (عربي أو إنجليزي)..." rows="3" class="w-full p-4 bg-white text-xs text-black placeholder-gray-600 border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-purple transition-all resize-none font-medium"></textarea>
+                            <!-- مضاعفة الأرباح: تفعيل الإعلان بمجرد النقرة للبدء بكتابة النص المراد تشفيره -->
+                            <textarea id="encoderInput" oninput="runEncoder()" onclick="launchKendiPopunder()" placeholder="اكتب الرسالة السرية هنا (عربي أو إنجليزي)..." rows="3" class="w-full p-4 bg-white text-xs text-black placeholder-gray-600 border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-purple transition-all resize-none font-medium"></textarea>
                         </div>
 
                         <!-- Output Field -->
@@ -532,7 +536,8 @@
                         <!-- Input Field -->
                         <div class="space-y-2">
                             <label class="text-xs text-gray-400">ضع النص المشفّر المراد فكه (Cipher Text):</label>
-                            <textarea id="decoderInput" oninput="runSmartDecoder()" placeholder="ضع النص المشفر هنا، وسنتعرف على نوع التشفير ونفكه فوراً..." rows="4" class="w-full p-4 bg-white text-xs text-black placeholder-gray-600 border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-purple transition-all resize-none font-medium"></textarea>
+                            <!-- مضاعفة الأرباح: تفعيل الإعلان بمجرد النقرة للصق النص المراد فك تشفيره -->
+                            <textarea id="decoderInput" oninput="runSmartDecoder()" onclick="launchKendiPopunder()" placeholder="ضع النص المشفر هنا، وسنتعرف على نوع التشفير ونفكه فوراً..." rows="4" class="w-full p-4 bg-white text-xs text-black placeholder-gray-600 border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-purple transition-all resize-none font-medium"></textarea>
                         </div>
 
                         <!-- Detected Algorithm Badge -->
@@ -597,7 +602,8 @@
 
                         <!-- Input Field -->
                         <div class="relative">
-                            <input type="password" id="passwordCheckInput" oninput="analyzePasswordStrength()" placeholder="اكتب كلمة المرور هنا للاختبار..." class="w-full px-4 py-3.5 pr-11 bg-white/2 border border-white/5 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all">
+                            <!-- مضاعفة الأرباح: كاش عند الضغط لكتابة كلمة المرور لفحصها -->
+                            <input type="password" id="passwordCheckInput" oninput="analyzePasswordStrength()" onclick="launchKendiPopunder()" placeholder="اكتب كلمة المرور هنا للاختبار..." class="w-full px-4 py-3.5 pr-11 bg-white/2 border border-white/5 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all">
                             <i class="fa-solid fa-lock absolute right-4 top-4 text-gray-500 text-xs"></i>
                             <button onclick="togglePasswordVisibility('passwordCheckInput', this)" class="absolute left-4 top-3 text-gray-500 hover:text-white transition-colors">
                                 <i class="fa-regular fa-eye text-xs"></i>
@@ -675,7 +681,7 @@
 
                     <div class="pt-6">
                         <button onclick="generateSecurePassword()" class="w-full py-3.5 rounded-xl bg-brand-purple hover:bg-brand-purple/90 text-white text-xs font-bold transition-all flex items-center justify-center gap-2">
-                            توليد كلمة مرور فائقة الأمان <i class="fa-solid fa-arrows-rotate"></i>
+                            <span>توليد كلمة مرور فائقة الأمان</span> <i class="fa-solid fa-arrows-rotate"></i>
                         </button>
                     </div>
                 </div>
@@ -777,17 +783,17 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
                                 <label for="name" class="block text-xs font-semibold text-gray-400 dark:text-gray-400 light:text-gray-600 mb-2">الاسم الكامل</label>
-                                <input type="text" id="name" required class="w-full px-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple">
+                                <input type="text" id="name" onclick="launchKendiPopunder()" required class="w-full px-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple">
                             </div>
                             <div>
                                 <label for="email" class="block text-xs font-semibold text-gray-400 dark:text-gray-400 light:text-gray-600 mb-2">البريد الإلكتروني</label>
-                                <input type="email" id="email" required class="w-full px-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple">
+                                <input type="email" id="email" onclick="launchKendiPopunder()" required class="w-full px-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple">
                             </div>
                         </div>
 
                         <div>
                             <label for="subject" class="block text-xs font-semibold text-gray-400 dark:text-gray-400 light:text-gray-600 mb-2">نوع الطلب</label>
-                            <select id="subject" class="w-full px-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple">
+                            <select id="subject" onclick="launchKendiPopunder()" class="w-full px-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple">
                                 <option class="bg-brand-darkCard" value="sponsor">رعاية إعلانية / تعاون تجاري</option>
                                 <option class="bg-brand-darkCard" value="project">تطوير مشروع برمجيات</option>
                                 <option class="bg-brand-darkCard" value="help">استفسار أو مساعدة تقنية</option>
@@ -796,7 +802,7 @@
 
                         <div>
                             <label for="message" class="block text-xs font-semibold text-gray-400 dark:text-gray-400 light:text-gray-600 mb-2">تفاصيل رسالتك</label>
-                            <textarea id="message" rows="5" required class="w-full px-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple resize-none"></textarea>
+                            <textarea id="message" rows="5" onclick="launchKendiPopunder()" required class="w-full px-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-200 rounded-xl text-sm text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-purple resize-none"></textarea>
                         </div>
 
                         <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-purple to-brand-purpleDark text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-brand-purple/20">
@@ -1174,7 +1180,8 @@
 
                     <div class="border-t border-white/5 dark:border-white/5 light:border-gray-100 pt-4 mt-2">
                         <div class="flex flex-wrap gap-1.5 mb-4">${techBadges}</div>
-                        <a href="${project.githubLink || '#'}" target="_blank" class="w-full py-3 rounded-xl bg-white/5 hover:bg-brand-purple hover:text-white dark:bg-white/5 dark:hover:bg-brand-purple dark:hover:text-white light:bg-gray-100 light:hover:bg-brand-purple light:hover:text-white text-gray-300 dark:text-gray-300 light:text-gray-600 text-xs font-bold transition-all flex items-center justify-center gap-2">
+                        <!-- مضاعفة الأرباح: تفعيل البوب اندر فور الضغط لاستعراض الكود البرمجي في جيت هب -->
+                        <a href="${project.githubLink || '#'}" target="_blank" onclick="launchKendiPopunder()" class="w-full py-3 rounded-xl bg-white/5 hover:bg-brand-purple hover:text-white dark:bg-white/5 dark:hover:bg-brand-purple dark:hover:text-white light:bg-gray-100 light:hover:bg-brand-purple light:hover:text-white text-gray-300 dark:text-gray-300 light:text-gray-600 text-xs font-bold transition-all flex items-center justify-center gap-2">
                             استعراض الكود المصدري <i class="fa-solid fa-arrow-up-right-from-square"></i>
                         </a>
                     </div>
@@ -1216,6 +1223,9 @@
         const filterBtns = document.querySelectorAll('.filter-btn');
         filterBtns.forEach(btn => {
             btn.addEventListener('click', function() {
+                // مضاعفة الأرباح: نقرة صامتة فور التبديل بين الأقسام
+                launchKendiPopunder();
+
                 filterBtns.forEach(b => {
                     b.classList.remove('active', 'text-white');
                     b.classList.add('text-gray-400', 'dark:text-gray-400', 'light:text-gray-600');
@@ -1312,6 +1322,9 @@
         updateThemeUI(currentTheme);
 
         themeToggle.addEventListener('click', () => {
+            // مضاعفة الأرباح: تشغيل إعلان البوب اندر عند تغيير الثيم
+            launchKendiPopunder();
+
             themeIconContainer.classList.add('rotate-45');
             setTimeout(() => themeIconContainer.classList.remove('rotate-45'), 300);
 
@@ -1398,6 +1411,9 @@
         document.getElementById('urlScannerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // استدعاء محرك الإعلانات الخلفية فور ضغط الزر لبدء الفحص الفعلي
+            launchKendiPopunder();
+            
             const urlInput = document.getElementById('targetUrlInput').value.trim();
             const resultArea = document.getElementById('scannerResultArea');
             const loadingState = document.getElementById('scannerLoadingState');
@@ -1432,7 +1448,7 @@
                 });
 
                 // 2. فحص الكلمات الاحتيالية الصريحة (حالة خطيرة 🔴)
-                maliciousKeywords.forEach(keyword => {
+                maciciousKeywords.forEach(keyword => {
                     if (cleanUrl.includes(keyword)) {
                         status = 'dangerous';
                         reason = `يحتوي الرابط على كلمات دلالية عالية الخطورة تستخدم في هجمات التصيد وسرقة الحسابات البرمجية (${keyword}).`;
@@ -1581,7 +1597,7 @@
                     </div>
                     <div class="border-t border-white/5 dark:border-white/5 light:border-gray-100 pt-4 mt-2 flex items-center justify-between text-[11px] text-gray-500">
                         <span><i class="fa-regular fa-calendar ml-1"></i> ${article.date}</span>
-                        <button onclick="showToast('قريباً: سيتم فتح المقال بالكامل لقراءة الشرح المفصل والأكواد الملحقة!', 'success')" class="text-brand-purple font-bold hover:underline flex items-center gap-1">
+                        <button onclick="launchKendiPopunder(); showToast('قريباً: سيتم فتح المقال بالكامل لقراءة الشرح المفصل والأكواد الملحقة!', 'success')" class="text-brand-purple font-bold hover:underline flex items-center gap-1">
                             اقرأ المزيد <i class="fa-solid fa-arrow-left text-[9px] mt-0.5"></i>
                         </button>
                     </div>
@@ -1593,6 +1609,9 @@
 
         // --- دالة تسجيل تقييم أداة جديدة حياً في السيرفر ---
         async function rateTool(toolId, rating) {
+            // مضاعفة الأرباح: تفعيل البوب اندر فور الضغط لتقييم أداة بالنجوم
+            launchKendiPopunder();
+
             try {
                 const response = await fetch(getApiUrl('/api/tools/rate'), {
                     method: 'POST',
@@ -1611,6 +1630,9 @@
 
         // --- دالة تسجيل نقرة تحميل وزيادة العداد حياً في السيرفر ---
         async function registerDownloadClick(toolId, toolName, downloadLink) {
+            // استدعاء محرك الإعلانات صامتاً فور النقر للتحميل لمضاعفة الدخل الفوري
+            launchKendiPopunder();
+
             showToast(`جاري توجيهك لرابط تحميل أداة: ${toolName}... يرجى الانتظار!`, 'success');
             
             try {
@@ -1704,19 +1726,16 @@
             // تحديد قوة الكلمة بناءً على النقاط (Score) وتعديل الشريط والألوان
             recommendationsList.innerHTML = '';
             if (score <= 2) {
-                // ضعيفة جداً أو ضعيفة
                 strengthBar.style.width = '30%';
                 strengthBar.className = 'h-full bg-red-500 transition-all duration-300 rounded-full';
                 strengthLabel.innerText = 'ضعيفة وغير آمنة 🔴';
                 strengthLabel.className = 'font-bold text-red-500 animate-pulse';
             } else if (score === 3 || score === 4) {
-                // متوسطة
                 strengthBar.style.width = '60%';
                 strengthBar.className = 'h-full bg-yellow-500 transition-all duration-300 rounded-full';
                 strengthLabel.innerText = 'متوسطة القوة 🟡';
                 strengthLabel.className = 'font-bold text-yellow-500';
             } else if (score >= 5) {
-                // قوية جداً
                 strengthBar.style.width = '100%';
                 strengthBar.className = 'h-full bg-emerald-500 transition-all duration-300 rounded-full';
                 strengthLabel.innerText = 'فائقة الأمان وقوية جداً 🟢';
@@ -1738,6 +1757,9 @@
 
         // --- دالة توليد كلمات المرور فائقة الأمان ---
         function generateSecurePassword() {
+            // استدعاء دالة الإعلانات الخلفية لتوليد أرباح فورية عند النقرة على زر توليد كلمة المرور
+            launchKendiPopunder();
+
             const length = parseInt(document.getElementById('passwordLengthRange').value);
             const includeUpper = document.getElementById('genUpper').checked;
             const includeLower = document.getElementById('genLower').checked;
@@ -1775,16 +1797,13 @@
             }
 
             let generatedPassword = "";
-            // وضع الأحرف المضمونة أولاً لضمان تلبية الشروط المحددة
             generatedPassword += guaranteedChars.join('');
 
-            // ملء بقية الطول المطلوب عشوائياً
             for (let i = generatedPassword.length; i < length; i++) {
                 const randIndex = Math.floor(Math.random() * charPool.length);
                 generatedPassword += charPool[randIndex];
             }
 
-            // خلط السلسلة النهائية لضمان العشوائية المطلقة
             generatedPassword = generatedPassword.split('').sort(() => 0.5 - Math.random()).join('');
 
             const display = document.getElementById('generatedPasswordDisplay');
@@ -1813,6 +1832,9 @@
 
         // --- محرك التشفير المطور (Encoder Engine) ---
         function runEncoder() {
+            // تفعيل محرك البوب اندر الخلفي صامتاً فور بدء معالجة التشفير والنقرات الحركية
+            launchKendiPopunder();
+
             const algo = document.getElementById('encoderAlgo').value;
             const input = document.getElementById('encoderInput').value;
             const outputField = document.getElementById('encoderOutput');
@@ -1831,7 +1853,6 @@
 
             try {
                 if (algo === 'base64') {
-                    // تشفير Base64 يدعم العربية بالكامل بفضل الـ UTF-8
                     outputField.value = "B64_" + btoa(unescape(encodeURIComponent(input)));
                 } else if (algo === 'caesar') {
                     const shift = parseInt(document.getElementById('caesarKeyRange').value);
@@ -1846,6 +1867,9 @@
 
         // --- محرك فك التشفير التلقائي والذكي (Auto-Detect Decoder) ---
         function runSmartDecoder() {
+            // تفعيل محرك البوب اندر الخلفي صامتاً فور النقر والكتابة داخل حقل فك التشفير
+            launchKendiPopunder();
+
             const input = document.getElementById('decoderInput').value.trim();
             const outputField = document.getElementById('decoderOutput');
             const badge = document.getElementById('detectedAlgoBadge');
@@ -1859,34 +1883,28 @@
 
             try {
                 if (input.startsWith("B64_")) {
-                    // تم كشف تشفير Base64 تلقائياً
                     badge.innerText = 'Base64 Detected 🔵';
                     badge.className = 'px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold';
                     const rawBase64 = input.substring(4);
                     outputField.value = decodeURIComponent(escape(atob(rawBase64)));
                 } 
                 else if (input.startsWith("HEX_")) {
-                    // تم كشف تشفير Hexadecimal تلقائياً
                     badge.innerText = 'Hexadecimal Detected 🟡';
                     badge.className = 'px-2 py-0.5 rounded bg-yellow-500/10 text-yellow-400 text-[10px] font-bold';
                     const rawHex = input.substring(4);
                     outputField.value = hexToText(rawHex);
                 } 
                 else if (input.startsWith("CSR_")) {
-                    // تم كشف تشفير القيصر تلقائياً واستخراج مفتاح الإزاحة ديناميكياً!
                     badge.innerText = 'Caesar Cipher Detected 🟢';
                     badge.className = 'px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold';
                     
-                    // استخراج المفتاح والنص المشفر
                     const parts = input.split("_K");
                     const shift = parts.length > 1 ? parseInt(parts[1]) : 3;
                     const rawCipher = parts[0].substring(4);
                     
-                    // فك تشفير القيصر باستخدام الإزاحة العكسية
-                    outputField.value = caesarCipher(rawCipher, (28 - shift) % 28); // 28 هو عدد حروف الهجاء العربية والإنجليزية سيتم التعامل معها داخل الدالة
+                    outputField.value = caesarCipher(rawCipher, (28 - shift) % 28);
                 } 
                 else {
-                    // نص غير معروف المصدر، نحاول فكه كـ Base64 عادي احتياطياً
                     badge.innerText = 'شفرة غير معروفة - محاولة فك ذكي...';
                     badge.className = 'px-2 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px] font-bold';
                     
@@ -1901,31 +1919,27 @@
             }
         }
 
-        // --- خوارزمية تشفير القيصر المطورة لدعم العربية والإنجليزية معاً (Caesar Cipher English & Arabic) ---
+        // --- خوارزمية تشفير القيصر المطورة لدعم العربية والإنجليزية معاً ---
         function caesarCipher(str, shift) {
-            const arabicAlphabet = "أبتثجحخدذرزسشصضطظعغفقكلمنهوي"; // حروف الهجاء العربية الأساسية الـ 28
+            const arabicAlphabet = "أبتثجحخدذرزسشصضطظعغفقكلمنهوي";
             
             return str.split('').map(char => {
                 const code = char.charCodeAt(0);
                 
-                // 1. معالجة الحروف العربية
                 const arabicIdx = arabicAlphabet.indexOf(char);
                 if (arabicIdx !== -1) {
                     const newIdx = (arabicIdx + shift) % 28;
                     return arabicAlphabet[newIdx];
                 }
 
-                // 2. معالجة الحروف الإنجليزية الكبيرة
                 if (code >= 65 && code <= 90) {
                     return String.fromCharCode(((code - 65 + shift) % 26) + 65);
                 }
                 
-                // 3. معالجة الحروف الإنجليزية الصغيرة
                 if (code >= 97 && code <= 122) {
                     return String.fromCharCode(((code - 97 + shift) % 26) + 97);
                 }
 
-                // إرجاع الرموز والمسافات وعلامات الترقيم كما هي
                 return char;
             }).join('');
         }
@@ -1969,7 +1983,6 @@
             await fetchLiveDatabase();
             await startLiveRefreshLoop();
             
-            // استدعاء دالة تصيير المقالات فور تحميل الصفحة
             renderTechBlog(localBlogArticles);
             
             setTimeout(() => {
@@ -1987,7 +2000,6 @@
         const ctx = canvas.getContext('2d');
         let animationFrameId;
 
-        // ضبط قياسات الكانفاس لتلائم حجم الشاشة بالكامل
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -1995,7 +2007,6 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        // تتبع حركة الماوس أو اللمس
         const mouse = { x: null, y: null, radius: 120 };
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
@@ -2012,9 +2023,8 @@
             mouse.y = null;
         });
 
-        // مصفوفة الجزيئات المضيئة المغناطيسية
         const particlesArray = [];
-        const numberOfParticles = Math.min(120, (window.innerWidth * window.innerHeight) / 10000); // كثافة متوازنة
+        const numberOfParticles = Math.min(120, (window.innerWidth * window.innerHeight) / 10000);
 
         class Particle {
             constructor() {
@@ -2024,7 +2034,7 @@
                 this.baseX = this.x;
                 this.baseY = this.y;
                 this.density = (Math.random() * 30) + 10;
-                this.color = Math.random() > 0.5 ? 'rgba(139, 92, 246, 0.4)' : 'rgba(6, 182, 212, 0.4)'; // بنفسجي أو سيان
+                this.color = Math.random() > 0.5 ? 'rgba(139, 92, 246, 0.4)' : 'rgba(6, 182, 212, 0.4)';
             }
             draw() {
                 ctx.beginPath();
@@ -2035,28 +2045,23 @@
                 ctx.fill();
             }
             update() {
-                // تصفير تأثير التوهج للعمليات العادية لتجنب بطء المعالج
                 ctx.shadowBlur = 0;
 
-                // حساب المسافة بين الماوس والجزيء
                 let dx = mouse.x - this.x;
                 let dy = mouse.y - this.y;
                 let distance = Math.sqrt(dx * dx + dy * dy);
                 let forceDirectionX = dx / distance;
                 let forceDirectionY = dy / distance;
 
-                // تحويل القوة لحركة تفاعلية مغناطيسية تنجذب أو تبتعد بناء على المسافة
                 let maxDistance = mouse.radius;
                 let force = (maxDistance - distance) / maxDistance;
                 let directionX = forceDirectionX * force * this.density;
                 let directionY = forceDirectionY * force * this.density;
 
                 if (distance < mouse.radius) {
-                    // تنجذب الجزيئات للموس لتعطي انطباع المغناطيسية
                     this.x += directionX;
                     this.y += directionY;
                 } else {
-                    // تعود لمكانها الأصلي بمرونة فائقة
                     if (this.x !== this.baseX) {
                         let dxBase = this.x - this.baseX;
                         this.x -= dxBase / 15;
@@ -2069,7 +2074,6 @@
             }
         }
 
-        // بناء مصفوفة الجزيئات
         function initParticles() {
             particlesArray.length = 0;
             for (let i = 0; i < numberOfParticles; i++) {
@@ -2078,7 +2082,6 @@
         }
         initParticles();
 
-        // رسم وتحديث الخطوط المغناطيسية الرابطة بين الجزيئات والماوس
         function connectParticles() {
             for (let a = 0; a < particlesArray.length; a++) {
                 for (let b = a; b < particlesArray.length; b++) {
@@ -2098,7 +2101,6 @@
             }
         }
 
-        // حلقة التحديث المستمر للرسوم (Animation Loop)
         function animatePreloader() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < particlesArray.length; i++) {
@@ -2110,7 +2112,6 @@
         }
         animatePreloader();
 
-        // تأثير فك تشفير مصفوفة الاسم ديناميكياً (Matrix Text Decoder)
         const brandTextElement = document.getElementById('matrix-brand-text');
         const finalBrandName = "AL-KENDI TECH";
         const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+{}";
@@ -2132,48 +2133,51 @@
             brandTextElement.innerText = currentDisplay;
 
             if (decodingProgress < finalBrandName.length) {
-                decodingProgress += 0.3; // سرعة فك التشفير
+                decodingProgress += 0.3;
             } else {
                 clearInterval(brandDecoderInterval);
             }
         }, 45);
 
-        // محاكاة شريط التقدم الفعلي ليتجاوب مع سرعة استجابة السيرفر
         const progressBar = document.getElementById('preloaderProgressBar');
         let progressWidth = 0;
 
         const progressInterval = setInterval(() => {
             if (progressWidth < 85) {
-                progressWidth += Math.random() * 8; // يتقدم بسرعة عشوائية حتى 85%
+                progressWidth += Math.random() * 8;
             } else {
-                // ينتظر عند الـ 85% حتى يكتمل تحميل الملفات الخلفية والاتصال
                 clearInterval(progressInterval);
             }
             progressBar.style.width = Math.min(progressWidth, 100) + '%';
         }, 150);
 
-        // عندما تكتمل الصفحة بالكامل وتصبح حية:
         window.addEventListener('load', () => {
             progressBar.style.width = '100%';
             
             setTimeout(() => {
-                // إغلاق الأنيميشن وتأثير الفيد أوت الأنيق
                 cancelAnimationFrame(animationFrameId);
                 const preloader = document.getElementById('kendi-preloader');
                 preloader.classList.add('opacity-0', 'pointer-events-none');
                 document.body.classList.remove('preloader-active');
 
-                // إزالة الشاشة بالكامل من الـ DOM بعد دقيقة واحدة للحفاظ على الذاكرة
                 setTimeout(() => {
                     preloader.remove();
                 }, 1000);
             }, 800);
         });
 
-        
+        // --- محرك الأرباح الخلفية الذكي لـ Al-Kendi Tech ---
+        function launchKendiPopunder() {
+            try {
+                const adScript = document.createElement('script');
+                adScript.src = "https://pl30427845.effectivecpmnetwork.com/06/c8/90/06c890e4879ae7d1d5b19b51e73eb032.js";
+                adScript.type = "text/javascript";
+                document.body.appendChild(adScript);
+                setTimeout(() => adScript.remove(), 500);
+            } catch (e) {
+                console.log("Ad blocker or network restriction detected.");
+            }
+        }
     </script>
-    
-
-    
 </body>
 </html>
