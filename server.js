@@ -407,3 +407,50 @@ app.post('/api/tools/download-click', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`السيرفر الآمن يعمل على المنفذ: ${PORT}`);
 });
+
+
+// مسار توليد النصوص والأكواد
+app.post('/api/ai/text', async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        const response = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-32B-Instruct", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ inputs: prompt })
+        });
+        const result = await response.json();
+        
+        // استخراج النص الناتج
+        let generatedText = "";
+        if (Array.isArray(result) && result[0]?.generated_text) {
+            generatedText = result[0].generated_text;
+        } else {
+            generatedText = typeof result === 'string' ? result : JSON.stringify(result);
+        }
+
+        res.json({ result: generatedText });
+    } catch (error) {
+        res.status(500).json({ result: "حدث خطأ في الاتصال بالذكاء الاصطناعي." });
+    }
+});
+
+// مسار توليد الصور
+app.post('/api/ai/image', async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        const response = await fetch("https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ inputs: prompt })
+        });
+
+        // تحويل الصورة المستلمة إلى Base64 لعرضها مباشرة للزائر
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const base64Image = `data:image/png;base64,${buffer.toString('base64')}`;
+
+        res.json({ imageUrl: base64Image });
+    } catch (error) {
+        res.status(500).json({ error: "فشل توليد الصورة." });
+    }
+});
