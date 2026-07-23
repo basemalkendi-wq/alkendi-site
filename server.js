@@ -112,8 +112,8 @@ function createDefaultData() {
         footerContact: {
             contactTitle: 'هل لديك فكرة أو طلب تعاون؟',
             contactDesc: 'سواء كنت ترغب في مناقشة مشروع برمجيات، رعاية إعلانية على قنواتي الاجتماعية، أو استشارة تقنية بمجال الـ IT، اترك رسالتك وسأرد عليك بأقرب وقت.',
-            contactEmail: 'work@alkendi.me', // بريدك الرسمي المعتمد للأبد
-            contactLocation: 'صنعاء، اليمن',   // موقعك الرسمي المعتمد للأبد
+            contactEmail: 'work@alkendi.me',
+            contactLocation: 'صنعاء، اليمن',
             copyright: '© 2026 جميع الحقوق محفوظة لـ Al-Kendi Tech. تم تطوير الموقع بكل حب وشغف بالبرمجة.'
         },
         messages: [],
@@ -157,7 +157,6 @@ function normalizeProject(project = {}) {
     };
 }
 
-// دمج وتأمين مصفوفة الفحص لمنع السيرفر من استرجاع أي بيانات تجريبية أو قديمة
 function normalizeData(rawData = {}) {
     const defaultData = createDefaultData();
     const source = rawData && typeof rawData === 'object' ? rawData : {};
@@ -404,13 +403,9 @@ app.post('/api/tools/download-click', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`السيرفر الآمن يعمل على المنفذ: ${PORT}`);
-});
-
-
-
-
+// ==========================================
+// 🤖 مسارات الذكاء الاصطناعي (مكانها الصحيح)
+// ==========================================
 
 // مسار توليد النصوص والأكواد باستخدام Google Gemini
 app.post('/api/ai/text', async (req, res) => {
@@ -445,15 +440,13 @@ app.post('/api/ai/text', async (req, res) => {
     }
 });
 
-// مسار توليد الصور المحسن بطلب مباشر ومضمون الاستجابة
+// مسار توليد الصور المحسن بطلب مباشر
 app.post('/api/ai/image', async (req, res) => {
     try {
         const { prompt } = req.body;
-        // استخدام محرك توليد صور مباشر وسريع عبر Pollinations API المجاني والمستقر دون نتوءات أمان
         const encodedPrompt = encodeURIComponent(prompt);
         const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000000)}&nologo=true`;
 
-        // التأكد من استجابة الصورة
         const checkImg = await fetch(imageUrl);
         if (checkImg.ok) {
             return res.json({ imageUrl });
@@ -463,4 +456,11 @@ app.post('/api/ai/image', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: "حدث خطأ أثناء الاتصال بالسيرفر." });
     }
+});
+
+// ==========================================
+// 🚀 بدء تشغيل السيرفر (يجب أن يكون في النهاية)
+// ==========================================
+app.listen(PORT, () => {
+    console.log(`السيرفر الآمن يعمل على المنفذ: ${PORT}`);
 });
