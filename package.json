@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/basemalkendi-wq/alkendi-site#readme",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.3.0",
     "cookie-parser": "^1.4.7",

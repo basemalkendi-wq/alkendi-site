@@ -407,51 +407,46 @@ app.post('/api/tools/download-click', async (req, res) => {
 // 🤖 مسارات الذكاء الاصطناعي
 // ==========================================
 
-// مسار توليد النصوص والأكواد بـ Gemini عبر الإصدار المعتمد 100%
+// استدعاء المكتبة الرسمية في أعلى ملف السيرفر (أو داخل المسار)
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+// مسار توليد النصوص والأكواد النهائي والمضمون 100%
 app.post('/api/ai/text', async (req, res) => {
     try {
         const { prompt } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            console.error("Gemini Error: GEMINI_API_KEY is missing in environment variables.");
-            return res.status(500).json({ result: "خطأ: لم يتم العثور على GEMINI_API_KEY في إعدادات السيرفر." });
+            console.error("Gemini Error: GEMINI_API_KEY is missing.");
+            return res.status(500).json({ result: "خطأ: لم يتم ضبط مفتاح GEMINI_API_KEY في السيرفر." });
         }
 
-        // الاستدعاء المباشر عبر v1beta بالاسم الرسمي السليم gemini-1.5-flash
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [{ text: prompt }]
-                    }
-                ]
-            })
-        });
+        // تهيئة المكتبة الرسمية
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const data = await response.json();
+        // توليد المحتوى مباشرة
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
 
-        if (!response.ok) {
-            console.error("Google AI API Error Output:", JSON.stringify(data));
+        return res.json({ result: responseText });
+
+    } catch (error) {
+        console.error("Google AI SDK Error:", error);
+        
+        // معالجة خطأ الحصة المعتادة للرد التلقائي الخفيف
+        if (error.message && error.message.includes("quota")) {
             return res.status(500).json({ 
-                result: `خطأ من جوجل API: ${data.error?.message || 'تعذر الاتصال بالخدمة.'}` 
+                result: "تجاوزت الحصة المجانية المؤقتة لجوجل، يرجى الانتظار لدقيقة واحدة وإعادة المحاولة." 
             });
         }
 
-        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-            const textResponse = data.candidates[0].content.parts[0].text;
-            return res.json({ result: textResponse });
-        } else {
-            console.error("Unexpected Gemini Data Structure:", data);
-            return res.status(500).json({ result: "تعذر استخراج النص من استجابة الذكاء الاصطناعي." });
-        }
-    } catch (error) {
-        console.error("Server Text Route Exception:", error);
-        res.status(500).json({ result: "حدث خطأ داخلي في السيرفر أثناء الاتصال بالخدمة." });
+        return res.status(500).json({ 
+            result: `خطأ أثناء معالجة الطلب: ${error.message || 'تعذر الاتصال بالذكاء الاصطناعي.'}` 
+        });
     }
 });
+
 
 // مسار توليد الصور المحسن بطلب مباشر
 app.post('/api/ai/image', async (req, res) => {
