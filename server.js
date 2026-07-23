@@ -408,9 +408,9 @@ app.post('/api/tools/download-click', async (req, res) => {
 // ==========================================
 
 // استدعاء المكتبة الرسمية في أعلى ملف السيرفر (أو داخل المسار)
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-// مسار توليد النصوص والأكواد النهائي والمضمون 100%
+// مسار توليد النصوص والأكواد بـ SDK جوجل الرسمي المحدث
 app.post('/api/ai/text', async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -421,11 +421,10 @@ app.post('/api/ai/text', async (req, res) => {
             return res.status(500).json({ result: "خطأ: لم يتم ضبط مفتاح GEMINI_API_KEY في السيرفر." });
         }
 
-        // تهيئة المكتبة الرسمية
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // تم تحديث اسم النموذج للنسخة المعتمدة 2.0 المتاحة للجميع
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-        // توليد المحتوى مباشرة
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
 
@@ -434,13 +433,6 @@ app.post('/api/ai/text', async (req, res) => {
     } catch (error) {
         console.error("Google AI SDK Error:", error);
         
-        // معالجة خطأ الحصة المعتادة للرد التلقائي الخفيف
-        if (error.message && error.message.includes("quota")) {
-            return res.status(500).json({ 
-                result: "تجاوزت الحصة المجانية المؤقتة لجوجل، يرجى الانتظار لدقيقة واحدة وإعادة المحاولة." 
-            });
-        }
-
         return res.status(500).json({ 
             result: `خطأ أثناء معالجة الطلب: ${error.message || 'تعذر الاتصال بالذكاء الاصطناعي.'}` 
         });
