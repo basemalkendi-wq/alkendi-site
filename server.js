@@ -404,39 +404,53 @@ app.post('/api/tools/download-click', async (req, res) => {
 });
 
 // ==========================================
-// 🤖 مسارات الذكاء الاصطناعي (مكانها الصحيح)
+// 🤖 مسارات الذكاء الاصطناعي
 // ==========================================
 
-// مسار توليد النصوص والأكواد باستخدام Google Gemini
+// مسار توليد النصوص والأكواد بـ Gemini المحدث والمستقر 100%
 app.post('/api/ai/text', async (req, res) => {
     try {
         const { prompt } = req.body;
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.status(500).json({ result: "خطأ: لم يتم ضبط مفتاح Gemini API في السيرفر." });
+            console.error("Gemini Error: GEMINI_API_KEY is missing in environment variables.");
+            return res.status(500).json({ result: "خطأ: لم يتم العثور على GEMINI_API_KEY في إعدادات السيرفر." });
         }
 
+        // استدعاء مباشر لنموذج Gemini المعتمد
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
+                contents: [
+                    {
+                        parts: [{ text: prompt }]
+                    }
+                ]
             })
         });
 
         const data = await response.json();
 
+        // طباعة النتيجة في Render Logs لمعرفة السبب الحقيقي إن وجد خطأ
+        if (!response.ok) {
+            console.error("Google AI API Error Output:", JSON.stringify(data));
+            return res.status(500).json({ 
+                result: `خطأ من جوجل API: ${data.error?.message || 'مفتاح API غير صالح أو غير مفعل.'}` 
+            });
+        }
+
         if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
             const textResponse = data.candidates[0].content.parts[0].text;
             return res.json({ result: textResponse });
         } else {
-            console.error("Gemini Error:", data);
-            return res.status(500).json({ result: "تعذر الحصول على إجابة من الذكاء الاصطناعي." });
+            console.error("Unexpected Gemini Data Structure:", data);
+            return res.status(500).json({ result: "تعذر استخراج النص من استجابة الذكاء الاصطناعي." });
         }
     } catch (error) {
-        console.error("Server Exception:", error);
-        res.status(500).json({ result: "حدث خطأ أثناء الاتصال بالسيرفر." });
+        console.error("Server Text Route Exception:", error);
+        res.status(500).json({ result: "حدث خطأ داخلي في السيرفر أثناء الاتصال بالخدمة." });
     }
 });
 
@@ -459,7 +473,7 @@ app.post('/api/ai/image', async (req, res) => {
 });
 
 // ==========================================
-// 🚀 بدء تشغيل السيرفر (يجب أن يكون في النهاية)
+// 🚀 بدء تشغيل السيرفر
 // ==========================================
 app.listen(PORT, () => {
     console.log(`السيرفر الآمن يعمل على المنفذ: ${PORT}`);
