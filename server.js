@@ -409,65 +409,57 @@ app.listen(PORT, () => {
 });
 
 
-// مسار توليد النصوص والأكواد
+
+
+
+// مسار توليد النصوص والأكواد باستخدام Google Gemini
 app.post('/api/ai/text', async (req, res) => {
     try {
         const { prompt } = req.body;
-        const response = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-32B-Instruct", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.HF_TOKEN}`
-            },
+        const apiKey = process.env.GEMINI_API_KEY;
+
+        if (!apiKey) {
+            return res.status(500).json({ result: "خطأ: لم يتم ضبط مفتاح Gemini API في السيرفر." });
+        }
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                inputs: prompt,
-                parameters: { max_new_tokens: 500, return_full_text: false }
+                contents: [{ parts: [{ text: prompt }] }]
             })
         });
 
-        const result = await response.json();
+        const data = await response.json();
 
-        if (!response.ok) {
-            return res.status(500).json({ result: "الخدمة قيد التحميل، يرجى إعادة المحاولة بعد ثوانٍ." });
-        }
-        
-        let generatedText = "";
-        if (Array.isArray(result) && result[0]?.generated_text) {
-            generatedText = result[0].generated_text;
-        } else if (result.generated_text) {
-            generatedText = result.generated_text;
+        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+            const textResponse = data.candidates[0].content.parts[0].text;
+            return res.json({ result: textResponse });
         } else {
-            generatedText = typeof result === 'string' ? result : JSON.stringify(result);
+            console.error("Gemini Error:", data);
+            return res.status(500).json({ result: "تعذر الحصول على إجابة من الذكاء الاصطناعي." });
         }
-
-        res.json({ result: generatedText.trim() });
     } catch (error) {
+        console.error("Server Exception:", error);
         res.status(500).json({ result: "حدث خطأ أثناء الاتصال بالسيرفر." });
     }
 });
 
-// مسار توليد الصور
+// مسار توليد الصور المحسن بطلب مباشر ومضمون الاستجابة
 app.post('/api/ai/image', async (req, res) => {
     try {
         const { prompt } = req.body;
-        const response = await fetch("https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell", {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.HF_TOKEN}`
-            },
-            body: JSON.stringify({ inputs: prompt })
-        });
+        // استخدام محرك توليد صور مباشر وسريع عبر Pollinations API المجاني والمستقر دون نتوءات أمان
+        const encodedPrompt = encodeURIComponent(prompt);
+        const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000000)}&nologo=true`;
 
-        if (!response.ok) {
-            return res.status(500).json({ error: "فشل توليد الصورة." });
+        // التأكد من استجابة الصورة
+        const checkImg = await fetch(imageUrl);
+        if (checkImg.ok) {
+            return res.json({ imageUrl });
+        } else {
+            return res.status(500).json({ error: "فشل إنشاء الصورة." });
         }
-
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const base64Image = `data:image/png;base64,${buffer.toString('base64')}`;
-
-        res.json({ imageUrl: base64Image });
     } catch (error) {
         res.status(500).json({ error: "حدث خطأ أثناء الاتصال بالسيرفر." });
     }
