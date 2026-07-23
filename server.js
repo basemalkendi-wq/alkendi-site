@@ -407,8 +407,7 @@ app.post('/api/tools/download-click', async (req, res) => {
 // 🤖 مسارات الذكاء الاصطناعي
 // ==========================================
 
-// مسار توليد النصوص والأكواد بـ Gemini المحدث والمستقر 100%
-// مسار توليد النصوص والأكواد بالنموذج المجاني المتاح بدون قيود
+// مسار توليد النصوص والأكواد بـ Gemini عبر الإصدار المعتمد 100%
 app.post('/api/ai/text', async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -419,8 +418,8 @@ app.post('/api/ai/text', async (req, res) => {
             return res.status(500).json({ result: "خطأ: لم يتم العثور على GEMINI_API_KEY في إعدادات السيرفر." });
         }
 
-        // استخدام gemini-1.5-flash-latest مع النسخة المعتمدة المجانية v1beta
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+        // الاستدعاء المباشر عبر v1beta بالاسم الرسمي السليم gemini-1.5-flash
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -437,7 +436,7 @@ app.post('/api/ai/text', async (req, res) => {
         if (!response.ok) {
             console.error("Google AI API Error Output:", JSON.stringify(data));
             return res.status(500).json({ 
-                result: `خطأ من جوجل API: ${data.error?.message || 'مفتاح API غير صالح أو تجاوز الحصة المجانية.'}` 
+                result: `خطأ من جوجل API: ${data.error?.message || 'تعذر الاتصال بالخدمة.'}` 
             });
         }
 
