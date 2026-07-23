@@ -415,22 +415,34 @@ app.post('/api/ai/text', async (req, res) => {
         const { prompt } = req.body;
         const response = await fetch("https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-32B-Instruct", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ inputs: prompt })
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.HF_TOKEN}`
+            },
+            body: JSON.stringify({
+                inputs: prompt,
+                parameters: { max_new_tokens: 500, return_full_text: false }
+            })
         });
+
         const result = await response.json();
+
+        if (!response.ok) {
+            return res.status(500).json({ result: "الخدمة قيد التحميل، يرجى إعادة المحاولة بعد ثوانٍ." });
+        }
         
-        // استخراج النص الناتج
         let generatedText = "";
         if (Array.isArray(result) && result[0]?.generated_text) {
             generatedText = result[0].generated_text;
+        } else if (result.generated_text) {
+            generatedText = result.generated_text;
         } else {
             generatedText = typeof result === 'string' ? result : JSON.stringify(result);
         }
 
-        res.json({ result: generatedText });
+        res.json({ result: generatedText.trim() });
     } catch (error) {
-        res.status(500).json({ result: "حدث خطأ في الاتصال بالذكاء الاصطناعي." });
+        res.status(500).json({ result: "حدث خطأ أثناء الاتصال بالسيرفر." });
     }
 });
 
@@ -440,17 +452,23 @@ app.post('/api/ai/image', async (req, res) => {
         const { prompt } = req.body;
         const response = await fetch("https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.HF_TOKEN}`
+            },
             body: JSON.stringify({ inputs: prompt })
         });
 
-        // تحويل الصورة المستلمة إلى Base64 لعرضها مباشرة للزائر
+        if (!response.ok) {
+            return res.status(500).json({ error: "فشل توليد الصورة." });
+        }
+
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const base64Image = `data:image/png;base64,${buffer.toString('base64')}`;
 
         res.json({ imageUrl: base64Image });
     } catch (error) {
-        res.status(500).json({ error: "فشل توليد الصورة." });
+        res.status(500).json({ error: "حدث خطأ أثناء الاتصال بالسيرفر." });
     }
 });
