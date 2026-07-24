@@ -149,6 +149,12 @@
                 });
                 
                 const data = await response.json();
+
+                if (!response.ok) {
+                    outputEl.textContent = data.result || data.error || 'تعذر توليد النص حالياً.';
+                    return;
+                }
+
                 outputEl.textContent = data.result || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
             } catch (err) {
                 outputEl.textContent = "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
@@ -182,6 +188,12 @@
                 });
                 
                 const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || data.message || 'تعذر إنشاء الصورة، يرجى إعادة المحاولة.');
+                    outputBox.classList.add('hidden');
+                    return;
+                }
 
                 if (data.imageUrl) {
                     imgEl.src = data.imageUrl;

@@ -13,6 +13,8 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'AlKendi_Super_Secret_Key_2026_@#!';
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
+const POLLINATIONS_TEXT_BASE_URL = 'https://text.pollinations.ai/';
+const AI_TEXT_TIMEOUT_MS = 25000;
 
 const defaultOrigins = [
     'https://alkendi-site.onrender.com',
@@ -407,34 +409,63 @@ app.post('/api/tools/download-click', async (req, res) => {
 // 🤖 مسارات الذكاء الاصطناعي
 // ==========================================
 
-// استدعاء المكتبة الرسمية في أعلى ملف السيرفر (أو داخل المسار)
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+function buildTextAIPrompt(userPrompt) {
+    return [
+        'أنت مساعد تقني عربي محترف.',
+        'أجب مباشرة وبشكل عملي ومختصر، واستخدم العربية إلا إذا طلب المستخدم لغة أخرى.',
+        'إذا كان الطلب يخص البرمجة، اشرح الفكرة ثم قدم الكود المناسب إن لزم.',
+        '',
+        `طلب المستخدم: ${userPrompt}`
+    ].join('\n');
+}
 
-// مسار توليد النصوص والأكواد بـ SDK جوجل الرسمي المحدث
-app.post('/api/ai/text', async (req, res) => {
+async function generateTextWithPollinations(userPrompt) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), AI_TEXT_TIMEOUT_MS);
+
     try {
-        const { prompt } = req.body;
-        const apiKey = process.env.GEMINI_API_KEY;
+        const response = await fetch(`${POLLINATIONS_TEXT_BASE_URL}${encodeURIComponent(buildTextAIPrompt(userPrompt))}`, {
+            method: 'GET',
+            signal: controller.signal,
+            headers: {
+                Accept: 'text/plain'
+            }
+        });
 
-        if (!apiKey) {
-            console.error("Gemini Error: GEMINI_API_KEY is missing.");
-            return res.status(500).json({ result: "خطأ: لم يتم ضبط مفتاح GEMINI_API_KEY في السيرفر." });
+        if (!response.ok) {
+            throw new Error(`Pollinations responded with ${response.status}`);
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        // تم تحديث اسم النموذج للنسخة المعتمدة 2.0 المتاحة للجميع
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const text = await response.text();
+        return text.trim();
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
 
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
+// مسار توليد النصوص والأكواد عبر Pollinations بدون مفتاح وبدون قيود Gemini الإقليمية
+app.post('/api/ai/text', async (req, res) => {
+    try {
+        const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt.trim() : '';
+
+        if (!prompt) {
+            return res.status(400).json({ result: 'يرجى كتابة الطلب أولاً.' });
+        }
+
+        const responseText = await generateTextWithPollinations(prompt);
+
+        if (!responseText) {
+            return res.status(502).json({ result: 'تعذر الحصول على رد من خدمة الذكاء الاصطناعي الآن.' });
+        }
 
         return res.json({ result: responseText });
 
     } catch (error) {
-        console.error("Google AI SDK Error:", error);
+        console.error('Text AI Error:', error);
         
-        return res.status(500).json({ 
-            result: `خطأ أثناء معالجة الطلب: ${error.message || 'تعذر الاتصال بالذكاء الاصطناعي.'}` 
+        return res.status(503).json({ 
+            result: 'تعذر الاتصال بخدمة الذكاء الاصطناعي الآن. حاول مرة أخرى بعد قليل.',
+            error: error.message || 'AI text provider unavailable'
         });
     }
 });
