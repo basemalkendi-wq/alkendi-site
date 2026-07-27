@@ -415,7 +415,13 @@ app.post('/api/ai/text', async (req, res) => {
             return res.status(400).json({ result: "يرجى كتابة سؤال أو كود أولاً." });
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const apiKey = process.env.GEMINI_API_KEY;
+
+        if (!apiKey) {
+            return res.status(500).json({ result: "مفتاح API غير متوفر في إعدادات البيئة (Render Environment)." });
+        }
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -433,8 +439,9 @@ app.post('/api/ai/text', async (req, res) => {
             const aiReply = data.candidates[0].content.parts[0].text;
             return res.json({ result: aiReply.trim() });
         } else {
-            console.error("Gemini Response Details:", data);
-            return res.status(500).json({ result: "تعذر معالجة الطلب حالياً عبر Gemini API." });
+            console.error("Gemini Response Details Error:", JSON.stringify(data));
+            const errorMsg = data.error?.message || "تعذر معالجة الطلب حالياً عبر Gemini API.";
+            return res.status(500).json({ result: errorMsg });
         }
 
     } catch (error) {
