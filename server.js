@@ -421,28 +421,44 @@ app.post('/api/ai/text', async (req, res) => {
             return res.status(500).json({ result: "مفتاح API غير متوفر في إعدادات البيئة (Render Environment)." });
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // قائمة بأسماء النماذج الرسمية لت تجربتها بالترتيب
+        const modelNames = [
+            'gemini-1.5-flash-latest',
+            'gemini-1.5-pro-latest',
+            'gemini-1.0-pro'
+        ];
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompt.trim() }]
-                }]
-            })
-        });
+        let lastError = null;
 
-        const data = await response.json();
+        for (const model of modelNames) {
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-            const aiReply = data.candidates[0].content.parts[0].text;
-            return res.json({ result: aiReply.trim() });
-        } else {
-            console.error("Gemini Response Details Error:", JSON.stringify(data));
-            const errorMsg = data.error?.message || "تعذر معالجة الطلب حالياً عبر Gemini API.";
-            return res.status(500).json({ result: errorMsg });
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt.trim() }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    const aiReply = data.candidates[0].content.parts[0].text;
+                    return res.json({ result: aiReply.trim() });
+                } else {
+                    lastError = data.error?.message || "فشلت الاستجابة للنموذج المحدد";
+                }
+            } catch (err) {
+                lastError = err.message;
+            }
         }
+
+        console.error("Gemini All Models Error Details:", lastError);
+        return res.status(500).json({ result: `تعذر معالجة الطلب: ${lastError}` });
 
     } catch (error) {
         console.error("AI Text Route Error:", error);
