@@ -418,47 +418,32 @@ app.post('/api/ai/text', async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.status(500).json({ result: "مفتاح API غير متوفر في إعدادات البيئة (Render Environment)." });
+            return res.status(500).json({ result: "مفتاح GEMINI_API_KEY غير موجود في إعدادات Render." });
         }
 
-        // قائمة بأسماء النماذج الرسمية لت تجربتها بالترتيب
-        const modelNames = [
-            'gemini-1.5-flash-latest',
-            'gemini-1.5-pro-latest',
-            'gemini-1.0-pro'
-        ];
+        // استخدام اسم النموذج الرسمي المباشر من Google AI Studio
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-        let lastError = null;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: prompt.trim() }]
+                }]
+            })
+        });
 
-        for (const model of modelNames) {
-            try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const data = await response.json();
 
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: prompt.trim() }]
-                        }]
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                    const aiReply = data.candidates[0].content.parts[0].text;
-                    return res.json({ result: aiReply.trim() });
-                } else {
-                    lastError = data.error?.message || "فشلت الاستجابة للنموذج المحدد";
-                }
-            } catch (err) {
-                lastError = err.message;
-            }
+        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const aiReply = data.candidates[0].content.parts[0].text;
+            return res.json({ result: aiReply.trim() });
+        } else {
+            console.error("Gemini Error Payload:", JSON.stringify(data));
+            const errorDetails = data.error?.message || "حدث خطأ غير معروف من خادم Google.";
+            return res.status(500).json({ result: `خطأ من Gemini: ${errorDetails}` });
         }
-
-        console.error("Gemini All Models Error Details:", lastError);
-        return res.status(500).json({ result: `تعذر معالجة الطلب: ${lastError}` });
 
     } catch (error) {
         console.error("AI Text Route Error:", error);
