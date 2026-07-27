@@ -129,40 +129,65 @@
         }
 
         async function generateTextDirect() {
-            const promptInput = document.getElementById('text-prompt');
-            const prompt = promptInput ? promptInput.value.trim() : '';
+    const promptInput = document.getElementById('text-prompt');
+    const prompt = promptInput ? promptInput.value.trim() : '';
 
-            if (!prompt) {
-                alert('يرجى كتابة الطلب أو الكود أولاً');
+    if (!prompt) {
+        alert('يرجى كتابة الطلب أو الكود أولاً');
+        return;
+    }
+
+    const btn = document.getElementById('btn-gen-text');
+    const outputBox = document.getElementById('text-output-box');
+    const outputEl = document.getElementById('text-output');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
+    outputBox.classList.remove('hidden');
+    outputEl.textContent = "جاري معالجة طلبك بواسطة الذكاء الاصطناعي...";
+
+    try {
+        // المحاولة الأولى: طلب POST مباشر مع إرسال الرسالة بنسق JSON مقبول 100%
+        const response = await fetch('https://text.pollinations.ai/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: [
+                    { role: 'system', content: 'You are a helpful AI assistant for Al-Kendi Tech.' },
+                    { role: 'user', content: prompt }
+                ],
+                model: 'openai'
+            })
+        });
+
+        if (response.ok) {
+            const dataText = await response.text();
+            if (dataText && dataText.trim()) {
+                outputEl.textContent = dataText.trim();
                 return;
             }
-
-            const btn = document.getElementById('btn-gen-text');
-            const outputBox = document.getElementById('text-output-box');
-            const outputEl = document.getElementById('text-output');
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
-            outputBox.classList.remove('hidden');
-            outputEl.textContent = "جاري الاتصال بالمحرك مباشرة...";
-
-            try {
-                // طلب مباشر وسريع من متصفحك يلتف حول أخطاء الخوادم
-                const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`);
-                
-                if (response.ok) {
-                    const dataText = await response.text();
-                    outputEl.textContent = dataText || "تمت المعالجة بدون نص.";
-                } else {
-                    outputEl.textContent = "حدث خطأ في الخادم الخارجي، يرجى المحاولة مرة أخرى.";
-                }
-            } catch (err) {
-                outputEl.textContent = "حدث خطأ في شبكة الاتصال، تحقق من الاتصال بالإنترنت.";
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
-            }
         }
+
+        // المحاولة الثانية (Backup GET direct query) في حال تعثر الطلب الأول
+        const fallbackRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`);
+        if (fallbackRes.ok) {
+            const fallbackText = await fallbackRes.text();
+            outputEl.textContent = fallbackText.trim();
+            return;
+        }
+
+        outputEl.textContent = "تعذر جلب الإجابة حالياً، يرجى المحاولة مرة أخرى أو تعديل صياغة السؤال.";
+
+    } catch (err) {
+        console.error("Client AI Error:", err);
+        outputEl.textContent = "حدث خطأ أثناء الاتصال بالمحرك، يرجى التحقق من الاتصال بالإنترنت.";
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
+    }
+}
 
         async function generateImageDirect() {
             const prompt = document.getElementById('image-prompt').value.trim();
