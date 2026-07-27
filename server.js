@@ -13,8 +13,6 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'AlKendi_Super_Secret_Key_2026_@#!';
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
-const POLLINATIONS_TEXT_BASE_URL = 'https://text.pollinations.ai/';
-const AI_TEXT_TIMEOUT_MS = 25000;
 
 const defaultOrigins = [
     'https://alkendi-site.onrender.com',
@@ -409,7 +407,7 @@ app.post('/api/tools/download-click', async (req, res) => {
 // 🤖 مسارات الذكاء الاصطناعي (محدثة ومستقرة 100%)
 // ==========================================
 
-// 1. مسار توليد النصوص والأكواد بـ 3 سيرفرات احتياطية نضمن بها الإجابة 100%
+// 1. مسار توليد النصوص والأكواد بذكاء حقيقي وسريع
 app.post('/api/ai/text', async (req, res) => {
     try {
         const { prompt } = req.body || {};
@@ -420,44 +418,48 @@ app.post('/api/ai/text', async (req, res) => {
 
         const userPrompt = prompt.trim();
 
-        // المحاولة الأولى: Pollinations POST مع معلمة النموذج السريع
+        // الخيار الأول: معالجة النصوص عبر OpenRouter Free API باستخدام نموذج Llama 3.1
         try {
-            const response1 = await fetch('https://text.pollinations.ai/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY || 'sk-or-v1-free-anonymous'}`
+                },
                 body: JSON.stringify({
-                    messages: [{ role: 'user', content: userPrompt }],
-                    model: 'openai'
+                    model: "meta-llama/llama-3.1-8b-instruct:free",
+                    messages: [
+                        { role: "system", content: "You are a helpful AI assistant for Al-Kendi Tech platform. Answer accurately and politely in Arabic or English based on user query." },
+                        { role: "user", content: userPrompt }
+                    ]
                 })
             });
 
-            if (response1.ok) {
-                const text1 = await response1.text();
-                if (text1 && text1.trim()) {
-                    return res.json({ result: text1.trim() });
+            if (response.ok) {
+                const data = await response.json();
+                const aiMessage = data.choices?.[0]?.message?.content;
+                if (aiMessage && aiMessage.trim()) {
+                    return res.json({ result: aiMessage.trim() });
                 }
             }
         } catch (e) {
-            console.log("Attempt 1 failed, switching to backup...");
+            console.log("OpenRouter fetch failed, moving to backup engine...");
         }
 
-        // المحاولة الثانية: GET Direct Query
+        // الخيار الاحتياطي التلقائي: Pollinations Mistral Engine
         try {
-            const response2 = await fetch(`https://text.pollinations.ai/${encodeURIComponent(userPrompt)}?model=openai`);
-            if (response2.ok) {
-                const text2 = await response2.text();
-                if (text2 && text2.trim()) {
-                    return res.json({ result: text2.trim() });
+            const backupRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(userPrompt)}?model=mistral`);
+            if (backupRes.ok) {
+                const backupText = await backupRes.text();
+                if (backupText && backupText.trim()) {
+                    return res.json({ result: backupText.trim() });
                 }
             }
         } catch (e) {
-            console.log("Attempt 2 failed, switching to fallback...");
+            console.log("Pollinations backup failed...");
         }
 
-        // المحاولة الثالثة الاحتياطية (توليد رد منظم من الخادم مباشرة ضماناً لعدم توقف الموقع أثناء العرض)
-        return res.json({ 
-            result: `[Al-Kendi Tech AI Assistant]\n\nتم استلام طلبك بنجاح:\n"${userPrompt}"\n\nنظام الذكاء الاصطناعي متصل وجاهز للمعالجة!` 
-        });
+        return res.status(500).json({ result: "تعذر الحصول على إجابة حالياً، يرجى إعادة المحاولة بعد لحظات." });
 
     } catch (error) {
         console.error("AI Text Route Error:", error);
@@ -484,7 +486,6 @@ app.post('/api/ai/image', async (req, res) => {
         if (checkImg.ok || checkImg.status === 200) {
             return res.json({ imageUrl });
         } else {
-            // إرجاع الرابط مباشرة للواجهة كخيار مباشر
             return res.json({ imageUrl });
         }
 
