@@ -407,93 +407,86 @@ app.post('/api/tools/download-click', async (req, res) => {
 // 🤖 مسارات الذكاء الاصطناعي (محدثة ومستقرة 100%)
 // ==========================================
 
-// 1. مسار توليد النصوص والأكواد بذكاء حقيقي وسريع
-app.post('/api/ai/text', async (req, res) => {
-    try {
-        const { prompt } = req.body || {};
+async function generateText() {
+            const promptInput = document.getElementById('text-prompt');
+            const prompt = promptInput ? promptInput.value.trim() : '';
 
-        if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
-            return res.status(400).json({ result: "يرجى كتابة سؤال أو كود أولاً." });
-        }
-
-        const userPrompt = prompt.trim();
-
-        // الخيار الأول: معالجة النصوص عبر OpenRouter Free API باستخدام نموذج Llama 3.1
-        try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY || 'sk-or-v1-free-anonymous'}`
-                },
-                body: JSON.stringify({
-                    model: "meta-llama/llama-3.1-8b-instruct:free",
-                    messages: [
-                        { role: "system", content: "You are a helpful AI assistant for Al-Kendi Tech platform. Answer accurately and politely in Arabic or English based on user query." },
-                        { role: "user", content: userPrompt }
-                    ]
-                })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                const aiMessage = data.choices?.[0]?.message?.content;
-                if (aiMessage && aiMessage.trim()) {
-                    return res.json({ result: aiMessage.trim() });
-                }
+            if (!prompt) {
+                alert('يرجى كتابة الطلب أو الكود أولاً');
+                return;
             }
-        } catch (e) {
-            console.log("OpenRouter fetch failed, moving to backup engine...");
-        }
 
-        // الخيار الاحتياطي التلقائي: Pollinations Mistral Engine
-        try {
-            const backupRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(userPrompt)}?model=mistral`);
-            if (backupRes.ok) {
-                const backupText = await backupRes.text();
-                if (backupText && backupText.trim()) {
-                    return res.json({ result: backupText.trim() });
+            const btn = document.getElementById('btn-gen-text');
+            const outputBox = document.getElementById('text-output-box');
+            const outputEl = document.getElementById('text-output');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
+            outputBox.classList.remove('hidden');
+            outputEl.textContent = "جاري الاتصال بالذكاء الاصطناعي مباشرة...";
+
+            try {
+                // 🚀 الاتصال المباشر من المتصفح لتجاوز حظر سيرفر Render
+                const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`);
+                
+                if (response.ok) {
+                    const dataText = await response.text();
+                    outputEl.textContent = dataText || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
+                } else {
+                    outputEl.textContent = "حدث خطأ، يرجى المحاولة بصيغة أخرى.";
                 }
+            } catch (err) {
+                outputEl.textContent = "حدث خطأ في الاتصال. يرجى التحقق من الشبكة وإعادة المحاولة.";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
             }
-        } catch (e) {
-            console.log("Pollinations backup failed...");
         }
 
-        return res.status(500).json({ result: "تعذر الحصول على إجابة حالياً، يرجى إعادة المحاولة بعد لحظات." });
+        async function generateImage() {
+            const prompt = document.getElementById('image-prompt').value.trim();
+            if (!prompt) return alert('يرجى كتابة وصف الصورة أولاً');
 
-    } catch (error) {
-        console.error("AI Text Route Error:", error);
-        return res.status(500).json({ result: "حدث خطأ أثناء الاتصال بسيرفر الذكاء الاصطناعي." });
-    }
-});
+            const btn = document.getElementById('btn-gen-img');
+            const outputBox = document.getElementById('image-output-box');
+            const loader = document.getElementById('img-loader');
+            const container = document.getElementById('img-container');
+            const imgEl = document.getElementById('image-result');
+            const downloadBtn = document.getElementById('download-img-btn');
 
-// 2. مسار توليد الصور
-app.post('/api/ai/image', async (req, res) => {
-    try {
-        const { prompt } = req.body || {};
+            btn.disabled = true;
+            outputBox.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            container.classList.add('hidden');
 
-        if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
-            return res.status(400).json({ error: "يرجى كتابة وصف الصورة أولاً." });
+            try {
+                // 🚀 بناء رابط الصورة وتوليدها مباشرة من المتصفح
+                const randomSeed = Math.floor(Math.random() * 1000000);
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${randomSeed}&nologo=true`;
+                
+                // تحميل الصورة برمجياً أولاً للتأكد من جاهزيتها
+                imgEl.onload = () => {
+                    downloadBtn.href = imageUrl;
+                    loader.classList.add('hidden');
+                    container.classList.remove('hidden');
+                    btn.disabled = false;
+                };
+
+                imgEl.onerror = () => {
+                    alert('تعذر إنشاء الصورة، يرجى إعادة المحاولة.');
+                    outputBox.classList.add('hidden');
+                    btn.disabled = false;
+                };
+
+                // إعطاء أمر البدء برسم الصورة
+                imgEl.src = imageUrl;
+
+            } catch (err) {
+                alert('حدث خطأ في الاتصال أثناء إنشاء الصورة.');
+                outputBox.classList.add('hidden');
+                btn.disabled = false;
+            }
         }
-
-        const encodedPrompt = encodeURIComponent(prompt.trim());
-        const randomSeed = Math.floor(Math.random() * 1000000);
-        const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${randomSeed}&nologo=true`;
-
-        // التحقق المباشر من أن الرابط يعيد صورة صالحة
-        const checkImg = await fetch(imageUrl, { method: 'HEAD' });
-        
-        if (checkImg.ok || checkImg.status === 200) {
-            return res.json({ imageUrl });
-        } else {
-            return res.json({ imageUrl });
-        }
-
-    } catch (error) {
-        console.error("AI Image Route Error:", error);
-        return res.status(500).json({ error: "حدث خطأ أثناء توليد الصورة." });
-    }
-});
 
 // ==========================================
 // 🚀 بدء تشغيل السيرفر
