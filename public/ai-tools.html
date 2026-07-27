@@ -128,71 +128,40 @@
             }
         }
 
-async function generateTextDirect() {
-    const promptInput = document.getElementById('text-prompt');
-    const prompt = promptInput ? promptInput.value.trim() : '';
+        async function generateTextDirect() {
+            const promptInput = document.getElementById('text-prompt');
+            const prompt = promptInput ? promptInput.value.trim() : '';
 
-    if (!prompt) {
-        alert('يرجى كتابة الطلب أو الكود أولاً');
-        return;
-    }
-
-    const btn = document.getElementById('btn-gen-text');
-    const outputBox = document.getElementById('text-output-box');
-    const outputEl = document.getElementById('text-output');
-
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
-    outputBox.classList.remove('hidden');
-    outputEl.textContent = "جاري معالجة النص بواسطة الذكاء الاصطناعي...";
-
-    const encodedPrompt = encodeURIComponent(prompt);
-
-    // المحاولة 1: استخدام Pollinations المباشر مع ترويسة تعطل التخزين المؤقت
-    try {
-        const res1 = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=openai&cache=${Date.now()}`);
-        if (res1.ok) {
-            const text1 = await res1.text();
-            if (text1 && text1.trim()) {
-                outputEl.textContent = text1.trim();
+            if (!prompt) {
+                alert('يرجى كتابة الطلب أو الكود أولاً');
                 return;
             }
-        }
-    } catch (e) {
-        console.warn("Attempt 1 failed (CORS/Network), trying Proxy fallback...");
-    }
 
-    // المحاولة 2: المرور عبر CORS Proxy مجاني ومفتوح لتجاوز حظر المتصفح
-    try {
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://text.pollinations.ai/' + encodedPrompt)}`;
-        const res2 = await fetch(proxyUrl);
-        if (res2.ok) {
-            const data2 = await res2.json();
-            if (data2.contents && data2.contents.trim()) {
-                outputEl.textContent = data2.contents.trim();
-                return;
+            const btn = document.getElementById('btn-gen-text');
+            const outputBox = document.getElementById('text-output-box');
+            const outputEl = document.getElementById('text-output');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
+            outputBox.classList.remove('hidden');
+            outputEl.textContent = "جاري الاتصال بـ Gemini AI لمعالجة الإجابة...";
+
+            try {
+                const response = await fetch('/api/ai/text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                outputEl.textContent = data.result || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
+            } catch (err) {
+                outputEl.textContent = "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
             }
         }
-    } catch (e) {
-        console.warn("Attempt 2 failed, trying secondary model...");
-    }
-
-    // المحاولة 3: استخدام نموذج Qwen/Mistral عبر Pollinations
-    try {
-        const res3 = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=qwen`);
-        if (res3.ok) {
-            const text3 = await res3.text();
-            if (text3 && text3.trim()) {
-                outputEl.textContent = text3.trim();
-                return;
-            }
-        }
-    } catch (e) {
-        console.error("All attempts failed:", e);
-    }
-
-    outputEl.textContent = "تعذر الاتصال بخدمة الذكاء الاصطناعي حالياً. يرجى التأكد من إيقاف أي أداة حجب إعلانات (AdBlocker) قد تمنع الاتصال وتجربة الطلب مجدداً.";
-}
 
         async function generateImageDirect() {
             const prompt = document.getElementById('image-prompt').value.trim();

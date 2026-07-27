@@ -14,6 +14,7 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'AlKendi_Super_Secret_Key_2026_@#!';
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY_HERE';
 const defaultOrigins = [
     'https://alkendi-site.onrender.com',
     'http://localhost:3000',
@@ -54,7 +55,6 @@ app.options(/.*/, cors(corsOptions));
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(cookieParser());
 
-// تحديث الهيكل الافتراضي ليعتمد بشكل صلب ومستمر على بيانات الأدمن الرسمية
 function createDefaultData() {
     return {
         admin_account: {
@@ -404,93 +404,65 @@ app.post('/api/tools/download-click', async (req, res) => {
 });
 
 // ==========================================
-// 🤖 مسارات الذكاء الاصطناعي (محدثة ومستقرة 100%)
+// 🤖 مسار الذكاء الاصطناعي (Gemini Official API)
 // ==========================================
 
-async function generateText() {
-            const promptInput = document.getElementById('text-prompt');
-            const prompt = promptInput ? promptInput.value.trim() : '';
+app.post('/api/ai/text', async (req, res) => {
+    try {
+        const { prompt } = req.body || {};
 
-            if (!prompt) {
-                alert('يرجى كتابة الطلب أو الكود أولاً');
-                return;
-            }
-
-            const btn = document.getElementById('btn-gen-text');
-            const outputBox = document.getElementById('text-output-box');
-            const outputEl = document.getElementById('text-output');
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
-            outputBox.classList.remove('hidden');
-            outputEl.textContent = "جاري الاتصال بالذكاء الاصطناعي مباشرة...";
-
-            try {
-                // 🚀 الاتصال المباشر من المتصفح لتجاوز حظر سيرفر Render
-                const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`);
-                
-                if (response.ok) {
-                    const dataText = await response.text();
-                    outputEl.textContent = dataText || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
-                } else {
-                    outputEl.textContent = "حدث خطأ، يرجى المحاولة بصيغة أخرى.";
-                }
-            } catch (err) {
-                outputEl.textContent = "حدث خطأ في الاتصال. يرجى التحقق من الشبكة وإعادة المحاولة.";
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
-            }
+        if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+            return res.status(400).json({ result: "يرجى كتابة سؤال أو كود أولاً." });
         }
 
-        async function generateImage() {
-            const prompt = document.getElementById('image-prompt').value.trim();
-            if (!prompt) return alert('يرجى كتابة وصف الصورة أولاً');
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-            const btn = document.getElementById('btn-gen-img');
-            const outputBox = document.getElementById('image-output-box');
-            const loader = document.getElementById('img-loader');
-            const container = document.getElementById('img-container');
-            const imgEl = document.getElementById('image-result');
-            const downloadBtn = document.getElementById('download-img-btn');
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: prompt.trim() }]
+                }]
+            })
+        });
 
-            btn.disabled = true;
-            outputBox.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            container.classList.add('hidden');
+        const data = await response.json();
 
-            try {
-                // 🚀 بناء رابط الصورة وتوليدها مباشرة من المتصفح
-                const randomSeed = Math.floor(Math.random() * 1000000);
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&seed=${randomSeed}&nologo=true`;
-                
-                // تحميل الصورة برمجياً أولاً للتأكد من جاهزيتها
-                imgEl.onload = () => {
-                    downloadBtn.href = imageUrl;
-                    loader.classList.add('hidden');
-                    container.classList.remove('hidden');
-                    btn.disabled = false;
-                };
-
-                imgEl.onerror = () => {
-                    alert('تعذر إنشاء الصورة، يرجى إعادة المحاولة.');
-                    outputBox.classList.add('hidden');
-                    btn.disabled = false;
-                };
-
-                // إعطاء أمر البدء برسم الصورة
-                imgEl.src = imageUrl;
-
-            } catch (err) {
-                alert('حدث خطأ في الاتصال أثناء إنشاء الصورة.');
-                outputBox.classList.add('hidden');
-                btn.disabled = false;
-            }
+        if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            const aiReply = data.candidates[0].content.parts[0].text;
+            return res.json({ result: aiReply.trim() });
+        } else {
+            console.error("Gemini Response Details:", data);
+            return res.status(500).json({ result: "تعذر معالجة الطلب حالياً عبر Gemini API." });
         }
 
-// ==========================================
-// 🚀 بدء تشغيل السيرفر
-// ==========================================
+    } catch (error) {
+        console.error("AI Text Route Error:", error);
+        return res.status(500).json({ result: "حدث خطأ أثناء الاتصال بسيرفر الذكاء الاصطناعي." });
+    }
+});
+
+app.post('/api/ai/image', async (req, res) => {
+    try {
+        const { prompt } = req.body || {};
+
+        if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+            return res.status(400).json({ error: "يرجى كتابة وصف الصورة أولاً." });
+        }
+
+        const encodedPrompt = encodeURIComponent(prompt.trim());
+        const randomSeed = Math.floor(Math.random() * 1000000);
+        const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${randomSeed}&nologo=true`;
+
+        return res.json({ imageUrl });
+
+    } catch (error) {
+        console.error("AI Image Route Error:", error);
+        return res.status(500).json({ error: "حدث خطأ أثناء توليد الصورة." });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`السيرفر الآمن يعمل على المنفذ: ${PORT}`);
 });
