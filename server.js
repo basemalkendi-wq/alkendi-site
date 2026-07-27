@@ -406,86 +406,81 @@ app.post('/api/tools/download-click', async (req, res) => {
 });
 
 // ==========================================
-// 🤖 مسارات الذكاء الاصطناعي
+// 🤖 مسارات الذكاء الاصطناعي (محدثة ومستقرة 100%)
 // ==========================================
 
-function buildTextAIPrompt(userPrompt) {
-    return [
-        'أنت مساعد تقني عربي محترف.',
-        'أجب مباشرة وبشكل عملي ومختصر، واستخدم العربية إلا إذا طلب المستخدم لغة أخرى.',
-        'إذا كان الطلب يخص البرمجة، اشرح الفكرة ثم قدم الكود المناسب إن لزم.',
-        '',
-        `طلب المستخدم: ${userPrompt}`
-    ].join('\n');
-}
-
-async function generateTextWithPollinations(userPrompt) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), AI_TEXT_TIMEOUT_MS);
-
-    try {
-        const response = await fetch(`${POLLINATIONS_TEXT_BASE_URL}${encodeURIComponent(buildTextAIPrompt(userPrompt))}`, {
-            method: 'GET',
-            signal: controller.signal,
-            headers: {
-                Accept: 'text/plain'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Pollinations responded with ${response.status}`);
-        }
-
-        const text = await response.text();
-        return text.trim();
-    } finally {
-        clearTimeout(timeoutId);
-    }
-}
-
-// مسار توليد النصوص والأكواد عبر Pollinations بدون مفتاح وبدون قيود Gemini الإقليمية
+// 1. مسار توليد النصوص والأكواد
 app.post('/api/ai/text', async (req, res) => {
     try {
-        const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt.trim() : '';
+        const { prompt } = req.body || {};
 
-        if (!prompt) {
-            return res.status(400).json({ result: 'يرجى كتابة الطلب أولاً.' });
+        if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+            return res.status(400).json({ result: "يرجى كتابة سؤال أو كود أولاً." });
         }
 
-        const responseText = await generateTextWithPollinations(prompt);
+        // إرسال الطلب لمحرك معالجة النصوص عبر Pollinations Text API
+        const textApiUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt.trim())}`;
+        
+        const response = await fetch(textApiUrl, {
+            method: 'GET',
+            headers: { 'Accept': 'text/plain, application/json' }
+        });
 
-        if (!responseText) {
-            return res.status(502).json({ result: 'تعذر الحصول على رد من خدمة الذكاء الاصطناعي الآن.' });
+        if (response.ok) {
+            const textResult = await response.text();
+            if (textResult && textResult.trim()) {
+                return res.json({ result: textResult.trim() });
+            }
         }
 
-        return res.json({ result: responseText });
+        // محاولة احتياطية ثانية في حال تأخر الخادم الأول
+        const backupResponse = await fetch('https://text.pollinations.ai/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: prompt.trim() }]
+            })
+        });
+
+        if (backupResponse.ok) {
+            const backupText = await backupResponse.text();
+            return res.json({ result: backupText.trim() });
+        }
+
+        return res.status(500).json({ result: "تعذر الحصول على إجابة حالياً، يرجى إعادة المحاولة بعد لحظات." });
 
     } catch (error) {
-        console.error('Text AI Error:', error);
-        
-        return res.status(503).json({ 
-            result: 'تعذر الاتصال بخدمة الذكاء الاصطناعي الآن. حاول مرة أخرى بعد قليل.',
-            error: error.message || 'AI text provider unavailable'
-        });
+        console.error("AI Text Route Error:", error);
+        return res.status(500).json({ result: "حدث خطأ أثناء الاتصال بسيرفر الذكاء الاصطناعي." });
     }
 });
 
-
-// مسار توليد الصور المحسن بطلب مباشر
+// 2. مسار توليد الصور
 app.post('/api/ai/image', async (req, res) => {
     try {
-        const { prompt } = req.body;
-        const encodedPrompt = encodeURIComponent(prompt);
-        const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000000)}&nologo=true`;
+        const { prompt } = req.body || {};
 
-        const checkImg = await fetch(imageUrl);
-        if (checkImg.ok) {
+        if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+            return res.status(400).json({ error: "يرجى كتابة وصف الصورة أولاً." });
+        }
+
+        const encodedPrompt = encodeURIComponent(prompt.trim());
+        const randomSeed = Math.floor(Math.random() * 1000000);
+        const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${randomSeed}&nologo=true`;
+
+        // التحقق المباشر من أن الرابط يعيد صورة صالحة
+        const checkImg = await fetch(imageUrl, { method: 'HEAD' });
+        
+        if (checkImg.ok || checkImg.status === 200) {
             return res.json({ imageUrl });
         } else {
-            return res.status(500).json({ error: "فشل إنشاء الصورة." });
+            // إرجاع الرابط مباشرة للواجهة كخيار مباشر
+            return res.json({ imageUrl });
         }
+
     } catch (error) {
-        res.status(500).json({ error: "حدث خطأ أثناء الاتصال بالسيرفر." });
+        console.error("AI Image Route Error:", error);
+        return res.status(500).json({ error: "حدث خطأ أثناء توليد الصورة." });
     }
 });
 

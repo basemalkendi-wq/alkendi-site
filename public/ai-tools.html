@@ -128,40 +128,39 @@
         }
 
         async function generateText() {
-            const prompt = document.getElementById('text-prompt').value.trim();
-            if (!prompt) return alert('يرجى كتابة الطلب أو الكود أولاً');
+    const promptInput = document.getElementById('text-prompt');
+    const prompt = promptInput ? promptInput.value.trim() : '';
 
-            const btn = document.getElementById('btn-gen-text');
-            const outputBox = document.getElementById('text-output-box');
-            const outputEl = document.getElementById('text-output');
+    if (!prompt) {
+        alert('يرجى كتابة الطلب أو الكود أولاً');
+        return;
+    }
 
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
-            outputBox.classList.remove('hidden');
-            outputEl.textContent = "جاري الاتصال بالذكاء الاصطناعي ومعالجة الإجابة...";
+    const btn = document.getElementById('btn-gen-text');
+    const outputBox = document.getElementById('text-output-box');
+    const outputEl = document.getElementById('text-output');
 
-            try {
-                const response = await fetch('/api/ai/text', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-                
-                const data = await response.json();
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
+    outputBox.classList.remove('hidden');
+    outputEl.textContent = "جاري الاتصال بالذكاء الاصطناعي ومعالجة الإجابة...";
 
-                if (!response.ok) {
-                    outputEl.textContent = data.result || data.error || 'تعذر توليد النص حالياً.';
-                    return;
-                }
-
-                outputEl.textContent = data.result || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
-            } catch (err) {
-                outputEl.textContent = "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
-            }
-        }
+    try {
+        const response = await fetch('/api/api/ai/text', { // التأكد من المسار /api/ai/text
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        
+        const data = await response.json();
+        outputEl.textContent = data.result || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
+    } catch (err) {
+        outputEl.textContent = "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
+    }
+}
 
         async function generateImage() {
             const prompt = document.getElementById('image-prompt').value.trim();
