@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Al-Kendi Tech | أدوات الذكاء الاصطناعي</title>
     <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">    <style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
         body { font-family: 'Tajawal', sans-serif; }
     </style>
@@ -128,39 +129,45 @@
         }
 
         async function generateText() {
-    const promptInput = document.getElementById('text-prompt');
-    const prompt = promptInput ? promptInput.value.trim() : '';
+            const promptInput = document.getElementById('text-prompt');
+            const prompt = promptInput ? promptInput.value.trim() : '';
 
-    if (!prompt) {
-        alert('يرجى كتابة الطلب أو الكود أولاً');
-        return;
-    }
+            if (!prompt) {
+                alert('يرجى كتابة الطلب أو الكود أولاً');
+                return;
+            }
 
-    const btn = document.getElementById('btn-gen-text');
-    const outputBox = document.getElementById('text-output-box');
-    const outputEl = document.getElementById('text-output');
+            const btn = document.getElementById('btn-gen-text');
+            const outputBox = document.getElementById('text-output-box');
+            const outputEl = document.getElementById('text-output');
 
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
-    outputBox.classList.remove('hidden');
-    outputEl.textContent = "جاري الاتصال بالذكاء الاصطناعي ومعالجة الإجابة...";
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
+            outputBox.classList.remove('hidden');
+            outputEl.textContent = "جاري الاتصال بالذكاء الاصطناعي ومعالجة الإجابة...";
 
-    try {
-        const response = await fetch('/api/api/ai/text', { // التأكد من المسار /api/ai/text
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
-        });
-        
-        const data = await response.json();
-        outputEl.textContent = data.result || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
-    } catch (err) {
-        outputEl.textContent = "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
-    }
-}
+            try {
+                // تم تصحيح المسار من /api/api/ai/text إلى /api/ai/text
+                const response = await fetch('/api/ai/text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    outputEl.textContent = data.result || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
+                } else {
+                    outputEl.textContent = data.result || data.error || "حدث خطأ أثناء معالجة الطلب في السيرفر.";
+                }
+            } catch (err) {
+                outputEl.textContent = "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
+            }
+        }
 
         async function generateImage() {
             const prompt = document.getElementById('image-prompt').value.trim();
@@ -212,13 +219,17 @@
 
         function copyOutput() {
             const text = document.getElementById('text-output').textContent;
-            navigator.clipboard.writeText(text);
-            
-            const btnSpan = document.querySelector('#copy-btn span');
-            btnSpan.textContent = 'تم النسخ!';
-            setTimeout(() => {
-                btnSpan.textContent = 'نسخ';
-            }, 2000);
+            if (!text) return;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const btnSpan = document.querySelector('#copy-btn span');
+                btnSpan.textContent = 'تم النسخ!';
+                setTimeout(() => {
+                    btnSpan.textContent = 'نسخ';
+                }, 2000);
+            }).catch(err => {
+                console.error("Copy failed", err);
+            });
         }
     </script>
 </body>
