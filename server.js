@@ -362,12 +362,14 @@ async function generateGeminiRestText(apiKey, modelName, prompt, options = {}) {
 }
 
 async function generatePollinationsText(prompt) {
-    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?temperature=0.7`;
-    const response = await fetch(url, {
+    const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai`, {
         method: 'GET',
-        headers: { Accept: 'text/plain' },
+        headers: {
+            Accept: 'text/plain',
+            Referer: 'https://alkendi.me'
+        },
         credentials: 'omit',
-        referrerPolicy: 'no-referrer'
+        referrerPolicy: 'origin'
     });
     const text = await response.text().catch(() => '');
 
@@ -381,64 +383,41 @@ async function generatePollinationsText(prompt) {
     return text.trim();
 }
 
-function buildHelpfulFallbackText(prompt) {
-    const normalizedPrompt = String(prompt || '').toLowerCase();
+async function generatePollinationsSecondaryText(prompt) {
+    const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai-fast`, {
+        method: 'GET',
+        headers: {
+            Accept: 'text/plain',
+            Referer: 'https://alkendi.me'
+        },
+        credentials: 'omit',
+        referrerPolicy: 'origin'
+    });
 
-    if (normalizedPrompt.includes('تسجيل دخول') || normalizedPrompt.includes('login') || normalizedPrompt.includes('button') || normalizedPrompt.includes('زر')) {
-        return [
-            'إليك زر تسجيل دخول احترافي جاهز للاستخدام:',
-            '',
-            '```html',
-            '<button class="login-btn" type="button">',
-            '  <span class="login-btn__icon">🔐</span>',
-            '  <span>تسجيل الدخول</span>',
-            '</button>',
-            '',
-            '<style>',
-            '  .login-btn {',
-            '    display: inline-flex;',
-            '    align-items: center;',
-            '    gap: 0.75rem;',
-            '    padding: 0.95rem 1.4rem;',
-            '    border: 0;',
-            '    border-radius: 14px;',
-            '    background: linear-gradient(135deg, #111827, #1f2937);',
-            '    color: #fff;',
-            '    font: 700 1rem/1.2 system-ui, sans-serif;',
-            '    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.28);',
-            '    cursor: pointer;',
-            '    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;',
-            '  }',
-            '  .login-btn:hover {',
-            '    transform: translateY(-2px);',
-            '    background: linear-gradient(135deg, #0f172a, #374151);',
-            '    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.36);',
-            '  }',
-            '  .login-btn:active {',
-            '    transform: translateY(0);',
-            '  }',
-            '  .login-btn__icon {',
-            '    width: 2rem;',
-            '    height: 2rem;',
-            '    display: grid;',
-            '    place-items: center;',
-            '    border-radius: 999px;',
-            '    background: rgba(255, 255, 255, 0.12);',
-            '  }',
-            '</style>',
-            '```',
-            '',
-            'إذا أردت، أستطيع تحويله أيضاً إلى نسخة HTML مع حقول البريد وكلمة المرور وتأثيرات أجمل.'
-        ].join('\n');
+    const text = await response.text().catch(() => '');
+
+    if (!response.ok) {
+        const error = new Error(text || `Pollinations secondary failed with status ${response.status}`);
+        error.status = response.status;
+        error.responseText = text;
+        throw error;
     }
 
-    return [
-        'تعذر الوصول إلى Gemini أو Pollinations الآن، لكن هذا قالب بداية مفيد يمكنك البناء عليه:',
-        '',
-        '```text',
-        String(prompt || '').trim().slice(0, 400) || 'اكتب طلبك هنا مرة أخرى للحصول على نتيجة أدق.',
-        '```'
-    ].join('\n');
+    if (!text.trim()) {
+        throw new Error('Pollinations secondary returned empty content');
+    }
+
+    try {
+        const parsed = JSON.parse(text);
+        const content = parsed?.choices?.[0]?.message?.content;
+        if (typeof content === 'string' && content.trim()) {
+            return content.trim();
+        }
+    } catch (error) {
+        // Fallback to raw text if the API returns plain text instead of JSON.
+    }
+
+    return text.trim();
 }
 
 async function generateGeminiText(prompt) {
@@ -491,11 +470,29 @@ async function generateGeminiText(prompt) {
         console.error('[AI][Pollinations] fallback failed:', serializeGeminiError(error, error?.responseText || ''));
     }
 
+    try {
+        const pollinationsSecondaryText = await generatePollinationsSecondaryText(prompt);
+        if (pollinationsSecondaryText) {
+            return {
+                ok: true,
+                result: pollinationsSecondaryText,
+                model: 'openai-fast',
+                source: 'pollinations',
+                degraded: true,
+                attemptedModels: GEMINI_MODEL_CANDIDATES,
+                failures: failureDetails
+            };
+        }
+    } catch (error) {
+        failureDetails.push(`pollinations-secondary: ${serializeGeminiError(error, error?.responseText || '')}`);
+        console.error('[AI][Pollinations][secondary] fallback failed:', serializeGeminiError(error, error?.responseText || ''));
+    }
+
     return {
-        ok: true,
-        result: buildHelpfulFallbackText(prompt),
-        model: 'local-fallback',
-        source: 'local-fallback',
+        ok: false,
+        result: '',
+        model: 'unavailable',
+        source: 'unavailable',
         degraded: true,
         attemptedModels: GEMINI_MODEL_CANDIDATES,
         failures: failureDetails
@@ -693,29 +690,49 @@ app.post('/api/ai/text', async (req, res) => {
             return res.json({
                 success: true,
                 result: generation.result,
-                model: generation.model || 'fallback',
-                source: generation.source || 'local-fallback',
+                model: generation.model || 'pollinations-openai',
+                source: generation.source || 'pollinations',
                 degraded: Boolean(generation.degraded),
                 attemptedModels: generation.attemptedModels || []
             });
         }
 
-        return res.json({
-            success: true,
-            result: buildHelpfulFallbackText(prompt.trim()),
-            model: 'fallback',
-            source: 'local-fallback',
+        const secondaryPollinations = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt.trim())}?model=qwen`, {
+            method: 'GET',
+            headers: { Accept: 'text/plain' },
+            credentials: 'omit',
+            referrerPolicy: 'no-referrer'
+        });
+
+        const secondaryText = await secondaryPollinations.text().catch(() => '');
+
+        if (secondaryPollinations.ok && secondaryText.trim()) {
+            return res.json({
+                success: true,
+                result: secondaryText.trim(),
+                model: 'qwen',
+                source: 'pollinations',
+                degraded: true,
+                attemptedModels: generation.attemptedModels || []
+            });
+        }
+
+        return res.status(502).json({
+            success: false,
+            result: secondaryText.trim() || 'Pollinations secondary fallback failed.',
+            model: 'unavailable',
+            source: 'pollinations',
             degraded: true,
             attemptedModels: generation.attemptedModels || []
         });
 
     } catch (error) {
         console.error("Gemini SDK Error:", error);
-        return res.json({ 
-            success: true,
-            result: buildHelpfulFallbackText(req.body?.prompt || ''),
-            model: 'fallback',
-            source: 'local-fallback',
+        return res.status(502).json({ 
+            success: false,
+            result: error.message || 'تعذر توليد النص.',
+            model: 'unavailable',
+            source: 'error',
             degraded: true
         });
     }
