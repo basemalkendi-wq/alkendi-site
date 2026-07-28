@@ -14,10 +14,9 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'AlKendi_Super_Secret_Key_2026_@#!';
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 const GEMINI_MODEL_CANDIDATES = [
-    'gemini-2.5-flash',
     'gemini-2.0-flash',
-    'gemini-1.5-flash',
-    'gemini-1.5-pro'
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash-8b'
 ];
 const GEMINI_REST_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
@@ -238,38 +237,33 @@ function sendUnauthorizedResponse(req, res) {
     return res.redirect('/login.html');
 }
 
-function normalizeGeminiModelName(name) {
-    return String(name || '').replace(/^models\//, '').trim();
+function buildGeminiFallbackText(prompt, details) {
+    const promptSummary = String(prompt || '').trim().slice(0, 160);
+    const detailSuffix = details ? ` السبب الفني: ${details}.` : '';
+    return `تعذر الحصول على رد مباشر من Gemini حالياً.${detailSuffix} يمكنك إعادة المحاولة بعد لحظات. طلبك: ${promptSummary}`;
 }
 
-function buildGeminiGenerationPayload(prompt) {
-    return {
-        contents: [{
-            role: 'user',
-            parts: [{ text: prompt }]
-        }],
-        generationConfig: {
-            temperature: 0.7,
-            topP: 0.95,
-            topK: 40,
-            maxOutputTokens: 2048
-        }
-    };
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function normalizeGeminiModelName(name) {
+    return String(name || '').replace(/^models\//, '').trim();
 }
 
 function extractGeminiText(response) {
     if (!response) return '';
 
-    try {
-        if (typeof response.text === 'function') {
+    if (typeof response.text === 'function') {
+        try {
             return String(response.text() || '').trim();
+        } catch (error) {
+            // Ignore and use candidates below.
         }
+    }
 
-        if (typeof response.text === 'string') {
-            return response.text.trim();
-        }
-    } catch (error) {
-        // Fall through to alternate extraction paths.
+    if (typeof response.text === 'string') {
+        return response.text.trim();
     }
 
     const parts = response?.candidates?.[0]?.content?.parts;
@@ -280,234 +274,167 @@ function extractGeminiText(response) {
     return '';
 }
 
-function buildGeminiFallbackText(prompt, details) {
-    const promptSummary = String(prompt || '').trim().slice(0, 160);
-    const detailSuffix = details ? ` السبب الفني: ${details}.` : '';
-    return `تعذر الحصول على رد مباشر من Gemini حالياً.${detailSuffix} يمكنك إعادة المحاولة بعد لحظات. طلبك: ${promptSummary}`;
+function buildGeminiGenerationPayload(prompt) {
+    return {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+            temperature: 0.7,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 1024
+        }
+    };
 }
 
-function serializeGeminiError(error) {
-    if (!error) return 'Unknown Gemini error';
-
+function serializeGeminiError(error, responseText) {
     const status = error?.status || error?.response?.status || error?.code || 'unknown-status';
-    const message = error?.message || error?.error?.message || String(error);
-    const responseText = error?.responseText || error?.body || error?.response?.data || error?.response?.body;
-
-    return [
-        `status=${status}`,
-        `message=${message}`,
-        responseText ? `response=${typeof responseText === 'string' ? responseText : JSON.stringify(responseText)}` : null
-    ].filter(Boolean).join(' | ');
+    const message = error?.message || error?.error?.message || String(error || 'Unknown Gemini error');
+    const responseSnippet = responseText ? ` response=${responseText}` : '';
+    return `status=${status} message=${message}${responseSnippet}`;
 }
 
-function logGeminiFailure(stage, modelName, error, payloadType) {
-    console.error(`[AI][Gemini][${stage}] model=${modelName} payload=${payloadType} ${serializeGeminiError(error)}`);
+function logGeminiFailure(modelName, stage, error, responseText) {
+    console.error(`[AI][Gemini][${stage}] model=${modelName} ${serializeGeminiError(error, responseText)}`);
 }
 
-async function loadGeminiSdkClients(apiKey) {
-    const clients = [];
-
-    try {
-        const { GoogleGenAI } = require('@google/genai');
-        clients.push({ type: 'google-genai', client: new GoogleGenAI({ apiKey }) });
-    } catch (error) {
-        console.warn('[AI][Gemini][SDK] @google/genai unavailable:', error.message);
-    }
-
-    try {
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
-        clients.push({ type: 'google-generative-ai', client: new GoogleGenerativeAI(apiKey) });
-    } catch (error) {
-        console.warn('[AI][Gemini][SDK] @google/generative-ai unavailable:', error.message);
-    }
-
-    return clients;
-}
-
-async function listAccessibleGeminiModels(apiKey) {
-    const url = `${GEMINI_REST_BASE_URL}/models?key=${encodeURIComponent(apiKey)}&pageSize=100`;
-    const response = await fetch(url, { headers: { Accept: 'application/json' } });
-
-    if (!response.ok) {
-        const responseText = await response.text().catch(() => '');
-        throw new Error(`Model listing failed: ${response.status} ${response.statusText}${responseText ? ` | ${responseText}` : ''}`);
-    }
-
-    const data = await response.json();
-    const models = Array.isArray(data?.models) ? data.models : [];
-    return models
-        .filter((model) => Array.isArray(model?.supportedGenerationMethods) ? model.supportedGenerationMethods.includes('generateContent') : true)
-        .map((model) => normalizeGeminiModelName(model?.name || model?.displayName || ''))
-        .filter(Boolean);
-}
-
-function pickPreferredGeminiModels(availableModels) {
-    const normalizedAvailable = new Set((availableModels || []).map(normalizeGeminiModelName));
-    const orderedCandidates = [];
-
-    for (const candidate of GEMINI_MODEL_CANDIDATES) {
-        if (normalizedAvailable.has(candidate)) {
-            orderedCandidates.push(candidate);
-        }
-    }
-
-    for (const candidate of GEMINI_MODEL_CANDIDATES) {
-        if (!orderedCandidates.includes(candidate)) {
-            orderedCandidates.push(candidate);
-        }
-    }
-
-    return orderedCandidates;
-}
-
-async function generateWithGeminiRest(apiKey, modelName, prompt) {
+async function generateGeminiRestText(apiKey, modelName, prompt, options = {}) {
+    const { retryOn429 = false } = options;
     const url = `${GEMINI_REST_BASE_URL}/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
     const payload = buildGeminiGenerationPayload(prompt);
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload)
-    });
 
-    const responseText = await response.text();
+    const executeRequest = async () => {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(payload)
+        });
 
-    if (!response.ok) {
-        throw new Error(responseText || `REST request failed with status ${response.status}`);
+        const responseText = await response.text().catch(() => '');
+
+        if (!response.ok) {
+            const error = new Error(responseText || `Gemini REST failed with status ${response.status}`);
+            error.status = response.status;
+            error.responseText = responseText;
+            error.retryAfter = response.headers.get('retry-after');
+            throw error;
+        }
+
+        let parsed = {};
+        if (responseText) {
+            try {
+                parsed = JSON.parse(responseText);
+            } catch (parseError) {
+                const error = new Error(responseText || 'Gemini REST returned invalid JSON');
+                error.status = 502;
+                error.responseText = responseText;
+                throw error;
+            }
+        }
+
+        const text = extractGeminiText(parsed);
+        if (!text) {
+            const error = new Error('Gemini REST returned empty content');
+            error.status = 502;
+            error.responseText = responseText;
+            throw error;
+        }
+
+        return text;
+    };
+
+    try {
+        return await executeRequest();
+    } catch (error) {
+        const isRateLimited = Number(error?.status) === 429;
+        logGeminiFailure(modelName, isRateLimited ? 'REST-429' : 'REST', error, error?.responseText || '');
+
+        if (retryOn429 && isRateLimited) {
+            const retryAfterHeader = Number(error?.retryAfter);
+            const retryDelayMs = Number.isFinite(retryAfterHeader) && retryAfterHeader > 0
+                ? retryAfterHeader * 1000
+                : 750;
+            await sleep(retryDelayMs);
+            const retryText = await executeRequest();
+            return retryText;
+        }
+
+        throw error;
     }
-
-    const data = responseText ? JSON.parse(responseText) : {};
-    const text = extractGeminiText(data);
-
-    if (!text) {
-        throw new Error('REST response returned empty content');
-    }
-
-    return text;
 }
 
-async function generateWithGeminiSdk(clientRecord, modelName, prompt) {
-    if (clientRecord.type === 'google-genai') {
-        const payloadVariants = [
-            { contents: prompt },
-            buildGeminiGenerationPayload(prompt)
-        ];
+async function generatePollinationsText(prompt) {
+    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai&temperature=0.7`;
+    const response = await fetch(url, { headers: { Accept: 'text/plain' } });
+    const text = await response.text().catch(() => '');
 
-        for (const payload of payloadVariants) {
-            try {
-                const response = await clientRecord.client.models.generateContent({
-                    model: modelName,
-                    ...payload
-                });
-                const text = extractGeminiText(response);
-                if (text) {
-                    return text;
-                }
-                console.warn(`[AI][Gemini][SDK] model=${modelName} returned empty text for payload=${payload.contents === prompt ? 'string' : 'structured'}`);
-            } catch (error) {
-                logGeminiFailure('SDK', modelName, error, payload.contents === prompt ? 'string' : 'structured');
-            }
-        }
-
-        return '';
+    if (!response.ok) {
+        const error = new Error(text || `Pollinations failed with status ${response.status}`);
+        error.status = response.status;
+        error.responseText = text;
+        throw error;
     }
 
-    if (clientRecord.type === 'google-generative-ai') {
-        const payloadVariants = [
-            prompt,
-            buildGeminiGenerationPayload(prompt)
-        ];
-
-        for (const payload of payloadVariants) {
-            try {
-                const response = await clientRecord.client.getGenerativeModel({ model: modelName }).generateContent(payload);
-                const resolvedResponse = response?.response ? await response.response : response;
-                const text = extractGeminiText(resolvedResponse);
-                if (text) {
-                    return text;
-                }
-                console.warn(`[AI][Gemini][SDK] model=${modelName} returned empty text for payload=${typeof payload === 'string' ? 'string' : 'structured'}`);
-            } catch (error) {
-                logGeminiFailure('SDK', modelName, error, typeof payload === 'string' ? 'string' : 'structured');
-            }
-        }
-
-        return '';
-    }
-
-    return '';
+    return text.trim();
 }
 
 async function generateGeminiText(prompt) {
     const apiKey = process.env.GEMINI_API_KEY;
+    const failureDetails = [];
 
-    if (!apiKey) {
-        return {
-            ok: true,
-            degraded: true,
-            source: 'local-fallback',
-            result: buildGeminiFallbackText(prompt, 'مفتاح GEMINI_API_KEY غير متوفر في متغيرات البيئة')
-        };
-    }
+    if (apiKey) {
+        for (const modelName of GEMINI_MODEL_CANDIDATES) {
+            try {
+                const text = await generateGeminiRestText(apiKey, modelName, prompt, {
+                    retryOn429: modelName === 'gemini-2.0-flash'
+                });
 
-    let accessibleModels = [];
-
-    try {
-        accessibleModels = await listAccessibleGeminiModels(apiKey);
-        if (accessibleModels.length) {
-            console.log(`[AI][Gemini] Accessible models: ${accessibleModels.join(', ')}`);
-        } else {
-            console.warn('[AI][Gemini] Model listing returned no accessible models, using fallback candidates.');
-        }
-    } catch (error) {
-        console.error('[AI][Gemini] Model listing failed:', serializeGeminiError(error));
-    }
-
-    const attemptOrder = pickPreferredGeminiModels(accessibleModels);
-    const sdkClients = await loadGeminiSdkClients(apiKey);
-    const failures = [];
-
-    for (const modelName of attemptOrder) {
-        try {
-            for (const sdkClient of sdkClients) {
-                const sdkText = await generateWithGeminiSdk(sdkClient, modelName, prompt);
-                if (sdkText) {
+                if (text) {
                     return {
                         ok: true,
-                        result: sdkText,
+                        result: text,
                         model: modelName,
-                        source: sdkClient.type,
-                        degraded: false
+                        source: 'google-rest',
+                        degraded: false,
+                        attemptedModels: GEMINI_MODEL_CANDIDATES
                     };
                 }
+            } catch (error) {
+                failureDetails.push(`${modelName}: ${serializeGeminiError(error, error?.responseText || '')}`);
+                if (Number(error?.status) === 429) {
+                    console.warn(`[AI][Gemini] Rate limit hit on ${modelName}, falling through to next model.`);
+                }
             }
-
-            const restText = await generateWithGeminiRest(apiKey, modelName, prompt);
-            if (restText) {
-                return {
-                    ok: true,
-                    result: restText,
-                    model: modelName,
-                    source: 'google-rest',
-                    degraded: false
-                };
-            }
-        } catch (error) {
-            failures.push({ modelName, error: serializeGeminiError(error) });
-            logGeminiFailure('REST', modelName, error, 'structured');
         }
+    } else {
+        failureDetails.push('GEMINI_API_KEY missing');
     }
 
-    const failureSummary = failures.length
-        ? failures.map((entry) => `${entry.modelName}: ${entry.error}`).join(' || ')
-        : 'لم يتم تسجيل تفاصيل فشل من Gemini.';
+    try {
+        const pollinationsText = await generatePollinationsText(prompt);
+        if (pollinationsText) {
+            return {
+                ok: true,
+                result: pollinationsText,
+                model: 'pollinations-openai',
+                source: 'pollinations',
+                degraded: true,
+                attemptedModels: GEMINI_MODEL_CANDIDATES,
+                failures: failureDetails
+            };
+        }
+    } catch (error) {
+        failureDetails.push(`pollinations: ${serializeGeminiError(error, error?.responseText || '')}`);
+        console.error('[AI][Pollinations] fallback failed:', serializeGeminiError(error, error?.responseText || ''));
+    }
 
     return {
         ok: true,
-        degraded: true,
+        result: buildGeminiFallbackText(prompt, failureDetails.join(' || ')),
+        model: 'local-fallback',
         source: 'local-fallback',
-        result: buildGeminiFallbackText(prompt, failureSummary),
-        attemptedModels: attemptOrder,
-        failures
+        degraded: true,
+        attemptedModels: GEMINI_MODEL_CANDIDATES,
+        failures: failureDetails
     };
 }
 
