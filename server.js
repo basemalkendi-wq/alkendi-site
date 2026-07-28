@@ -409,7 +409,7 @@ app.post('/api/tools/download-click', async (req, res) => {
 // ==========================================
 
 // ==========================================
-// 🤖 مسار الذكاء الاصطناعي بواسطة المكتبة الرسمية المستقرة لـ Gemini
+// 🤖 مسار الذكاء الاصطناعي بواسطة المكتبة الرسمية لـ Gemini
 // ==========================================
 app.post('/api/ai/text', async (req, res) => {
     try {
@@ -425,13 +425,13 @@ app.post('/api/ai/text', async (req, res) => {
             return res.status(500).json({ result: "مفتاح GEMINI_API_KEY غير متوفر في متغيرات البيئة (Render Environment)." });
         }
 
-        // إعداد العميل الرسمي من Google
+        // إعداد العميل الرسمي
         const ai = new GoogleGenAI({ apiKey });
 
-        // تجربة النموذج الأساسي المستقر المتاح للجميع دائماً
+        // تجربة النموذج المستقر مع معالجة التمرير السليم
         try {
             const response = await ai.models.generateContent({
-                model: 'gemini-1.5-flash',
+                model: 'gemini-2.5-flash',
                 contents: prompt.trim(),
             });
 
@@ -439,11 +439,11 @@ app.post('/api/ai/text', async (req, res) => {
                 return res.json({ result: response.text.trim() });
             }
         } catch (modelErr) {
-            console.warn("Primary model gemini-1.5-flash failed, trying gemini-1.5-pro...", modelErr.message);
+            console.warn("Primary model failed, falling back to gemini-2.0-flash...", modelErr.message);
             
-            // خيار احتياطي تلقائي للنموذج الاحترافي المتاح
+            // خيار احتياطي باستخدام النموذج الأحدث المستقر
             const fallbackResponse = await ai.models.generateContent({
-                model: 'gemini-1.5-pro',
+                model: 'gemini-2.0-flash',
                 contents: prompt.trim(),
             });
 
