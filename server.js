@@ -1,3 +1,4 @@
+const { GoogleGenAI } = require('@google/genai');
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -407,6 +408,9 @@ app.post('/api/tools/download-click', async (req, res) => {
 // 🤖 مسار الذكاء الاصطناعي (Gemini Official API)
 // ==========================================
 
+// ==========================================
+// 🤖 مسار الذكاء الاصطناعي بواسطة المكتبة الرسمية لـ Gemini
+// ==========================================
 app.post('/api/ai/text', async (req, res) => {
     try {
         const { prompt } = req.body || {};
@@ -418,54 +422,29 @@ app.post('/api/ai/text', async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.status(500).json({ result: "مفتاح GEMINI_API_KEY غير موجود في إعدادات Render." });
+            return res.status(500).json({ result: "مفتاح GEMINI_API_KEY غير متوفر في متغيّرات البيئة (Render Environment)." });
         }
 
-        // قائمة النماذج الرسمية المعترف بها حالياً في v1beta بالترتيب
-        const modelsToTry = [
-            'gemini-2.0-flash',
-            'gemini-1.5-flash-8b',
-            'gemini-2.0-flash-lite-preview-02-05'
-        ];
+        // إعداد العميل الرسمي من Google
+        const ai = new GoogleGenAI({ apiKey });
 
-        let lastErrorMessage = "";
+        // توليد النص باستخدام المكتبة الرسمية ونموذج gemini-2.5-flash الأحدث والأسرع
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt.trim(),
+        });
 
-        for (const modelName of modelsToTry) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: prompt.trim() }]
-                        }]
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                    const aiReply = data.candidates[0].content.parts[0].text;
-                    return res.json({ result: aiReply.trim() });
-                }
-
-                // تسجيل الخطأ والانتقال للنموذج التالي في القائمة إذا لم يعمل
-                if (data.error?.message) {
-                    lastErrorMessage = data.error.message;
-                }
-            } catch (err) {
-                lastErrorMessage = err.message;
-            }
+        if (response && response.text) {
+            return res.json({ result: response.text.trim() });
+        } else {
+            return res.status(500).json({ result: "لم يتم استلام نص من نموذج الذكاء الاصطناعي." });
         }
-
-        console.error("Gemini Failure Details:", lastErrorMessage);
-        return res.status(500).json({ result: `تعذر معالجة الطلب: ${lastErrorMessage}` });
 
     } catch (error) {
-        console.error("AI Text Route Error:", error);
-        return res.status(500).json({ result: "حدث خطأ أثناء الاتصال بسيرفر الذكاء الاصطناعي." });
+        console.error("Gemini SDK Error:", error);
+        return res.status(500).json({ 
+            result: `حدث خطأ أثناء معالجة الطلب: ${error.message || "خطأ غير معروف"}` 
+        });
     }
 });
 
