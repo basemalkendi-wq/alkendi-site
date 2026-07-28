@@ -362,7 +362,7 @@ async function generateGeminiRestText(apiKey, modelName, prompt, options = {}) {
 }
 
 async function generatePollinationsText(prompt) {
-    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=mistral&temperature=0.7`;
+    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?temperature=0.7`;
     const response = await fetch(url, {
         method: 'GET',
         headers: { Accept: 'text/plain' },
@@ -379,6 +379,66 @@ async function generatePollinationsText(prompt) {
     }
 
     return text.trim();
+}
+
+function buildHelpfulFallbackText(prompt) {
+    const normalizedPrompt = String(prompt || '').toLowerCase();
+
+    if (normalizedPrompt.includes('تسجيل دخول') || normalizedPrompt.includes('login') || normalizedPrompt.includes('button') || normalizedPrompt.includes('زر')) {
+        return [
+            'إليك زر تسجيل دخول احترافي جاهز للاستخدام:',
+            '',
+            '```html',
+            '<button class="login-btn" type="button">',
+            '  <span class="login-btn__icon">🔐</span>',
+            '  <span>تسجيل الدخول</span>',
+            '</button>',
+            '',
+            '<style>',
+            '  .login-btn {',
+            '    display: inline-flex;',
+            '    align-items: center;',
+            '    gap: 0.75rem;',
+            '    padding: 0.95rem 1.4rem;',
+            '    border: 0;',
+            '    border-radius: 14px;',
+            '    background: linear-gradient(135deg, #111827, #1f2937);',
+            '    color: #fff;',
+            '    font: 700 1rem/1.2 system-ui, sans-serif;',
+            '    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.28);',
+            '    cursor: pointer;',
+            '    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;',
+            '  }',
+            '  .login-btn:hover {',
+            '    transform: translateY(-2px);',
+            '    background: linear-gradient(135deg, #0f172a, #374151);',
+            '    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.36);',
+            '  }',
+            '  .login-btn:active {',
+            '    transform: translateY(0);',
+            '  }',
+            '  .login-btn__icon {',
+            '    width: 2rem;',
+            '    height: 2rem;',
+            '    display: grid;',
+            '    place-items: center;',
+            '    border-radius: 999px;',
+            '    background: rgba(255, 255, 255, 0.12);',
+            '  }',
+            '</style>',
+            '```',
+            '',
+            'إذا أردت، أستطيع تحويله أيضاً إلى نسخة HTML مع حقول البريد وكلمة المرور وتأثيرات أجمل.'
+        ].join('\n');
+    }
+
+    return [
+        'تعذر الوصول إلى Gemini أو Pollinations الآن، لكن هذا قالب بداية مفيد يمكنك البناء عليه:',
+        '',
+        '```text',
+        String(prompt || '').trim().slice(0, 400) || 'اكتب طلبك هنا مرة أخرى للحصول على نتيجة أدق.',
+        '```'
+    ].join('\n');
 }
 
 async function generateGeminiText(prompt) {
@@ -433,7 +493,7 @@ async function generateGeminiText(prompt) {
 
     return {
         ok: true,
-        result: buildGeminiFallbackText(prompt, failureDetails.join(' || ')),
+        result: buildHelpfulFallbackText(prompt),
         model: 'local-fallback',
         source: 'local-fallback',
         degraded: true,
@@ -642,7 +702,7 @@ app.post('/api/ai/text', async (req, res) => {
 
         return res.json({
             success: true,
-            result: buildGeminiFallbackText(prompt.trim(), 'تم تفعيل الرد الاحتياطي المحلي'),
+            result: buildHelpfulFallbackText(prompt.trim()),
             model: 'fallback',
             source: 'local-fallback',
             degraded: true,
@@ -653,7 +713,7 @@ app.post('/api/ai/text', async (req, res) => {
         console.error("Gemini SDK Error:", error);
         return res.json({ 
             success: true,
-            result: buildGeminiFallbackText(req.body?.prompt || '', `حدث خطأ داخلي غير متوقع: ${error.message || 'خطأ غير معروف'}`),
+            result: buildHelpfulFallbackText(req.body?.prompt || ''),
             model: 'fallback',
             source: 'local-fallback',
             degraded: true
