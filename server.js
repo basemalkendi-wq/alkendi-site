@@ -1,4 +1,3 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -15,10 +14,12 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'AlKendi_Super_Secret_Key_2026_@#!';
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 const GEMINI_MODEL_CANDIDATES = [
+    'gemini-2.5-flash',
     'gemini-2.0-flash',
     'gemini-1.5-flash',
     'gemini-1.5-pro'
 ];
+const GEMINI_REST_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
 const defaultOrigins = [
     'https://alkendi-site.onrender.com',
@@ -237,10 +238,23 @@ function sendUnauthorizedResponse(req, res) {
     return res.redirect('/login.html');
 }
 
-function isMissingGeminiModelError(error) {
-    const status = error?.status || error?.response?.status;
-    const message = String(error?.message || '').toLowerCase();
-    return status === 404 || message.includes('404') || message.includes('model not found') || message.includes('not found') || message.includes('not supported') || message.includes('invalid model');
+function normalizeGeminiModelName(name) {
+    return String(name || '').replace(/^models\//, '').trim();
+}
+
+function buildGeminiGenerationPayload(prompt) {
+    return {
+        contents: [{
+            role: 'user',
+            parts: [{ text: prompt }]
+        }],
+        generationConfig: {
+            temperature: 0.7,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 2048
+        }
+    };
 }
 
 function extractGeminiText(response) {
@@ -248,18 +262,179 @@ function extractGeminiText(response) {
 
     try {
         if (typeof response.text === 'function') {
-            return (response.text() || '').trim();
+            return String(response.text() || '').trim();
+        }
+
+        if (typeof response.text === 'string') {
+            return response.text.trim();
         }
     } catch (error) {
         // Fall through to alternate extraction paths.
     }
 
-    const candidateText = response?.candidates?.[0]?.content?.parts
-        ?.map((part) => part?.text || '')
-        .join('')
-        .trim();
+    const parts = response?.candidates?.[0]?.content?.parts;
+    if (Array.isArray(parts)) {
+        return parts.map((part) => part?.text || '').join('').trim();
+    }
 
-    return candidateText || '';
+    return '';
+}
+
+function buildGeminiFallbackText(prompt, details) {
+    const promptSummary = String(prompt || '').trim().slice(0, 160);
+    const detailSuffix = details ? ` السبب الفني: ${details}.` : '';
+    return `تعذر الحصول على رد مباشر من Gemini حالياً.${detailSuffix} يمكنك إعادة المحاولة بعد لحظات. طلبك: ${promptSummary}`;
+}
+
+function serializeGeminiError(error) {
+    if (!error) return 'Unknown Gemini error';
+
+    const status = error?.status || error?.response?.status || error?.code || 'unknown-status';
+    const message = error?.message || error?.error?.message || String(error);
+    const responseText = error?.responseText || error?.body || error?.response?.data || error?.response?.body;
+
+    return [
+        `status=${status}`,
+        `message=${message}`,
+        responseText ? `response=${typeof responseText === 'string' ? responseText : JSON.stringify(responseText)}` : null
+    ].filter(Boolean).join(' | ');
+}
+
+function logGeminiFailure(stage, modelName, error, payloadType) {
+    console.error(`[AI][Gemini][${stage}] model=${modelName} payload=${payloadType} ${serializeGeminiError(error)}`);
+}
+
+async function loadGeminiSdkClients(apiKey) {
+    const clients = [];
+
+    try {
+        const { GoogleGenAI } = require('@google/genai');
+        clients.push({ type: 'google-genai', client: new GoogleGenAI({ apiKey }) });
+    } catch (error) {
+        console.warn('[AI][Gemini][SDK] @google/genai unavailable:', error.message);
+    }
+
+    try {
+        const { GoogleGenerativeAI } = require('@google/generative-ai');
+        clients.push({ type: 'google-generative-ai', client: new GoogleGenerativeAI(apiKey) });
+    } catch (error) {
+        console.warn('[AI][Gemini][SDK] @google/generative-ai unavailable:', error.message);
+    }
+
+    return clients;
+}
+
+async function listAccessibleGeminiModels(apiKey) {
+    const url = `${GEMINI_REST_BASE_URL}/models?key=${encodeURIComponent(apiKey)}&pageSize=100`;
+    const response = await fetch(url, { headers: { Accept: 'application/json' } });
+
+    if (!response.ok) {
+        const responseText = await response.text().catch(() => '');
+        throw new Error(`Model listing failed: ${response.status} ${response.statusText}${responseText ? ` | ${responseText}` : ''}`);
+    }
+
+    const data = await response.json();
+    const models = Array.isArray(data?.models) ? data.models : [];
+    return models
+        .filter((model) => Array.isArray(model?.supportedGenerationMethods) ? model.supportedGenerationMethods.includes('generateContent') : true)
+        .map((model) => normalizeGeminiModelName(model?.name || model?.displayName || ''))
+        .filter(Boolean);
+}
+
+function pickPreferredGeminiModels(availableModels) {
+    const normalizedAvailable = new Set((availableModels || []).map(normalizeGeminiModelName));
+    const orderedCandidates = [];
+
+    for (const candidate of GEMINI_MODEL_CANDIDATES) {
+        if (normalizedAvailable.has(candidate)) {
+            orderedCandidates.push(candidate);
+        }
+    }
+
+    for (const candidate of GEMINI_MODEL_CANDIDATES) {
+        if (!orderedCandidates.includes(candidate)) {
+            orderedCandidates.push(candidate);
+        }
+    }
+
+    return orderedCandidates;
+}
+
+async function generateWithGeminiRest(apiKey, modelName, prompt) {
+    const url = `${GEMINI_REST_BASE_URL}/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const payload = buildGeminiGenerationPayload(prompt);
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+        throw new Error(responseText || `REST request failed with status ${response.status}`);
+    }
+
+    const data = responseText ? JSON.parse(responseText) : {};
+    const text = extractGeminiText(data);
+
+    if (!text) {
+        throw new Error('REST response returned empty content');
+    }
+
+    return text;
+}
+
+async function generateWithGeminiSdk(clientRecord, modelName, prompt) {
+    if (clientRecord.type === 'google-genai') {
+        const payloadVariants = [
+            { contents: prompt },
+            buildGeminiGenerationPayload(prompt)
+        ];
+
+        for (const payload of payloadVariants) {
+            try {
+                const response = await clientRecord.client.models.generateContent({
+                    model: modelName,
+                    ...payload
+                });
+                const text = extractGeminiText(response);
+                if (text) {
+                    return text;
+                }
+                console.warn(`[AI][Gemini][SDK] model=${modelName} returned empty text for payload=${payload.contents === prompt ? 'string' : 'structured'}`);
+            } catch (error) {
+                logGeminiFailure('SDK', modelName, error, payload.contents === prompt ? 'string' : 'structured');
+            }
+        }
+
+        return '';
+    }
+
+    if (clientRecord.type === 'google-generative-ai') {
+        const payloadVariants = [
+            prompt,
+            buildGeminiGenerationPayload(prompt)
+        ];
+
+        for (const payload of payloadVariants) {
+            try {
+                const response = await clientRecord.client.getGenerativeModel({ model: modelName }).generateContent(payload);
+                const resolvedResponse = response?.response ? await response.response : response;
+                const text = extractGeminiText(resolvedResponse);
+                if (text) {
+                    return text;
+                }
+                console.warn(`[AI][Gemini][SDK] model=${modelName} returned empty text for payload=${typeof payload === 'string' ? 'string' : 'structured'}`);
+            } catch (error) {
+                logGeminiFailure('SDK', modelName, error, typeof payload === 'string' ? 'string' : 'structured');
+            }
+        }
+
+        return '';
+    }
+
+    return '';
 }
 
 async function generateGeminiText(prompt) {
@@ -267,54 +442,72 @@ async function generateGeminiText(prompt) {
 
     if (!apiKey) {
         return {
-            ok: false,
-            status: 500,
-            result: 'مفتاح GEMINI_API_KEY غير متوفر في متغيرات البيئة (Render Environment).'
+            ok: true,
+            degraded: true,
+            source: 'local-fallback',
+            result: buildGeminiFallbackText(prompt, 'مفتاح GEMINI_API_KEY غير متوفر في متغيرات البيئة')
         };
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const attemptedModels = [];
+    let accessibleModels = [];
 
-    for (const modelName of GEMINI_MODEL_CANDIDATES) {
-        attemptedModels.push(modelName);
+    try {
+        accessibleModels = await listAccessibleGeminiModels(apiKey);
+        if (accessibleModels.length) {
+            console.log(`[AI][Gemini] Accessible models: ${accessibleModels.join(', ')}`);
+        } else {
+            console.warn('[AI][Gemini] Model listing returned no accessible models, using fallback candidates.');
+        }
+    } catch (error) {
+        console.error('[AI][Gemini] Model listing failed:', serializeGeminiError(error));
+    }
 
+    const attemptOrder = pickPreferredGeminiModels(accessibleModels);
+    const sdkClients = await loadGeminiSdkClients(apiKey);
+    const failures = [];
+
+    for (const modelName of attemptOrder) {
         try {
-            const model = genAI.getGenerativeModel({ model: modelName });
-            const result = await model.generateContent({
-                contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.7,
-                    topP: 0.95,
-                    topK: 40,
-                    maxOutputTokens: 2048
+            for (const sdkClient of sdkClients) {
+                const sdkText = await generateWithGeminiSdk(sdkClient, modelName, prompt);
+                if (sdkText) {
+                    return {
+                        ok: true,
+                        result: sdkText,
+                        model: modelName,
+                        source: sdkClient.type,
+                        degraded: false
+                    };
                 }
-            });
+            }
 
-            const response = await result.response;
-            const text = extractGeminiText(response);
-
-            if (text) {
+            const restText = await generateWithGeminiRest(apiKey, modelName, prompt);
+            if (restText) {
                 return {
                     ok: true,
-                    result: text,
-                    model: modelName
+                    result: restText,
+                    model: modelName,
+                    source: 'google-rest',
+                    degraded: false
                 };
             }
         } catch (error) {
-            if (!isMissingGeminiModelError(error)) {
-                console.warn(`Gemini model ${modelName} failed:`, error.message);
-            } else {
-                console.warn(`Gemini model ${modelName} unavailable, trying next fallback.`);
-            }
+            failures.push({ modelName, error: serializeGeminiError(error) });
+            logGeminiFailure('REST', modelName, error, 'structured');
         }
     }
 
+    const failureSummary = failures.length
+        ? failures.map((entry) => `${entry.modelName}: ${entry.error}`).join(' || ')
+        : 'لم يتم تسجيل تفاصيل فشل من Gemini.';
+
     return {
-        ok: false,
-        status: 502,
-        result: 'لم يتمكن الخادم من توليد رد من Gemini بعد تجربة النماذج المتاحة.',
-        attemptedModels
+        ok: true,
+        degraded: true,
+        source: 'local-fallback',
+        result: buildGeminiFallbackText(prompt, failureSummary),
+        attemptedModels: attemptOrder,
+        failures
     };
 }
 
@@ -509,21 +702,30 @@ app.post('/api/ai/text', async (req, res) => {
             return res.json({
                 success: true,
                 result: generation.result,
-                model: generation.model
+                model: generation.model || 'fallback',
+                source: generation.source || 'local-fallback',
+                degraded: Boolean(generation.degraded),
+                attemptedModels: generation.attemptedModels || []
             });
         }
 
-        return res.status(generation.status || 500).json({
-            success: false,
-            result: generation.result,
+        return res.json({
+            success: true,
+            result: buildGeminiFallbackText(prompt.trim(), 'تم تفعيل الرد الاحتياطي المحلي'),
+            model: 'fallback',
+            source: 'local-fallback',
+            degraded: true,
             attemptedModels: generation.attemptedModels || []
         });
 
     } catch (error) {
         console.error("Gemini SDK Error:", error);
-        return res.status(500).json({ 
-            success: false,
-            result: `حدث خطأ أثناء معالجة الطلب: ${error.message || 'خطأ غير معروف'}` 
+        return res.json({ 
+            success: true,
+            result: buildGeminiFallbackText(req.body?.prompt || '', `حدث خطأ داخلي غير متوقع: ${error.message || 'خطأ غير معروف'}`),
+            model: 'fallback',
+            source: 'local-fallback',
+            degraded: true
         });
     }
 });
