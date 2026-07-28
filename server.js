@@ -1,4 +1,4 @@
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -15,7 +15,6 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'AlKendi_Super_Secret_Key_2026_@#!';
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY_HERE';
 const defaultOrigins = [
     'https://alkendi-site.onrender.com',
     'http://localhost:3000',
@@ -405,11 +404,7 @@ app.post('/api/tools/download-click', async (req, res) => {
 });
 
 // ==========================================
-// 🤖 مسار الذكاء الاصطناعي (Gemini Official API)
-// ==========================================
-
-// ==========================================
-// 🤖 مسار الذكاء الاصطناعي بواسطة المكتبة الرسمية لـ Gemini
+// 🤖 مسار الذكاء الاصطناعي الرسمى (Gemini SDK)
 // ==========================================
 app.post('/api/ai/text', async (req, res) => {
     try {
@@ -425,30 +420,29 @@ app.post('/api/ai/text', async (req, res) => {
             return res.status(500).json({ result: "مفتاح GEMINI_API_KEY غير متوفر في متغيرات البيئة (Render Environment)." });
         }
 
-        // إعداد العميل الرسمي
-        const ai = new GoogleGenAI({ apiKey });
+        const genAI = new GoogleGenerativeAI(apiKey);
 
-        // تجربة النموذج المستقر مع معالجة التمرير السليم
         try {
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: prompt.trim(),
-            });
+            // المحاولة الأولى: استخدام نموذج gemini-1.5-flash المباشر والمستقر
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const result = await model.generateContent(prompt.trim());
+            const response = await result.response;
+            const text = response.text();
 
-            if (response && response.text) {
-                return res.json({ result: response.text.trim() });
+            if (text && text.trim()) {
+                return res.json({ result: text.trim() });
             }
-        } catch (modelErr) {
-            console.warn("Primary model failed, falling back to gemini-2.0-flash...", modelErr.message);
-            
-            // خيار احتياطي باستخدام النموذج الأحدث المستقر
-            const fallbackResponse = await ai.models.generateContent({
-                model: 'gemini-2.0-flash',
-                contents: prompt.trim(),
-            });
+        } catch (primaryErr) {
+            console.warn("Primary model gemini-1.5-flash failed, trying gemini-1.5-pro...", primaryErr.message);
 
-            if (fallbackResponse && fallbackResponse.text) {
-                return res.json({ result: fallbackResponse.text.trim() });
+            // المحاولة الاحتياطية: استخدام gemini-1.5-pro
+            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+            const fallbackResult = await fallbackModel.generateContent(prompt.trim());
+            const fallbackResponse = await fallbackResult.response;
+            const fallbackText = fallbackResponse.text();
+
+            if (fallbackText && fallbackText.trim()) {
+                return res.json({ result: fallbackText.trim() });
             }
         }
 
