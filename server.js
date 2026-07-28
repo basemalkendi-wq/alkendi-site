@@ -15,8 +15,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'AlKendi_Super_Secret_Key_2026_@#!'
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
 const GEMINI_MODEL_CANDIDATES = [
     'gemini-2.0-flash',
-    'gemini-2.0-flash-lite',
-    'gemini-1.5-flash-8b'
+    'gemini-2.0-flash-lite'
 ];
 const GEMINI_REST_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
@@ -363,8 +362,13 @@ async function generateGeminiRestText(apiKey, modelName, prompt, options = {}) {
 }
 
 async function generatePollinationsText(prompt) {
-    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=openai&temperature=0.7`;
-    const response = await fetch(url, { headers: { Accept: 'text/plain' } });
+    const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=mistral&temperature=0.7`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: { Accept: 'text/plain' },
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer'
+    });
     const text = await response.text().catch(() => '');
 
     if (!response.ok) {
