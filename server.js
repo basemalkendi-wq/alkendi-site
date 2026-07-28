@@ -409,7 +409,7 @@ app.post('/api/tools/download-click', async (req, res) => {
 // ==========================================
 
 // ==========================================
-// 🤖 مسار الذكاء الاصطناعي بواسطة المكتبة الرسمية لـ Gemini
+// 🤖 مسار الذكاء الاصطناعي بواسطة المكتبة الرسمية المستقرة لـ Gemini
 // ==========================================
 app.post('/api/ai/text', async (req, res) => {
     try {
@@ -422,23 +422,37 @@ app.post('/api/ai/text', async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.status(500).json({ result: "مفتاح GEMINI_API_KEY غير متوفر في متغيّرات البيئة (Render Environment)." });
+            return res.status(500).json({ result: "مفتاح GEMINI_API_KEY غير متوفر في متغيرات البيئة (Render Environment)." });
         }
 
         // إعداد العميل الرسمي من Google
         const ai = new GoogleGenAI({ apiKey });
 
-        // توليد النص باستخدام المكتبة الرسمية ونموذج gemini-2.5-flash الأحدث والأسرع
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt.trim(),
-        });
+        // تجربة النموذج الأساسي المستقر المتاح للجميع دائماً
+        try {
+            const response = await ai.models.generateContent({
+                model: 'gemini-1.5-flash',
+                contents: prompt.trim(),
+            });
 
-        if (response && response.text) {
-            return res.json({ result: response.text.trim() });
-        } else {
-            return res.status(500).json({ result: "لم يتم استلام نص من نموذج الذكاء الاصطناعي." });
+            if (response && response.text) {
+                return res.json({ result: response.text.trim() });
+            }
+        } catch (modelErr) {
+            console.warn("Primary model gemini-1.5-flash failed, trying gemini-1.5-pro...", modelErr.message);
+            
+            // خيار احتياطي تلقائي للنموذج الاحترافي المتاح
+            const fallbackResponse = await ai.models.generateContent({
+                model: 'gemini-1.5-pro',
+                contents: prompt.trim(),
+            });
+
+            if (fallbackResponse && fallbackResponse.text) {
+                return res.json({ result: fallbackResponse.text.trim() });
+            }
         }
+
+        return res.status(500).json({ result: "لم يتم استلام نص من نموذج الذكاء الاصطناعي." });
 
     } catch (error) {
         console.error("Gemini SDK Error:", error);
