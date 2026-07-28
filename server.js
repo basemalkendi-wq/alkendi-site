@@ -14,6 +14,11 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
 const JWT_SECRET = process.env.JWT_SECRET || 'AlKendi_Super_Secret_Key_2026_@#!';
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
+const GEMINI_MODEL_CANDIDATES = [
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-1.5-pro'
+];
 
 const defaultOrigins = [
     'https://alkendi-site.onrender.com',
@@ -232,6 +237,87 @@ function sendUnauthorizedResponse(req, res) {
     return res.redirect('/login.html');
 }
 
+function isMissingGeminiModelError(error) {
+    const status = error?.status || error?.response?.status;
+    const message = String(error?.message || '').toLowerCase();
+    return status === 404 || message.includes('404') || message.includes('model not found') || message.includes('not found') || message.includes('not supported') || message.includes('invalid model');
+}
+
+function extractGeminiText(response) {
+    if (!response) return '';
+
+    try {
+        if (typeof response.text === 'function') {
+            return (response.text() || '').trim();
+        }
+    } catch (error) {
+        // Fall through to alternate extraction paths.
+    }
+
+    const candidateText = response?.candidates?.[0]?.content?.parts
+        ?.map((part) => part?.text || '')
+        .join('')
+        .trim();
+
+    return candidateText || '';
+}
+
+async function generateGeminiText(prompt) {
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+        return {
+            ok: false,
+            status: 500,
+            result: 'مفتاح GEMINI_API_KEY غير متوفر في متغيرات البيئة (Render Environment).'
+        };
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const attemptedModels = [];
+
+    for (const modelName of GEMINI_MODEL_CANDIDATES) {
+        attemptedModels.push(modelName);
+
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const result = await model.generateContent({
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    topK: 40,
+                    maxOutputTokens: 2048
+                }
+            });
+
+            const response = await result.response;
+            const text = extractGeminiText(response);
+
+            if (text) {
+                return {
+                    ok: true,
+                    result: text,
+                    model: modelName
+                };
+            }
+        } catch (error) {
+            if (!isMissingGeminiModelError(error)) {
+                console.warn(`Gemini model ${modelName} failed:`, error.message);
+            } else {
+                console.warn(`Gemini model ${modelName} unavailable, trying next fallback.`);
+            }
+        }
+    }
+
+    return {
+        ok: false,
+        status: 502,
+        result: 'لم يتمكن الخادم من توليد رد من Gemini بعد تجربة النماذج المتاحة.',
+        attemptedModels
+    };
+}
+
 const requireAuth = (req, res, next) => {
     const token = req.cookies.admin_token;
     if (!token) {
@@ -404,54 +490,40 @@ app.post('/api/tools/download-click', async (req, res) => {
 });
 
 // ==========================================
-// 🤖 مسار الذكاء الاصطناعي الرسمى (Gemini SDK)
+// 🤖 مسار الذكاء الاصطناعي النصي (Gemini SDK مع fallback للنماذج)
 // ==========================================
 app.post('/api/ai/text', async (req, res) => {
     try {
         const { prompt } = req.body || {};
 
         if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
-            return res.status(400).json({ result: "يرجى كتابة سؤال أو كود أولاً." });
+            return res.status(400).json({
+                success: false,
+                result: 'يرجى كتابة سؤال أو كود أولاً.'
+            });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
+        const generation = await generateGeminiText(prompt.trim());
 
-        if (!apiKey) {
-            return res.status(500).json({ result: "مفتاح GEMINI_API_KEY غير متوفر في متغيرات البيئة (Render Environment)." });
+        if (generation.ok) {
+            return res.json({
+                success: true,
+                result: generation.result,
+                model: generation.model
+            });
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-
-        try {
-            // المحاولة الأولى: استخدام نموذج gemini-1.5-flash المباشر والمستقر
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-            const result = await model.generateContent(prompt.trim());
-            const response = await result.response;
-            const text = response.text();
-
-            if (text && text.trim()) {
-                return res.json({ result: text.trim() });
-            }
-        } catch (primaryErr) {
-            console.warn("Primary model gemini-1.5-flash failed, trying gemini-1.5-pro...", primaryErr.message);
-
-            // المحاولة الاحتياطية: استخدام gemini-1.5-pro
-            const fallbackModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-            const fallbackResult = await fallbackModel.generateContent(prompt.trim());
-            const fallbackResponse = await fallbackResult.response;
-            const fallbackText = fallbackResponse.text();
-
-            if (fallbackText && fallbackText.trim()) {
-                return res.json({ result: fallbackText.trim() });
-            }
-        }
-
-        return res.status(500).json({ result: "لم يتم استلام نص من نموذج الذكاء الاصطناعي." });
+        return res.status(generation.status || 500).json({
+            success: false,
+            result: generation.result,
+            attemptedModels: generation.attemptedModels || []
+        });
 
     } catch (error) {
         console.error("Gemini SDK Error:", error);
         return res.status(500).json({ 
-            result: `حدث خطأ أثناء معالجة الطلب: ${error.message || "خطأ غير معروف"}` 
+            success: false,
+            result: `حدث خطأ أثناء معالجة الطلب: ${error.message || 'خطأ غير معروف'}` 
         });
     }
 });

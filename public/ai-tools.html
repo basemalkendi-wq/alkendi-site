@@ -153,10 +153,15 @@
                     body: JSON.stringify({ prompt })
                 });
 
-                const data = await response.json();
-                outputEl.textContent = data.result || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(data.result || data.message || data.error || `فشل الطلب برمز ${response.status}`);
+                }
+
+                outputEl.textContent = data.result || data.message || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
             } catch (err) {
-                outputEl.textContent = "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
+                outputEl.textContent = err?.message || "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
