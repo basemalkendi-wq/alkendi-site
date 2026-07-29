@@ -49,7 +49,6 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
-        /* Hide scrollbars but keep functionality */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -63,9 +62,8 @@
 
     <div class="flex h-screen overflow-hidden">
         
-        <!-- Sidebar Navigation (Responsive) -->
+        <!-- Sidebar Navigation -->
         <aside id="adminSidebar" class="fixed inset-y-0 right-0 z-40 flex flex-col w-72 h-screen bg-brand-darkCard border-l border-white/5 transition-transform duration-300 transform translate-x-full lg:translate-x-0 lg:relative shrink-0">
-            <!-- Sidebar Header Brand -->
             <div class="flex items-center justify-between px-6 h-20 border-b border-white/5 bg-[#0d0d14]">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-brand-purple/20 border border-brand-purple/40 flex items-center justify-center shadow-md shadow-brand-purple/10">
@@ -116,7 +114,6 @@
                     <span>الرعايات والإعلانات</span>
                 </button>
 
-                <!-- قسم تواصل معنا الجديد المضاف للقائمة الجانبية بناءً على طلبك -->
                 <button onclick="switchTab('footerContactTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
                     <i class="fa-solid fa-address-book text-lg"></i>
                     <span>تعديل صفحة تواصل معنا</span>
@@ -141,9 +138,8 @@
             </div>
         </aside>
 
-        <!-- Main Admin Work Area -->
+        <!-- Main Work Area -->
         <main class="flex-1 flex flex-col h-screen overflow-hidden bg-brand-darkBg">
-            <!-- Admin Workspace Header -->
             <header class="h-20 border-b border-white/5 bg-brand-darkCard/50 px-6 sm:px-10 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-4">
                     <button onclick="toggleMobileSidebar()" class="lg:hidden w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-brand-purple shrink-0 transition-all duration-200" aria-label="فتح قائمة التحكم">
@@ -250,7 +246,7 @@
                     </div>
                 </section>
 
-                <!-- TAB 1.5: HERO CODE SIMULATION -->
+                <!-- TAB 1.5: HERO CODE -->
                 <section id="heroCodeTab" class="tab-content hidden space-y-6">
                     <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
                         <div class="flex items-center gap-4 border-b border-white/5 pb-4">
@@ -371,7 +367,7 @@
                     <div id="adminProjectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 </section>
 
-                <!-- TAB 5: ADS BANNER MANAGER -->
+                <!-- TAB 5: ADS MANAGER -->
                 <section id="adsTab" class="tab-content hidden space-y-6">
                     <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
                         <div class="flex items-center gap-4 border-b border-white/5 pb-4">
@@ -406,7 +402,7 @@
                     </div>
                 </section>
 
-                <!-- TAB 5.5: FOOTER & CONTACT LABELS (صفحة تواصل معنا المحدثة بالكامل) -->
+                <!-- TAB 5.5: FOOTER & CONTACT -->
                 <section id="footerContactTab" class="tab-content hidden space-y-6">
                     <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
                         <div class="flex items-center gap-4 border-b border-white/5 pb-4">
@@ -441,7 +437,7 @@
                     </div>
                 </section>
 
-                <!-- TAB 6: RECEIVED MESSAGES -->
+                <!-- TAB 6: MESSAGES -->
                 <section id="messagesTab" class="tab-content hidden space-y-6">
                     <div class="bg-brand-darkCard border border-white/5 p-6 sm:p-8 rounded-3xl space-y-6">
                         <div class="flex items-center justify-between border-b border-white/5 pb-4">
@@ -484,12 +480,14 @@
                         <select id="tfCategory" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                             <option value="security" class="bg-brand-darkCard">الأمان والحماية</option>
                             <option value="utility" class="bg-brand-darkCard">الإنتاجية والأدوات</option>
-                            <option value="creators" class="bg-brand-darkCard">صناعة المحتوى</option>
+                            <option value="creators" class="bg-brand-darkCard">صناعة المحتوى والذكاء الاصطناعي</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 mb-2">الأيقونة (رمز FontAwesome)</label>
                         <select id="tfIcon" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            <option value="fa-brands fa-whatsapp" class="bg-brand-darkCard">WhatsApp / بوت وتواصل واتساب</option>
+                            <option value="fa-robot" class="bg-brand-darkCard">Robot / ذكاء اصطناعي وبوتات</option>
                             <option value="fa-shield-halved" class="bg-brand-darkCard">Shield / درع حماية</option>
                             <option value="fa-gauge-high" class="bg-brand-darkCard">Speedometer / مؤشر تسريع</option>
                             <option value="fa-clapperboard" class="bg-brand-darkCard">Clapperboard / مونتاج وصناعة محتوى</option>
@@ -504,15 +502,15 @@
                         <input type="text" id="tfVersion" required placeholder="v1.0" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">حجم الملف</label>
-                        <input type="text" id="tfSize" required placeholder="15.4 MB" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">حجم الملف / المنصة</label>
+                        <input type="text" id="tfSize" required placeholder="15.4 MB أو WhatsApp" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">رابط التحميل المباشر والآمن</label>
-                        <input type="text" id="tfLink" required placeholder="#" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">رابط التحميل أو رابط الواتساب المباشر (https://wa.me/...)</label>
+                        <input type="text" id="tfLink" required placeholder="https://wa.me/18002428478" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">وصف توضيحي مختصر عن الأداة</label>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">وصف توضيحي مختصر عن الأداة أو البوت</label>
                         <textarea id="tfDesc" required rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple resize-none"></textarea>
                     </div>
                 </div>
@@ -567,7 +565,7 @@
         </div>
     </div>
 
-    <!-- MODAL: CUSTOM CONFIRMATION POPUP -->
+    <!-- MODAL: CONFIRM POPUP -->
     <div id="confirmModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-brand-darkBg/90 backdrop-blur-sm hidden">
         <div class="bg-brand-darkCard border border-white/10 rounded-3xl w-full max-w-sm overflow-hidden p-6 text-center space-y-6 shadow-2xl">
             <div class="w-16 h-16 rounded-full bg-brand-neonRed/10 border border-brand-neonRed/30 text-brand-neonRed flex items-center justify-center text-2xl mx-auto">
@@ -600,8 +598,6 @@
             footerContact: { contactTitle: "", contactDesc: "", contactEmail: "", contactLocation: "", copyright: "" },
             messages: []
         };
-
-        let activeConfirmAction = null;
 
         const API_BASE = window.location.origin && window.location.origin !== 'null' ? window.location.origin : 'http://localhost:3000';
 
@@ -650,7 +646,6 @@
                 renderAdminTools();
                 renderAdminProjects();
                 renderAdminMessages();
-                console.log("Database initialized cleanly from cloud container!");
             } catch (err) {
                 showToast(err.message, "error");
                 loadFallbackMockDatabase();
@@ -661,7 +656,6 @@
             const savedData = localStorage.getItem('localMockDatabase');
             if (savedData) {
                 mainDatabase = JSON.parse(savedData);
-                showToast("تم جلب آخر نسخة معدلة محلياً في متصفحك.", "success");
             } else {
                 mainDatabase = {
                     profile: { name: "Al-Kendi Tech", tagline: "هنا بوابتك المفتوحة للحصول على أقوى برامج الحماية، والأدوات التقنية المفيدة...", avatar: "", subBadge: "طالب هندسة تقنية المعلومات IT & صانع محتوى تقني" },
@@ -671,12 +665,11 @@
                     tools: [],
                     portfolio: [],
                     projects: [],
-                    ads: { badge: "مساحة إعلانية شاغرة", title: "هل ترغب في رعاية موقع وقناة Al-Kendi Tech？", description: "اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.", btnText: "احجز مساحتك الآن", btnLink: "#contact" },
-                    footerContact: { contactTitle: "هل لديك فكرة أو طلب تعاون؟", contactDesc: "سواء كنت ترغب في مناقشة مشروع برمجيات، رعاية إعلانية...", contactEmail: "work@alkendi.me", contactLocation: "صنعاء، اليمن", copyright: "© 2026 جميع الحقوق محفوظة لـ Al-Kendi Tech. تم تطوير الموقع بكل حب وشغف بالبرمجة." },
+                    ads: { badge: "مساحة إعلانية شاغرة", title: "هل ترغب في رعاية موقع وقناة Al-Kendi Tech؟", description: "اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.", btnText: "احجز مساحتك الآن", btnLink: "#contact" },
+                    footerContact: { contactTitle: "هل لديك فكرة أو طلب تعاون؟", contactDesc: "سواء كنت ترغب في مناقشة مشروع برمجيات...", contactEmail: "work@alkendi.me", contactLocation: "صنعاء، اليمن", copyright: "© 2026 جميع الحقوق محفوظة لـ Al-Kendi Tech." },
                     messages: []
                 };
                 syncPortfolioCollections();
-                showToast("جاري العمل بنظام المحاكاة للبيانات الافتراضية.", "success");
             }
             populateDashboardForms();
             renderAdminTools();
@@ -685,14 +678,12 @@
         }
 
         function populateDashboardForms() {
-            // Tab 1 Profile
             document.getElementById('pName').value = mainDatabase.profile.name || '';
             document.getElementById('pTagline').value = mainDatabase.profile.tagline || '';
             document.getElementById('pAvatar').value = mainDatabase.profile.avatar || '';
             document.getElementById('pSubBadge').value = mainDatabase.profile.subBadge || '';
             previewAvatar(mainDatabase.profile.avatar);
 
-            // Tab 1 Links Text + URL
             document.getElementById('lTiktok').value = mainDatabase.links.tiktok || '';
             document.getElementById('lTiktokText').value = mainDatabase.links.tiktokText || '';
             document.getElementById('lInstagram').value = mainDatabase.links.instagram || '';
@@ -702,7 +693,6 @@
             document.getElementById('lGithub').value = mainDatabase.links.github || '';
             document.getElementById('lGithubText').value = mainDatabase.links.githubText || '';
 
-            // Tab 1.5 Terminal Config
             document.getElementById('cTerminalDomain').value = mainDatabase.terminalCode.domain || '';
             document.getElementById('cObjName').value = mainDatabase.terminalCode.objName || '';
             document.getElementById('cPropName').value = mainDatabase.terminalCode.propName || '';
@@ -714,7 +704,6 @@
             document.getElementById('cBoxNumber').value = mainDatabase.terminalCode.boxNumber || '';
             document.getElementById('cBoxPercent').value = mainDatabase.terminalCode.boxPercent || '';
 
-            // Tab 2 Metrics
             document.getElementById('mFollowers').value = mainDatabase.metrics.followers || '';
             document.getElementById('mFollowersLabel').value = mainDatabase.metrics.followersLabel || '';
             document.getElementById('mTools').value = mainDatabase.metrics.tools || '';
@@ -724,14 +713,12 @@
             document.getElementById('mSafety').value = mainDatabase.metrics.safety || '';
             document.getElementById('mSafetyLabel').value = mainDatabase.metrics.safetyLabel || '';
 
-            // Tab 5 Ads
             document.getElementById('adBadge').value = mainDatabase.ads.badge || '';
             document.getElementById('adTitle').value = mainDatabase.ads.title || '';
             document.getElementById('adDesc').value = mainDatabase.ads.description || '';
             document.getElementById('adBtnText').value = mainDatabase.ads.btnText || '';
             document.getElementById('adBtnLink').value = mainDatabase.ads.btnLink || '';
 
-            // Tab 5.5 Footer & Contact Labels
             if(!mainDatabase.footerContact) mainDatabase.footerContact = {};
             document.getElementById('cContactTitle').value = mainDatabase.footerContact.contactTitle || '';
             document.getElementById('cContactDesc').value = mainDatabase.footerContact.contactDesc || '';
@@ -740,7 +727,44 @@
             document.getElementById('fCopyright').value = mainDatabase.footerContact.copyright || '';
         }
 
+        // ================== MODAL OPEN/CLOSE FIXES ==================
+        function openToolModal() {
+            document.getElementById('toolFormId').value = '';
+            document.getElementById('toolForm').reset();
+            document.getElementById('toolModalTitle').innerText = "إضافة أداة أو برنامج جديد";
+            document.getElementById('toolModal').classList.remove('hidden');
+        }
+
+        function closeToolModal() { 
+            document.getElementById('toolModal').classList.add('hidden'); 
+        }
+
+        function openProjectModal() {
+            document.getElementById('projectFormId').value = '';
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectModalTitle').innerText = "إضافة مشروع برمجيات جديد";
+            document.getElementById('projectModal').classList.remove('hidden');
+        }
+
+        function closeProjectModal() { 
+            document.getElementById('projectModal').classList.add('hidden'); 
+        }
+
         // ================== TOOLS CONTROLLER ==================
+        function extractPhoneNumber(urlOrText) {
+            if (!urlOrText) return null;
+            const match = urlOrText.match(/\d{8,15}/);
+            return match ? '+' + match[0] : null;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("تم نسخ الرقم إلى الحافظة بنجاح: " + text, "success");
+            }).catch(() => {
+                showToast("تعذر النسخ التلقائي", "error");
+            });
+        }
+
         function renderAdminTools() {
             const grid = document.getElementById('adminToolsGrid');
             grid.innerHTML = '';
@@ -751,11 +775,20 @@
             mainDatabase.tools.forEach(tool => {
                 const card = document.createElement('div');
                 card.className = "bg-brand-darkCard border border-white/5 p-5 rounded-3xl flex flex-col justify-between";
-                let catLabel = tool.category === 'utility' ? "الإنتاجية والأدوات" : (tool.category === 'creators' ? "صناعة المحتوى" : "الأمان والحماية");
+                let catLabel = tool.category === 'utility' ? "الإنتاجية والأدوات" : (tool.category === 'creators' ? "صناعة المحتوى والذكاء الاصطناعي" : "الأمان والحماية");
+                
+                const rawLink = tool.downloadLink || tool.link || '';
+                const extractedPhone = extractPhoneNumber(rawLink);
+                const copyBtnHtml = extractedPhone ? `
+                    <button onclick="copyToClipboard('${extractedPhone}')" title="نسخ رقم التواصل" class="py-2 px-3 rounded-xl bg-brand-purple/20 text-brand-purple hover:bg-brand-purple hover:text-white transition-all text-xs font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
+                ` : '';
+
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg"><i class="fa-solid ${tool.icon || 'fa-toolbox'}"></i></div>
+                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg"><i class="${tool.icon || 'fa-solid fa-toolbox'}"></i></div>
                             <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 text-gray-400">${catLabel}</span>
                         </div>
                         <h3 class="text-sm font-bold text-white mb-2">${tool.name}</h3>
@@ -763,11 +796,12 @@
                     </div>
                     <div class="border-t border-white/5 pt-4">
                         <div class="flex items-center justify-between text-[10px] text-gray-500 mb-4">
-                            <span>الإصدار: ${tool.version}</span><span>الحجم: ${tool.size}</span>
+                            <span>الإصدار: ${tool.version}</span><span>الحجم/المنصة: ${tool.size}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="editTool(${tool.id})" class="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-gray-300">تعديل</button>
-                            <button onclick="triggerDeleteTool(${tool.id})" class="py-2 px-3 rounded-xl bg-brand-neonRed/10 text-brand-neonRed"><i class="fa-solid fa-trash-can"></i></button>
+                            <button onclick="editTool(${tool.id})" class="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-gray-300 font-bold transition-all">تعديل</button>
+                            ${copyBtnHtml}
+                            <button onclick="triggerDeleteTool(${tool.id})" class="py-2 px-3 rounded-xl bg-brand-neonRed/10 text-brand-neonRed hover:bg-brand-neonRed hover:text-white transition-all"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </div>`;
                 grid.appendChild(card);
@@ -797,6 +831,7 @@
             }
             closeToolModal();
             renderAdminTools();
+            showToast("تم إضافة/تعديل الأداة بنجاح!", "success");
         }
 
         function editTool(id) {
@@ -808,7 +843,7 @@
             document.getElementById('tfIcon').value = tool.icon;
             document.getElementById('tfVersion').value = tool.version;
             document.getElementById('tfSize').value = tool.size;
-            document.getElementById('tfLink').value = tool.downloadLink;
+            document.getElementById('tfLink').value = tool.downloadLink || tool.link || '#';
             document.getElementById('tfDesc').value = tool.description;
             document.getElementById('toolModalTitle').innerText = "تعديل تفاصيل الأداة الحالية";
             document.getElementById('toolModal').classList.remove('hidden');
@@ -845,8 +880,8 @@
                     <div class="border-t border-white/5 pt-4">
                         <div class="flex flex-wrap gap-1.5 mb-4">${techBadges}</div>
                         <div class="flex items-center gap-2">
-                            <button onclick="editProject(${project.id})" class="flex-1 py-2 rounded-xl bg-white/5 text-xs text-gray-300">تعديل</button>
-                            <button onclick="triggerDeleteProject(${project.id})" class="py-2 px-3 rounded-xl bg-brand-neonRed/10 text-brand-neonRed"><i class="fa-solid fa-trash-can"></i></button>
+                            <button onclick="editProject(${project.id})" class="flex-1 py-2 rounded-xl bg-white/5 text-xs text-gray-300 font-bold hover:bg-white/10 transition-all">تعديل</button>
+                            <button onclick="triggerDeleteProject(${project.id})" class="py-2 px-3 rounded-xl bg-brand-neonRed/10 text-brand-neonRed hover:bg-brand-neonRed hover:text-white transition-all"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </div>`;
                 grid.appendChild(card);
@@ -874,6 +909,7 @@
             syncPortfolioCollections();
             closeProjectModal();
             renderAdminProjects();
+            showToast("تم حفظ المشروع بنجاح!", "success");
         }
 
         function editProject(id) {
@@ -937,8 +973,6 @@
         }
         function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); }
         document.getElementById('confirmModal').addEventListener('click', function(e) { if(e.target === this) closeConfirmModal(); });
-        function closeToolModal() { document.getElementById('toolModal').classList.add('hidden'); }
-        function closeProjectModal() { document.getElementById('projectModal').classList.add('hidden'); }
 
         function switchTab(tabId, buttonElement) {
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -969,7 +1003,7 @@
             } else sidebar.classList.toggle('translate-x-full');
         }
 
-        // ================== GLOBAL STATE EXPORT & SAVE ==================
+        // ================== SAVE & PUBLISH ==================
         async function publishAllChanges() {
             mainDatabase.profile.name = document.getElementById('pName').value;
             mainDatabase.profile.tagline = document.getElementById('pTagline').value;
@@ -1037,11 +1071,7 @@
                     renderAdminMessages();
                 }
 
-                if (result?.updatedAt) {
-                    localStorage.setItem('alkendi-data-version', result.updatedAt);
-                }
-
-                showToast("تم الحفظ والمزامنة السحابية بنجاح! تم تحديث موقع المستخدمين تلقائياً.", "success");
+                showToast("تم الحفظ والمزامنة بنجاح! تم تحديث الموقع تلقائياً.", "success");
             } catch (err) {
                 showToast(`خطأ في الحفظ السحابي: ${err.message}`, "error");
                 localStorage.setItem('localMockDatabase', JSON.stringify(mainDatabase));
