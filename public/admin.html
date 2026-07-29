@@ -472,11 +472,11 @@
                 <input type="hidden" id="toolFormId">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">اسم الأداة أو البرنامج</label>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">اسم الأداة أو الخدمة</label>
                         <input type="text" id="tfName" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">تصنيف البرنامج</label>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">تصنيف الأداة</label>
                         <select id="tfCategory" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                             <option value="security" class="bg-brand-darkCard">الأمان والحماية</option>
                             <option value="utility" class="bg-brand-darkCard">الإنتاجية والأدوات</option>
@@ -487,14 +487,14 @@
                         <label class="block text-xs font-semibold text-gray-400 mb-2">الأيقونة (رمز FontAwesome)</label>
                         <select id="tfIcon" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                             <option value="fa-brands fa-whatsapp" class="bg-brand-darkCard">WhatsApp / بوت وتواصل واتساب</option>
-                            <option value="fa-robot" class="bg-brand-darkCard">Robot / ذكاء اصطناعي وبوتات</option>
-                            <option value="fa-shield-halved" class="bg-brand-darkCard">Shield / درع حماية</option>
-                            <option value="fa-gauge-high" class="bg-brand-darkCard">Speedometer / مؤشر تسريع</option>
-                            <option value="fa-clapperboard" class="bg-brand-darkCard">Clapperboard / مونتاج وصناعة محتوى</option>
-                            <option value="fa-ban" class="bg-brand-darkCard">Ban / حظر ومنع إعلانات</option>
-                            <option value="fa-file-video" class="bg-brand-darkCard">Video File / ضغط فيديوهات</option>
-                            <option value="fa-code" class="bg-brand-darkCard">Code / برمجة وتطوير</option>
-                            <option value="fa-key" class="bg-brand-darkCard">Key / مفاتيح وتشفير</option>
+                            <option value="fa-solid fa-robot" class="bg-brand-darkCard">Robot / ذكاء اصطناعي وبوتات</option>
+                            <option value="fa-solid fa-shield-halved" class="bg-brand-darkCard">Shield / درع حماية</option>
+                            <option value="fa-solid fa-gauge-high" class="bg-brand-darkCard">Speedometer / مؤشر تسريع</option>
+                            <option value="fa-solid fa-clapperboard" class="bg-brand-darkCard">Clapperboard / مونتاج وصناعة محتوى</option>
+                            <option value="fa-solid fa-ban" class="bg-brand-darkCard">Ban / حظر ومنع إعلانات</option>
+                            <option value="fa-solid fa-file-video" class="bg-brand-darkCard">Video File / ضغط فيديوهات</option>
+                            <option value="fa-solid fa-code" class="bg-brand-darkCard">Code / برمجة وتطوير</option>
+                            <option value="fa-solid fa-key" class="bg-brand-darkCard">Key / مفاتيح وتشفير</option>
                         </select>
                     </div>
                     <div>
@@ -502,11 +502,11 @@
                         <input type="text" id="tfVersion" required placeholder="v1.0" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">حجم الملف / المنصة</label>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">الحجم / المنصة</label>
                         <input type="text" id="tfSize" required placeholder="15.4 MB أو WhatsApp" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">رابط التحميل أو رابط الواتساب المباشر (https://wa.me/...)</label>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">رابط التحميل أو رابط الواتساب المباشر (مثال: https://wa.me/18002428478)</label>
                         <input type="text" id="tfLink" required placeholder="https://wa.me/18002428478" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
                     <div class="sm:col-span-2">
@@ -727,7 +727,7 @@
             document.getElementById('fCopyright').value = mainDatabase.footerContact.copyright || '';
         }
 
-        // ================== MODAL OPEN/CLOSE FIXES ==================
+        // ================== MODAL OPEN/CLOSE ==================
         function openToolModal() {
             document.getElementById('toolFormId').value = '';
             document.getElementById('toolForm').reset();
@@ -750,7 +750,7 @@
             document.getElementById('projectModal').classList.add('hidden'); 
         }
 
-        // ================== TOOLS CONTROLLER ==================
+        // ================== TOOLS CONTROLLER (SMART WHATSAPP DETECTION) ==================
         function extractPhoneNumber(urlOrText) {
             if (!urlOrText) return null;
             const match = urlOrText.match(/\d{8,15}/);
@@ -759,7 +759,7 @@
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                showToast("تم نسخ الرقم إلى الحافظة بنجاح: " + text, "success");
+                showToast("تم نسخ الرقم بنجاح: " + text, "success");
             }).catch(() => {
                 showToast("تعذر النسخ التلقائي", "error");
             });
@@ -772,18 +772,42 @@
                 grid.innerHTML = `<div class="col-span-full border border-white/5 p-12 text-center rounded-3xl text-gray-500"><p class="text-xs font-bold">لم تقم بإضافة أي برمجيات أو أدوات بعد.</p></div>`;
                 return;
             }
+
             mainDatabase.tools.forEach(tool => {
                 const card = document.createElement('div');
                 card.className = "bg-brand-darkCard border border-white/5 p-5 rounded-3xl flex flex-col justify-between";
                 let catLabel = tool.category === 'utility' ? "الإنتاجية والأدوات" : (tool.category === 'creators' ? "صناعة المحتوى والذكاء الاصطناعي" : "الأمان والحماية");
                 
                 const rawLink = tool.downloadLink || tool.link || '';
+                const isWhatsApp = (rawLink && rawLink.includes('wa.me')) || 
+                                   (tool.icon && tool.icon.includes('whatsapp')) || 
+                                   (tool.size && tool.size.toLowerCase().includes('whatsapp'));
+
                 const extractedPhone = extractPhoneNumber(rawLink);
-                const copyBtnHtml = extractedPhone ? `
-                    <button onclick="copyToClipboard('${extractedPhone}')" title="نسخ رقم التواصل" class="py-2 px-3 rounded-xl bg-brand-purple/20 text-brand-purple hover:bg-brand-purple hover:text-white transition-all text-xs font-bold flex items-center gap-1">
-                        <i class="fa-solid fa-copy"></i>
+
+                // 1. زر العرض والتفاعل الرئيسي
+                const actionButtonHtml = isWhatsApp ? `
+                    <a href="${rawLink}" target="_blank" class="flex-1 py-2.5 px-3 rounded-xl bg-green-600/20 border border-green-500/40 text-green-400 font-bold text-xs hover:bg-green-600 hover:text-white transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>انقر للانتقال إلى واتساب مباشرة</span>
+                    </a>
+                ` : `
+                    <a href="${rawLink}" target="_blank" class="flex-1 py-2.5 px-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple font-bold text-xs hover:bg-brand-purple hover:text-white transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-download text-xs"></i>
+                        <span>تحميل مباشر وآمن</span>
+                    </a>
+                `;
+
+                // 2. زر نسخ الرقم إذا توفر
+                const copyBtnHtml = (isWhatsApp && extractedPhone) ? `
+                    <button onclick="copyToClipboard('${extractedPhone}')" title="نسخ الرقم" class="py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all text-xs font-bold flex items-center gap-1">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>نسخ الرقم</span>
                     </button>
                 ` : '';
+
+                // 3. شارة العرض للحجم أو المنصة
+                const sizeDisplay = isWhatsApp ? 'منصة: واتساب' : `الحجم: ${tool.size || '0 MB'}`;
 
                 card.innerHTML = `
                     <div>
@@ -794,14 +818,18 @@
                         <h3 class="text-sm font-bold text-white mb-2">${tool.name}</h3>
                         <p class="text-[11px] text-gray-400 leading-relaxed mb-4 line-clamp-2">${tool.description}</p>
                     </div>
-                    <div class="border-t border-white/5 pt-4">
-                        <div class="flex items-center justify-between text-[10px] text-gray-500 mb-4">
-                            <span>الإصدار: ${tool.version}</span><span>الحجم/المنصة: ${tool.size}</span>
+                    <div class="border-t border-white/5 pt-4 space-y-3">
+                        <div class="flex items-center justify-between text-[10px] text-gray-500">
+                            <span>الإصدار: ${tool.version}</span>
+                            <span>${sizeDisplay}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="editTool(${tool.id})" class="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-gray-300 font-bold transition-all">تعديل</button>
+                            ${actionButtonHtml}
                             ${copyBtnHtml}
-                            <button onclick="triggerDeleteTool(${tool.id})" class="py-2 px-3 rounded-xl bg-brand-neonRed/10 text-brand-neonRed hover:bg-brand-neonRed hover:text-white transition-all"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                        <div class="flex items-center gap-2 pt-1 border-t border-white/5">
+                            <button onclick="editTool(${tool.id})" class="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-300 font-semibold transition-all">تعديل البيانات</button>
+                            <button onclick="triggerDeleteTool(${tool.id})" class="py-1.5 px-3 rounded-lg bg-brand-neonRed/10 text-brand-neonRed hover:bg-brand-neonRed hover:text-white transition-all"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </div>`;
                 grid.appendChild(card);
@@ -831,7 +859,7 @@
             }
             closeToolModal();
             renderAdminTools();
-            showToast("تم إضافة/تعديل الأداة بنجاح!", "success");
+            showToast("تم حفظ بيانات الأداة بنجاح!", "success");
         }
 
         function editTool(id) {
@@ -1071,7 +1099,7 @@
                     renderAdminMessages();
                 }
 
-                showToast("تم الحفظ والمزامنة بنجاح! تم تحديث الموقع تلقائياً.", "success");
+                showToast("تم الحفظ والمزامنة السحابية بنجاح! تم تحديث الموقع تلقائياً.", "success");
             } catch (err) {
                 showToast(`خطأ في الحفظ السحابي: ${err.message}`, "error");
                 localStorage.setItem('localMockDatabase', JSON.stringify(mainDatabase));
