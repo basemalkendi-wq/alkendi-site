@@ -121,7 +121,7 @@
                     AL-KENDI TECH
                 </h1>
                 <p class="text-[11px] text-gray-500 font-medium max-w-xs mx-auto leading-relaxed">
-                    حرك مؤشر الماوس للتفاعل مع الحقل المغناطیسی لدرع الكندي الواقي...
+                    حرك مؤشر الماوس للتفاعل مع الحقل المغناطيسي لدرع الكندي الواقي...
                 </p>
             </div>
 
@@ -554,7 +554,7 @@
                         <!-- Input Field -->
                         <div class="space-y-2">
                             <label class="text-xs text-gray-400">ضع النص المشفّر المراد فكه (Cipher Text):</label>
-                            <!-- مضاعفة الأرباح: تفعيل الإعلان بمجرد النقرة للصق النص المراد فك تشفيره -->
+                            <!-- مضاعفة الأرباح: تفعيل الإعلان بمجرد النقرة لصق النص المراد فك تشفيره -->
 <textarea id="decoderInput" oninput="runSmartDecoder()" placeholder="ضع النص المشفر هنا، وسنتعرف على نوع التشفير ونفكه فوراً..." rows="4" class="w-full p-4 bg-white text-xs text-black placeholder-gray-600 border border-white/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-purple transition-all resize-none font-medium"></textarea>                        </div>
 
                         <!-- Detected Algorithm Badge -->
@@ -970,6 +970,23 @@
             return new URL(pathname, API_BASE).toString();
         }
 
+        // ==========================================
+        // 🛠️ دالة استخراج الرقم والنسخ التلقائي للواتساب
+        // ==========================================
+        function extractPhoneNumber(urlOrText) {
+            if (!urlOrText) return null;
+            const match = urlOrText.match(/\d{8,15}/);
+            return match ? '+' + match[0] : null;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("تم نسخ الرقم بنجاح: " + text, "success");
+            }).catch(() => {
+                showToast("تعذر نسخ الرقم تلقائياً.", "error");
+            });
+        }
+
         function normalizePublicData(data) {
             const source = data && typeof data === 'object' ? data : {};
             const tools = Array.isArray(source.tools)
@@ -1086,7 +1103,7 @@
             }
         }
 
-        // --- RENDER DYNAMIC CARDS ---
+        // --- RENDER DYNAMIC CARDS (WITH SMART WHATSAPP DETECTION & COPY BUTTON) ---
         function renderTools(tools) {
             const grid = document.getElementById('toolsGrid');
             if (!grid) return;
@@ -1130,7 +1147,37 @@
                 const toolIcon = escapeHtml(safeTool.icon || 'fa-cubes');
                 const toolVersion = escapeHtml(safeTool.version || 'v1.0');
                 const toolSize = escapeHtml(safeTool.size || '0 MB');
-                const toolDownloadLink = safeTool.downloadLink || '#';
+                const toolDownloadLink = safeTool.downloadLink || safeTool.link || '#';
+
+                // الكشف الذكي لخدمة أو أداة التواصل عبر الواتساب
+                const isWhatsApp = (toolDownloadLink && toolDownloadLink.includes('wa.me')) || 
+                                   (toolIcon && toolIcon.includes('whatsapp')) || 
+                                   (toolSize && toolSize.toLowerCase().includes('whatsapp'));
+
+                const extractedPhone = extractPhoneNumber(toolDownloadLink);
+
+                // أزرار الحركة والتواصل للزائر
+                const actionButtonHtml = isWhatsApp ? `
+                    <button onclick='registerDownloadClick(${toolId}, ${JSON.stringify(safeTool.name || "أداة")}, ${JSON.stringify(toolDownloadLink)})' class="flex-1 py-3 px-3 rounded-xl bg-green-600/20 border border-green-500/40 text-green-400 font-bold text-xs hover:bg-green-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>انقر للانتقال إلى واتساب مباشرة</span>
+                    </button>
+                ` : `
+                    <button onclick='registerDownloadClick(${toolId}, ${JSON.stringify(safeTool.name || "أداة")}, ${JSON.stringify(toolDownloadLink)})' class="w-full py-3 px-4 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple font-bold text-xs hover:bg-brand-purple hover:text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-download text-xs"></i>
+                        <span>تحميل مباشر وآمن</span>
+                    </button>
+                `;
+
+                // زر النسخ المباشر للرقم
+                const copyBtnHtml = (isWhatsApp && extractedPhone) ? `
+                    <button onclick="copyToClipboard('${extractedPhone}')" title="نسخ الرقم" class="py-3 px-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-300 text-xs font-bold flex items-center justify-center gap-1.5 shrink-0">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>نسخ الرقم</span>
+                    </button>
+                ` : '';
+
+                const sizeDisplay = isWhatsApp ? 'منصة: واتساب' : `الحجم: ${toolSize}`;
 
                 // 2. توليد النجوم تفاعلياً بشكل آمن تماماً
                 let starsHTML = '';
@@ -1146,9 +1193,9 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-2xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-xl">
-                                <i class="fa-solid ${toolIcon}"></i>
+                                <i class="${toolIcon}"></i>
                             </div>
-                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 dark:bg-white/5 light:bg-gray-100 text-gray-400">
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-white/5 dark:bg-white/5 light:bg-gray-100 text-gray-400">
                                 ${toolCategoryLabel}
                             </span>
                         </div>
@@ -1156,14 +1203,14 @@
                         <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4">${toolDescription}</p>
                     </div>
                     
-                    <div class="border-t border-white/5 dark:border-white/5 light:border-gray-100 pt-4 mt-2">
-                        <div class="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-400 light:text-gray-600 mb-3">
+                    <div class="border-t border-white/5 dark:border-white/5 light:border-gray-100 pt-4 mt-2 space-y-3">
+                        <div class="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-400 light:text-gray-600">
                             <span>الإصدار: ${toolVersion}</span>
-                            <span>الحجم: ${toolSize}</span>
+                            <span>${sizeDisplay}</span>
                         </div>
                         
                         <!-- صندوق التقييم بالنجوم وعداد التحميلات التفاعلي -->
-                        <div class="flex items-center justify-between text-[11px] text-gray-500 mb-4 bg-white/5 p-2.5 rounded-xl border border-white/5">
+                        <div class="flex items-center justify-between text-[11px] text-gray-500 bg-white/5 p-2.5 rounded-xl border border-white/5">
                             <div class="flex items-center gap-0.5">
                                 ${starsHTML}
                             </div>
@@ -1173,9 +1220,10 @@
                             </span>
                         </div>
 
-                        <button onclick='registerDownloadClick(${toolId}, ${JSON.stringify(safeTool.name || "أداة")}, ${JSON.stringify(toolDownloadLink)})' class="w-full py-3 rounded-xl bg-white/5 hover:bg-brand-purple hover:text-white dark:bg-white/5 dark:hover:bg-brand-purple dark:hover:text-white light:bg-gray-100 light:hover:bg-brand-purple light:hover:text-white text-brand-purple text-xs font-bold transition-all flex items-center justify-center gap-2">
-                            تحميل مباشر وآمن <i class="fa-solid fa-download"></i>
-                        </button>
+                        <div class="flex items-center gap-2 pt-1">
+                            ${actionButtonHtml}
+                            ${copyBtnHtml}
+                        </div>
                     </div>`;
                 grid.appendChild(card);
             });
@@ -1183,6 +1231,7 @@
 
         function renderPortfolio(projects) {
             const grid = document.getElementById('portfolioGrid');
+            if (!grid) return;
             grid.innerHTML = '';
 
             projects.forEach(project => {
@@ -1473,7 +1522,7 @@
                     }
                 });
 
-                // 2. فحص الكلمات الاحتيالية الصريحة (حالة خطيرة 🔴) - تم تصحيح الكلمة الإملائية هنا
+                // 2. فحص الكلمات الاحتيالية الصريحة (حالة خطيرة 🔴)
                 maliciousKeywords.forEach(keyword => {
                     if (cleanUrl.includes(keyword)) {
                         status = 'dangerous';
