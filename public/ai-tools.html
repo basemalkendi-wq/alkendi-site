@@ -6,9 +6,20 @@
     <title>Al-Kendi Tech | أدوات الذكاء الاصطناعي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <!-- Marked.js Parsing Engine for Beautiful Code & Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
         body { font-family: 'Tajawal', sans-serif; }
+        
+        /* Markdown Output Styles */
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 { font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: #f8fafc; }
+        .markdown-content p { margin-bottom: 0.75rem; line-height: 1.7; }
+        .markdown-content ul { list-style-type: disc; margin-right: 1.5rem; margin-bottom: 0.75rem; }
+        .markdown-content ol { list-style-type: decimal; margin-right: 1.5rem; margin-bottom: 0.75rem; }
+        .markdown-content code { background-color: #0f172a; color: #38bdf8; padding: 0.2rem 0.4rem; border-radius: 0.375rem; font-family: monospace; font-size: 0.875rem; }
+        .markdown-content pre { background-color: #020617; padding: 1rem; border-radius: 0.75rem; overflow-x: auto; margin-top: 0.75rem; margin-bottom: 0.75rem; border: 1px solid #1e293b; position: relative; }
+        .markdown-content pre code { background-color: transparent; padding: 0; color: #e2e8f0; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
@@ -65,10 +76,10 @@
                     </h3>
                     <button onclick="copyOutput()" id="copy-btn" 
                         class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-copy"></i> <span>نسخ</span>
+                        <i class="fa-solid fa-copy"></i> <span>نسخ الكل</span>
                     </button>
                 </div>
-                <pre id="text-output" class="whitespace-pre-wrap font-mono text-sm text-slate-200 bg-slate-900 p-4 rounded-xl border border-slate-800 overflow-x-auto leading-relaxed"></pre>
+                <div id="text-output" class="markdown-content text-sm text-slate-200 bg-slate-900 p-5 rounded-xl border border-slate-800 overflow-x-auto leading-relaxed"></div>
             </div>
         </div>
 
@@ -98,7 +109,7 @@
                     <div>
                         <a id="download-img-btn" download="ai-image.png" target="_blank" 
                             class="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition shadow">
-                            <i class="fa-solid fa-download"></i> تحميل الصورة
+                            <i class="fa-solid fa-download"></i> تحميل الصورة المباشرة
                         </a>
                     </div>
                 </div>
@@ -107,8 +118,20 @@
 
     </main>
 
+    <!-- Toast Notifications Container -->
+    <div id="aiToastContainer" class="fixed bottom-6 left-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
     <!-- JavaScript Logic -->
     <script>
+        function showAiToast(message, type = 'success') {
+            const container = document.getElementById('aiToastContainer');
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800 border ${type === 'success' ? 'border-purple-500/40 text-purple-300' : 'border-red-500/40 text-red-400'} shadow-2xl text-xs font-bold transition-all duration-300 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-purple-400' : 'fa-triangle-exclamation text-red-400'}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
         function switchTab(tab) {
             const textSection = document.getElementById('section-text');
             const imageSection = document.getElementById('section-image');
@@ -133,7 +156,7 @@
             const prompt = promptInput ? promptInput.value.trim() : '';
 
             if (!prompt) {
-                alert('يرجى كتابة الطلب أو الكود أولاً');
+                showAiToast('يرجى كتابة الطلب أو الكود أولاً', 'error');
                 return;
             }
 
@@ -144,7 +167,7 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التفكير...';
             outputBox.classList.remove('hidden');
-            outputEl.textContent = "جاري الاتصال بـ Gemini AI لمعالجة الإجابة...";
+            outputEl.innerHTML = "<p class='text-slate-400 animate-pulse'><i class='fa-solid fa-circle-notch fa-spin ml-2'></i>جاري الاتصال بالسيرفر لمعالجة الإجابة...</p>";
 
             try {
                 const response = await fetch('/api/ai/text', {
@@ -159,9 +182,16 @@
                     throw new Error(data.result || data.message || data.error || `فشل الطلب برمز ${response.status}`);
                 }
 
-                outputEl.textContent = data.result || data.message || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
+                const rawResult = data.result || data.message || "لم يتم إرجاع استجابة من الذكاء الاصطناعي.";
+                
+                if (typeof marked !== 'undefined') {
+                    outputEl.innerHTML = marked.parse(rawResult);
+                } else {
+                    outputEl.textContent = rawResult;
+                }
+
             } catch (err) {
-                outputEl.textContent = err?.message || "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة.";
+                outputEl.innerHTML = `<p class="text-red-400 font-bold"><i class="fa-solid fa-triangle-exclamation ml-2"></i>${err?.message || "حدث خطأ في الاتصال بالسيرفر. يرجى التحقق من الشبكة وإعادة المحاولة."}</p>`;
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> توليد الإجابة';
@@ -170,7 +200,7 @@
 
         async function generateImageDirect() {
             const prompt = document.getElementById('image-prompt').value.trim();
-            if (!prompt) return alert('يرجى كتابة وصف الصورة أولاً');
+            if (!prompt) return showAiToast('يرجى كتابة وصف الصورة أولاً', 'error');
 
             const btn = document.getElementById('btn-gen-img');
             const outputBox = document.getElementById('image-output-box');
@@ -193,10 +223,11 @@
                     loader.classList.add('hidden');
                     container.classList.remove('hidden');
                     btn.disabled = false;
+                    showAiToast('تم إنشاء الصورة بنجاح!', 'success');
                 };
 
                 imgEl.onerror = () => {
-                    alert('تعذر إنشاء الصورة، يرجى إعادة المحاولة.');
+                    showAiToast('تعذر إنشاء الصورة، يرجى إعادة المحاولة.', 'error');
                     outputBox.classList.add('hidden');
                     btn.disabled = false;
                 };
@@ -204,22 +235,20 @@
                 imgEl.src = imageUrl;
 
             } catch (err) {
-                alert('حدث خطأ أثناء الاتصال وإنشاء الصورة.');
+                showAiToast('حدث خطأ أثناء الاتصال وإنشاء الصورة.', 'error');
                 outputBox.classList.add('hidden');
                 btn.disabled = false;
             }
         }
 
         function copyOutput() {
-            const text = document.getElementById('text-output').textContent;
+            const text = document.getElementById('text-output').innerText || document.getElementById('text-output').textContent;
             if (!text) return;
 
             navigator.clipboard.writeText(text).then(() => {
-                const btnSpan = document.querySelector('#copy-btn span');
-                btnSpan.textContent = 'تم النسخ!';
-                setTimeout(() => {
-                    btnSpan.textContent = 'نسخ';
-                }, 2000);
+                showAiToast('تم نسخ الإجابة كاملة للترجمة أو الاستخدام!', 'success');
+            }).catch(() => {
+                showAiToast('تعذر النسخ تلقائياً', 'error');
             });
         }
     </script>
