@@ -101,7 +101,7 @@
 
                 <button onclick="switchTab('toolsTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
                     <i class="fa-solid fa-toolbox text-lg"></i>
-                    <span>إدارة الأدوات والتحميلات</span>
+                    <span>إدارة الأدوات والبرومبتات</span>
                 </button>
 
                 <button onclick="switchTab('portfolioTab', this)" class="tab-link w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 text-sm font-bold transition-all duration-300">
@@ -339,15 +339,15 @@
                     </div>
                 </section>
 
-                <!-- TAB 3: TOOLS MANAGER -->
+                <!-- TAB 3: TOOLS & PROMPTS MANAGER -->
                 <section id="toolsTab" class="tab-content hidden space-y-6">
                     <div class="flex items-center justify-between">
                         <h2 class="text-md font-extrabold text-white flex items-center gap-3">
                             <span class="w-2.5 h-2.5 rounded-full bg-brand-purple"></span>
-                            <span>إدارة البرمجيات والأدوات المتوفرة بالمعرض</span>
+                            <span>إدارة البرمجيات والبرومبتات المتوفرة بالمعرض</span>
                         </h2>
                         <button onclick="openToolModal()" class="px-4 py-2.5 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple hover:bg-brand-purple hover:text-white transition-all text-xs font-bold flex items-center gap-2">
-                            إضافة أداة جديدة <i class="fa-solid fa-plus"></i>
+                            إضافة أداة أو برومبت جديد <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
                     <div id="adminToolsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -457,66 +457,95 @@
         </main>
     </div>
 
-    <!-- MODAL: ADD/EDIT TOOL -->
+    <!-- MODAL: ADD/EDIT TOOL OR PROMPT -->
     <div id="toolModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-darkBg/80 backdrop-blur-md hidden transition-opacity duration-300">
-        <div class="bg-brand-darkCard border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl">
-            <div class="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-[#0d0d14]">
-                <h3 id="toolModalTitle" class="text-md font-bold text-white">إضافة أداة أو برنامج جديد</h3>
+        <div class="bg-brand-darkCard border border-white/10 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col">
+            <div class="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-[#0d0d14] shrink-0">
+                <h3 id="toolModalTitle" class="text-md font-bold text-white">إضافة أداة أو برومبت جديد</h3>
                 <button onclick="closeToolModal()" class="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors flex items-center justify-center" aria-label="إغلاق النافذة">
                     <svg class="w-4 h-4 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
-            <form id="toolForm" onsubmit="saveTool(event)" class="p-6 space-y-6">
+            
+            <form id="toolForm" onsubmit="saveTool(event)" class="p-6 space-y-5 overflow-y-auto no-scrollbar">
                 <input type="hidden" id="toolFormId">
+
+                <!-- 1. نوع العنصر (أداة أو برومبت) -->
+                <div>
+                    <label class="block text-xs font-semibold text-brand-purple mb-2">نوع الإضافة (النوع الفعلي):</label>
+                    <select id="tfType" onchange="toggleToolFormFields()" class="w-full px-4 py-3 bg-brand-purple/10 border border-brand-purple/30 rounded-xl text-sm font-bold text-white focus:outline-none focus:border-brand-purple">
+                        <option value="tool" class="bg-brand-darkCard text-white">أداة أو برنامج تقني قابل للتحميل / تواصل</option>
+                        <option value="prompt" class="bg-brand-darkCard text-white">برومبت ذكاء اصطناعي (AI Prompt) قابل للنسخ بكفر صورة</option>
+                    </select>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">اسم الأداة أو الخدمة</label>
+                        <label id="tfNameLabel" class="block text-xs font-semibold text-gray-400 mb-2">اسم الأداة أو عنوان البرومبت</label>
                         <input type="text" id="tfName" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
+
                     <div>
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">تصنيف الأداة</label>
+                        <label class="block text-xs font-semibold text-gray-400 mb-2">تصنيف القسم</label>
                         <select id="tfCategory" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                            <option value="creators" class="bg-brand-darkCard">صناعة المحتوى والذكاء الاصطناعي</option>
                             <option value="security" class="bg-brand-darkCard">الأمان والحماية</option>
                             <option value="utility" class="bg-brand-darkCard">الإنتاجية والأدوات</option>
-                            <option value="creators" class="bg-brand-darkCard">صناعة المحتوى والذكاء الاصطناعي</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 mb-2">الأيقونة (رمز FontAwesome)</label>
                         <select id="tfIcon" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
-                            <option value="fa-brands fa-whatsapp" class="bg-brand-darkCard">WhatsApp / بوت وتواصل واتساب</option>
-                            <option value="fa-solid fa-robot" class="bg-brand-darkCard">Robot / ذكاء اصطناعي وبوتات</option>
-                            <option value="fa-solid fa-shield-halved" class="bg-brand-darkCard">Shield / درع حماية</option>
-                            <option value="fa-solid fa-gauge-high" class="bg-brand-darkCard">Speedometer / مؤشر تسريع</option>
-                            <option value="fa-solid fa-clapperboard" class="bg-brand-darkCard">Clapperboard / مونتاج وصناعة محتوى</option>
-                            <option value="fa-solid fa-ban" class="bg-brand-darkCard">Ban / حظر ومنع إعلانات</option>
-                            <option value="fa-solid fa-file-video" class="bg-brand-darkCard">Video File / ضغط فيديوهات</option>
-                            <option value="fa-solid fa-code" class="bg-brand-darkCard">Code / برمجة وتطوير</option>
-                            <option value="fa-solid fa-key" class="bg-brand-darkCard">Key / مفاتيح وتشفير</option>
+                            <option value="fa-solid fa-wand-magic-sparkles" class="bg-brand-darkCard">Wand / سحر وبرومبتات ذكاء اصطناعي</option>
+                            <option value="fa-solid fa-robot" class="bg-brand-darkCard">Robot / ذكاء اصطناعي وروبوت</option>
+                            <option value="fa-brands fa-whatsapp" class="bg-brand-darkCard">WhatsApp / بوت واتساب</option>
+                            <option value="fa-solid fa-shield-halved" class="bg-brand-darkCard">Shield / حماية وأمان</option>
+                            <option value="fa-solid fa-gauge-high" class="bg-brand-darkCard">Speedometer / تسريع وتنظيف</option>
+                            <option value="fa-solid fa-clapperboard" class="bg-brand-darkCard">Clapperboard / مونتاج وتصميم</option>
+                            <option value="fa-solid fa-code" class="bg-brand-darkCard">Code / برمجة وأكواد</option>
+                            <option value="fa-solid fa-key" class="bg-brand-darkCard">Key / تشفير ومفاتيح</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 mb-2">رقم الإصدار</label>
                         <input type="text" id="tfVersion" required placeholder="v1.0" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
-                    <div>
+
+                    <!-- حقل الحجم (يختفي عند اختيار برومبت) -->
+                    <div id="tfSizeContainer">
                         <label class="block text-xs font-semibold text-gray-400 mb-2">الحجم / المنصة</label>
-                        <input type="text" id="tfSize" required placeholder="15.4 MB أو WhatsApp" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                        <input type="text" id="tfSize" placeholder="15.4 MB أو ChatGPT" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
                     </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">رابط التحميل أو رابط الواتساب المباشر (مثال: https://wa.me/18002428478)</label>
-                        <input type="text" id="tfLink" required placeholder="https://wa.me/18002428478" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+
+                    <!-- حقل كفر صورة البرومبت (يظهر فقط عند اختيار برومبت) -->
+                    <div id="tfCoverContainer" class="sm:col-span-2 hidden">
+                        <label class="block text-xs font-semibold text-cyan-400 mb-2"><i class="fa-solid fa-image ml-1"></i> رابط صورة غلاف البرومبت (Preview Cover Image URL):</label>
+                        <div class="flex gap-4 items-center">
+                            <input type="text" id="tfCoverImage" oninput="previewCoverImage(this.value)" placeholder="https://example.com/barcelona-kid.jpg أو مسار صورة محلي" class="flex-1 px-4 py-3 bg-white/5 border border-cyan-500/30 rounded-xl text-sm text-white focus:outline-none focus:border-cyan-400">
+                            <div class="w-14 h-14 rounded-xl border border-white/10 bg-white/5 overflow-hidden flex items-center justify-center shrink-0">
+                                <img id="coverPreviewImg" src="https://placehold.co/100/12121A/8B5CF6?text=Cover" class="w-full h-full object-cover">
+                            </div>
+                        </div>
                     </div>
+
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-400 mb-2">وصف توضيحي مختصر عن الأداة أو البوت</label>
-                        <textarea id="tfDesc" required rows="3" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple resize-none"></textarea>
+                        <label id="tfLinkLabel" class="block text-xs font-semibold text-gray-400 mb-2">رابط التحميل أو رابط المنصة</label>
+                        <input type="text" id="tfLink" placeholder="https://chatgpt.com أو https://wa.me/..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple">
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label id="tfDescLabel" class="block text-xs font-semibold text-gray-400 mb-2">وصف توضيحي أو نص البرومبت بالكامل (Prompt)</label>
+                        <textarea id="tfDesc" required rows="4" placeholder="اكتب وصف الأداة أو الصق نص البرومبت بالكامل هنا..." class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-purple resize-none font-mono"></textarea>
                     </div>
                 </div>
+
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
                     <button type="button" onclick="closeToolModal()" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-bold text-xs transition-colors">إلغاء</button>
-                    <button type="submit" class="px-5 py-3 rounded-xl bg-brand-purple text-white font-bold text-xs hover:opacity-90 transition-all shadow-md shadow-brand-purple/20">حفظ الأداة</button>
+                    <button type="submit" class="px-5 py-3 rounded-xl bg-brand-purple text-white font-bold text-xs hover:opacity-90 transition-all shadow-md shadow-brand-purple/20">حفظ ونشر العنصر</button>
                 </div>
             </form>
         </div>
@@ -727,11 +756,49 @@
             document.getElementById('fCopyright').value = mainDatabase.footerContact.copyright || '';
         }
 
+        // ================== TOGGLE TOOL / PROMPT FIELDS ==================
+        function toggleToolFormFields() {
+            const itemType = document.getElementById('tfType').value;
+            const sizeContainer = document.getElementById('tfSizeContainer');
+            const coverContainer = document.getElementById('tfCoverContainer');
+            const nameLabel = document.getElementById('tfNameLabel');
+            const descLabel = document.getElementById('tfDescLabel');
+            const linkLabel = document.getElementById('tfLinkLabel');
+
+            if (itemType === 'prompt') {
+                sizeContainer.classList.add('hidden');
+                coverContainer.classList.remove('hidden');
+                nameLabel.innerText = "عنوان البرومبت (Prompt Title)";
+                descLabel.innerText = "نص البرومبت بالكامل (Prompt Content - سينسخه الزائر بنقرة واحدة)";
+                linkLabel.innerText = "رابط المنصة المقترحة (اختياري مثل https://chatgpt.com)";
+                document.getElementById('tfDesc').placeholder = "ضع نص البرومبت الإنجليزي أو العربي هنا...";
+            } else {
+                sizeContainer.classList.remove('hidden');
+                coverContainer.classList.add('hidden');
+                nameLabel.innerText = "اسم الأداة أو الخدمة";
+                descLabel.innerText = "وصف توضيحي مختصر عن الأداة";
+                linkLabel.innerText = "رابط التحميل أو رابط الواتساب المباشر";
+                document.getElementById('tfDesc').placeholder = "اكتب شرحاً توضيحياً عن الأداة...";
+            }
+        }
+
+        function previewCoverImage(url) {
+            const img = document.getElementById('coverPreviewImg');
+            if (url && url.trim() !== '') {
+                img.src = url;
+            } else {
+                img.src = 'https://placehold.co/100/12121A/8B5CF6?text=Cover';
+            }
+        }
+
         // ================== MODAL OPEN/CLOSE ==================
         function openToolModal() {
             document.getElementById('toolFormId').value = '';
             document.getElementById('toolForm').reset();
-            document.getElementById('toolModalTitle').innerText = "إضافة أداة أو برنامج جديد";
+            document.getElementById('tfType').value = 'tool';
+            toggleToolFormFields();
+            previewCoverImage('');
+            document.getElementById('toolModalTitle').innerText = "إضافة أداة أو برومبت جديد";
             document.getElementById('toolModal').classList.remove('hidden');
         }
 
@@ -750,16 +817,16 @@
             document.getElementById('projectModal').classList.add('hidden'); 
         }
 
-        // ================== TOOLS CONTROLLER (SMART WHATSAPP DETECTION) ==================
+        // ================== TOOLS CONTROLLER ==================
         function extractPhoneNumber(urlOrText) {
             if (!urlOrText) return null;
             const match = urlOrText.match(/\d{8,15}/);
             return match ? '+' + match[0] : null;
         }
 
-        function copyToClipboard(text) {
+        function copyToClipboard(text, successMsg = "تم النسخ بنجاح!") {
             navigator.clipboard.writeText(text).then(() => {
-                showToast("تم نسخ الرقم بنجاح: " + text, "success");
+                showToast(successMsg, "success");
             }).catch(() => {
                 showToast("تعذر النسخ التلقائي", "error");
             });
@@ -769,15 +836,15 @@
             const grid = document.getElementById('adminToolsGrid');
             grid.innerHTML = '';
             if (!mainDatabase.tools || mainDatabase.tools.length === 0) {
-                grid.innerHTML = `<div class="col-span-full border border-white/5 p-12 text-center rounded-3xl text-gray-500"><p class="text-xs font-bold">لم تقم بإضافة أي برمجيات أو أدوات بعد.</p></div>`;
+                grid.innerHTML = `<div class="col-span-full border border-white/5 p-12 text-center rounded-3xl text-gray-500"><p class="text-xs font-bold">لم تقم بإضافة أي برمجيات أو برومبتات بعد.</p></div>`;
                 return;
             }
 
             mainDatabase.tools.forEach(tool => {
                 const card = document.createElement('div');
                 card.className = "bg-brand-darkCard border border-white/5 p-5 rounded-3xl flex flex-col justify-between";
-                let catLabel = tool.category === 'utility' ? "الإنتاجية والأدوات" : (tool.category === 'creators' ? "صناعة المحتوى والذكاء الاصطناعي" : "الأمان والحماية");
                 
+                const isPrompt = tool.itemType === 'prompt' || Boolean(tool.coverImage);
                 const rawLink = tool.downloadLink || tool.link || '';
                 const isWhatsApp = (rawLink && rawLink.includes('wa.me')) || 
                                    (tool.icon && tool.icon.includes('whatsapp')) || 
@@ -785,47 +852,75 @@
 
                 const extractedPhone = extractPhoneNumber(rawLink);
 
-                // 1. زر العرض والتفاعل الرئيسي
-                const actionButtonHtml = isWhatsApp ? `
-                    <a href="${rawLink}" target="_blank" class="flex-1 py-2.5 px-3 rounded-xl bg-green-600/20 border border-green-500/40 text-green-400 font-bold text-xs hover:bg-green-600 hover:text-white transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-brands fa-whatsapp text-sm"></i>
-                        <span>انقر للانتقال إلى واتساب مباشرة</span>
-                    </a>
-                ` : `
-                    <a href="${rawLink}" target="_blank" class="flex-1 py-2.5 px-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple font-bold text-xs hover:bg-brand-purple hover:text-white transition-all flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-download text-xs"></i>
-                        <span>تحميل مباشر وآمن</span>
-                    </a>
-                `;
+                // شارة الصنف التوضيحية
+                let typeBadge = isPrompt 
+                    ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"><i class="fa-solid fa-wand-magic-sparkles ml-1"></i> برومبت ذكاء اصطناعي</span>`
+                    : `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/5 text-gray-400">${tool.categoryLabel || 'أداة'}</span>`;
 
-                // 2. زر نسخ الرقم إذا توفر
-                const copyBtnHtml = (isWhatsApp && extractedPhone) ? `
-                    <button onclick="copyToClipboard('${extractedPhone}')" title="نسخ الرقم" class="py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all text-xs font-bold flex items-center gap-1">
+                // معاينة الكفر للبرومبت
+                let coverHtml = '';
+                if (isPrompt && tool.coverImage) {
+                    coverHtml = `
+                        <div class="w-full h-40 rounded-2xl overflow-hidden mb-4 border border-white/10 bg-black/40 relative group">
+                            <img src="${tool.coverImage}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/600x400/12121A/8B5CF6?text=Cover+Image'">
+                            <span class="absolute top-2 right-2 px-2 py-1 rounded-lg bg-black/70 backdrop-blur text-[10px] text-white font-bold">معاينة الغلاف</span>
+                        </div>
+                    `;
+                }
+
+                // الزر التفاعلي
+                let actionBtnHtml = '';
+                if (isPrompt) {
+                    actionBtnHtml = `
+                        <button onclick='copyToClipboard(${JSON.stringify(tool.description || "")}, "تم نسخ نص البرومبت بالكامل!")' class="flex-1 py-2.5 px-3 rounded-xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-bold text-xs hover:bg-cyan-500 hover:text-black transition-all flex items-center justify-center gap-1.5 shadow-md">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>نسخ البرومبت</span>
+                        </button>
+                    `;
+                } else if (isWhatsApp) {
+                    actionBtnHtml = `
+                        <a href="${rawLink}" target="_blank" class="flex-1 py-2.5 px-3 rounded-xl bg-green-600/20 border border-green-500/40 text-green-400 font-bold text-xs hover:bg-green-600 hover:text-white transition-all flex items-center justify-center gap-1.5">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span>انتقال لواتساب</span>
+                        </a>
+                    `;
+                } else {
+                    actionBtnHtml = `
+                        <a href="${rawLink}" target="_blank" class="flex-1 py-2.5 px-3 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple font-bold text-xs hover:bg-brand-purple hover:text-white transition-all flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-download text-xs"></i>
+                            <span>تحميل مباشر</span>
+                        </a>
+                    `;
+                }
+
+                // زر نسخ الهاتف إذا كان واتساب
+                const copyPhoneBtn = (isWhatsApp && extractedPhone) ? `
+                    <button onclick="copyToClipboard('${extractedPhone}', 'تم نسخ رقم الهاتف!')" title="نسخ الرقم" class="py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all text-xs font-bold flex items-center gap-1">
                         <i class="fa-regular fa-copy"></i>
-                        <span>نسخ الرقم</span>
                     </button>
                 ` : '';
 
-                // 3. شارة العرض للحجم أو المنصة
-                const sizeDisplay = isWhatsApp ? 'منصة: واتساب' : `الحجم: ${tool.size || '0 MB'}`;
+                const metaDisplay = isPrompt 
+                    ? `<span>النوع: برومبت AI</span><span>${tool.version || 'v1.0'}</span>`
+                    : `<span>الإصدار: ${tool.version || 'v1.0'}</span><span>${isWhatsApp ? 'منصة: واتساب' : 'الحجم: ' + (tool.size || '0 MB')}</span>`;
 
                 card.innerHTML = `
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        ${coverHtml}
+                        <div class="flex items-center justify-between mb-3">
                             <div class="w-10 h-10 rounded-xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-lg"><i class="${tool.icon || 'fa-solid fa-toolbox'}"></i></div>
-                            <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-white/5 text-gray-400">${catLabel}</span>
+                            ${typeBadge}
                         </div>
                         <h3 class="text-sm font-bold text-white mb-2">${tool.name}</h3>
                         <p class="text-[11px] text-gray-400 leading-relaxed mb-4 line-clamp-2">${tool.description}</p>
                     </div>
                     <div class="border-t border-white/5 pt-4 space-y-3">
                         <div class="flex items-center justify-between text-[10px] text-gray-500">
-                            <span>الإصدار: ${tool.version}</span>
-                            <span>${sizeDisplay}</span>
+                            ${metaDisplay}
                         </div>
                         <div class="flex items-center gap-2">
-                            ${actionButtonHtml}
-                            ${copyBtnHtml}
+                            ${actionBtnHtml}
+                            ${copyPhoneBtn}
                         </div>
                         <div class="flex items-center gap-2 pt-1 border-t border-white/5">
                             <button onclick="editTool(${tool.id})" class="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-gray-300 font-semibold transition-all">تعديل البيانات</button>
@@ -839,17 +934,22 @@
         function saveTool(event) {
             event.preventDefault();
             const id = document.getElementById('toolFormId').value;
+            const itemType = document.getElementById('tfType').value;
+
             const payload = {
                 id: id ? parseInt(id) : Date.now(),
+                itemType: itemType,
                 name: document.getElementById('tfName').value,
                 description: document.getElementById('tfDesc').value,
                 category: document.getElementById('tfCategory').value,
                 categoryLabel: document.getElementById('tfCategory').options[document.getElementById('tfCategory').selectedIndex].text,
                 icon: document.getElementById('tfIcon').value,
-                version: document.getElementById('tfVersion').value,
-                size: document.getElementById('tfSize').value,
-                downloadLink: document.getElementById('tfLink').value
+                version: document.getElementById('tfVersion').value || 'v1.0',
+                size: itemType === 'prompt' ? 'Prompt' : (document.getElementById('tfSize').value || '0 MB'),
+                coverImage: itemType === 'prompt' ? (document.getElementById('tfCoverImage').value || '') : '',
+                downloadLink: document.getElementById('tfLink').value || '#'
             };
+
             if (!mainDatabase.tools) mainDatabase.tools = [];
             if (id) {
                 const idx = mainDatabase.tools.findIndex(t => t.id === parseInt(id));
@@ -859,26 +959,33 @@
             }
             closeToolModal();
             renderAdminTools();
-            showToast("تم حفظ بيانات الأداة بنجاح!", "success");
+            showToast("تم حفظ ونشر العنصر بنجاح!", "success");
         }
 
         function editTool(id) {
             const tool = mainDatabase.tools.find(t => t.id === id);
             if (!tool) return;
+            
             document.getElementById('toolFormId').value = tool.id;
+            document.getElementById('tfType').value = tool.itemType || (tool.coverImage ? 'prompt' : 'tool');
+            toggleToolFormFields();
+
             document.getElementById('tfName').value = tool.name;
             document.getElementById('tfCategory').value = tool.category;
             document.getElementById('tfIcon').value = tool.icon;
             document.getElementById('tfVersion').value = tool.version;
-            document.getElementById('tfSize').value = tool.size;
+            document.getElementById('tfSize').value = tool.size || '';
+            document.getElementById('tfCoverImage').value = tool.coverImage || '';
+            previewCoverImage(tool.coverImage || '');
             document.getElementById('tfLink').value = tool.downloadLink || tool.link || '#';
             document.getElementById('tfDesc').value = tool.description;
-            document.getElementById('toolModalTitle').innerText = "تعديل تفاصيل الأداة الحالية";
+            
+            document.getElementById('toolModalTitle').innerText = "تعديل تفاصيل العنصر الحالي";
             document.getElementById('toolModal').classList.remove('hidden');
         }
 
         function triggerDeleteTool(id) {
-            openConfirmModal("حذف هذه الأداة نهائياً؟", () => {
+            openConfirmModal("حذف هذا العنصر نهائياً؟", () => {
                 mainDatabase.tools = mainDatabase.tools.filter(t => t.id !== id);
                 renderAdminTools(); closeConfirmModal();
             });
