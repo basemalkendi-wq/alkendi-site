@@ -401,10 +401,10 @@
             <!-- Section Header -->
             <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-white dark:text-white light:text-gray-900">
-                    مركز <span class="text-brand-purple">الأدوات والبرامج</span> الموصى بها
+                    مركز <span class="text-brand-purple">الأدوات والبرامج والبرومبتات</span> الموصى بها
                 </h2>
                 <p class="text-sm sm:text-base text-gray-400 dark:text-gray-400 light:text-gray-600">
-                    أدوات حماية، برمجيات مساعدة، وقوالب إنتاجية آمنة وموثوقة وجاهزة للتحميل المباشر.
+                    أدوات حماية، برمجيات مساعدة، برومبتات ذكاء اصطناعي، وقوالب إنتاجية آمنة وموثوقة وجاهزة للتحميل المباشر والنسخ السريع.
                 </p>
             </div>
 
@@ -416,7 +416,7 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </span>
                     <!-- مضاعفة الأرباح: تشغيل الإعلان الخلفي فور النقر للبحث -->
-<input type="text" id="toolSearch" autocomplete="off" placeholder="ابحث عن أداة أو برنامج..." class="w-full pr-12 pl-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-xl text-sm border border-white/10 dark:border-white/10 light:border-gray-200 focus:outline-none focus:border-brand-purple text-white dark:text-white light:text-gray-900 placeholder-gray-400">                </div>
+<input type="text" id="toolSearch" autocomplete="off" placeholder="ابحث عن أداة أو برنامج أو برومبت..." class="w-full pr-12 pl-4 py-3 bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-xl text-sm border border-white/10 dark:border-white/10 light:border-gray-200 focus:outline-none focus:border-brand-purple text-white dark:text-white light:text-gray-900 placeholder-gray-400">                </div>
 
                 <!-- Filter Category Buttons with Interactive Magic Slider -->
                 <div class="relative flex flex-wrap gap-2 w-full md:w-auto justify-start md:justify-end p-1.5 bg-white/5 dark:bg-white/5 light:bg-gray-100 rounded-2xl" id="filterContainer">
@@ -426,7 +426,7 @@
                     <button class="filter-btn active relative z-10 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors duration-300 text-white" data-category="all">الكل</button>
                     <button class="filter-btn relative z-10 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors duration-300 text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-brand-purple" data-category="security">الأمان والحماية</button>
                     <button class="filter-btn relative z-10 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors duration-300 text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-brand-purple" data-category="utility">الإنتاجية والأدوات</button>
-                    <button class="filter-btn relative z-10 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors duration-300 text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-brand-purple" data-category="creators">صناعة المحتوى</button>
+                    <button class="filter-btn relative z-10 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors duration-300 text-gray-400 dark:text-gray-400 light:text-gray-600 hover:text-brand-purple" data-category="creators">صناعة المحتوى والذكاء الاصطناعي</button>
                 </div>
             </div>
 
@@ -448,7 +448,9 @@
                     </div>
                     <div>
                         <span class="text-[10px] uppercase tracking-wider font-extrabold text-brand-purple bg-brand-purple/10 px-2 py-0.5 rounded-md">مساحة إعلانية شاغرة</span>
-                        <h4 class="text-lg font-bold text-white dark:text-white light:text-gray-900 mt-1">هل ترغب في رعاية موقع وقناة Al-Kendi Tech؟</h4>
+                        <h4 class="text-lg font-bold text-white dark:text-white light:text-gray-900 mt-1" dir="rtl">
+                            هل ترغب في رعاية موقع وقناة <span dir="ltr" class="inline-block font-sans">Al-Kendi Tech</span>؟
+                        </h4>
                         <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 mt-0.5">اعرض تطبيقك، متجرك، أو خدمتك أمام أكثر من 100 ألف متابع مهتم بالتقنية.</p>
                     </div>
                 </div>
@@ -583,14 +585,39 @@
     </section>
 
 
-    <!-- كارت قسم الذكاء الاصطناعي -->
-<a href="/ai-tools.html" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-purple-500 transition block group">
-    <div class="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition">
-        <i class="fa-solid fa-robot"></i>
-    </div>
-    <h3 class="text-xl font-bold mb-2">أدوات الذكاء الاصطناعي</h3>
-    <p class="text-slate-400 text-sm">توليد أكواد برمجية، كتابة نصوص، وإنشاء صور فائقة الدقة بضغطة زر واحدة.</p>
-</a>
+    <!-- كارت قسم الذكاء الاصطناعي الأنيق والمصغر -->
+    <section class="py-8 max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
+        <a href="/ai-tools.html" class="relative rounded-3xl overflow-hidden p-[1px] bg-gradient-to-r from-brand-purple/50 via-fuchsia-500/40 to-brand-purple/50 block group transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-brand-purple/20">
+            <div class="bg-brand-darkCard dark:bg-brand-darkCard light:bg-white p-5 sm:p-6 rounded-[23px] flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+                
+                <!-- Left Info Side -->
+                <div class="flex items-center gap-4 text-right w-full sm:w-auto">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-purple/10 text-brand-purple border border-brand-purple/20 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 group-hover:bg-brand-purple group-hover:text-white transition-all duration-300">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] font-extrabold text-brand-purple bg-brand-purple/10 px-2 py-0.5 rounded-md border border-brand-purple/20">منصة الذكاء الاصطناعي</span>
+                            <span class="text-[10px] text-green-400 font-bold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> متاحة الآن
+                            </span>
+                        </div>
+                        <h3 class="text-md font-extrabold text-white dark:text-white light:text-gray-900 group-hover:text-brand-purple transition-colors">أدوات الذكاء الاصطناعي</h3>
+                        <p class="text-[11px] text-gray-400 dark:text-gray-400 light:text-gray-600 mt-0.5 leading-relaxed">توليد أكواد، كتابة نصوص، وإنشاء صور بدقة عالية.</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Action Button -->
+                <div class="w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                    <div class="w-full py-2.5 px-4 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple font-bold text-xs group-hover:bg-brand-purple group-hover:text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-md">
+                        <span>دخول المنصة</span>
+                        <i class="fa-solid fa-arrow-left text-xs transition-transform group-hover:-translate-x-1"></i>
+                    </div>
+                </div>
+
+            </div>
+        </a>
+    </section>
 
 
     <!-- Password Security Suite Section -->
@@ -971,7 +998,7 @@
         }
 
         // ==========================================
-        // 🛠️ دالة استخراج الرقم والنسخ التلقائي للواتساب
+        // 🛠️ دالة استخراج الرقم والنسخ التلقائي
         // ==========================================
         function extractPhoneNumber(urlOrText) {
             if (!urlOrText) return null;
@@ -979,11 +1006,11 @@
             return match ? '+' + match[0] : null;
         }
 
-        function copyToClipboard(text) {
+        function copyToClipboard(text, customMessage = "تم النسخ بنجاح!") {
             navigator.clipboard.writeText(text).then(() => {
-                showToast("تم نسخ الرقم بنجاح: " + text, "success");
+                showToast(customMessage, "success");
             }).catch(() => {
-                showToast("تعذر نسخ الرقم تلقائياً.", "error");
+                showToast("تعذر النسخ التلقائي.", "error");
             });
         }
 
@@ -999,7 +1026,7 @@
                     categoryLabel: tool.categoryLabel || (tool.category === 'utility'
                         ? 'الإنتاجية والأدوات'
                         : tool.category === 'creators'
-                            ? 'صناعة المحتوى'
+                            ? 'صناعة المحتوى والذكاء الاصطناعي'
                             : 'الأمان والحماية')
                 }))
                 : localToolsDatabase;
@@ -1103,7 +1130,7 @@
             }
         }
 
-        // --- RENDER DYNAMIC CARDS (WITH SMART WHATSAPP DETECTION & COPY BUTTON) ---
+        // --- RENDER DYNAMIC CARDS (WITH SUPPORT FOR PROMPTS WITH COVER IMAGES & WHATSAPP) ---
         function renderTools(tools) {
             const grid = document.getElementById('toolsGrid');
             if (!grid) return;
@@ -1142,42 +1169,89 @@
                 const activeStars = Math.min(5, Math.max(0, toSafeInt(safeTool.stars, 5)));
                 const downloadCount = Math.max(0, toSafeInt(safeTool.downloads, 140));
                 const toolName = escapeHtml(safeTool.name || 'أداة جديدة');
-                const toolDescription = escapeHtml(safeTool.description || '');
+                const rawDescription = safeTool.description || '';
+                const toolDescription = escapeHtml(rawDescription);
                 const toolCategoryLabel = escapeHtml(safeTool.categoryLabel || 'أداة عامة');
                 const toolIcon = escapeHtml(safeTool.icon || 'fa-cubes');
                 const toolVersion = escapeHtml(safeTool.version || 'v1.0');
                 const toolSize = escapeHtml(safeTool.size || '0 MB');
                 const toolDownloadLink = safeTool.downloadLink || safeTool.link || '#';
+                const coverImage = safeTool.coverImage || '';
+
+                // كشف ما إذا كان العنصر برومبت ذكاء اصطناعي (AI Prompt)
+                const isPrompt = safeTool.itemType === 'prompt' || Boolean(coverImage) || toolName.includes('برومبت') || toolName.includes('Prompt');
 
                 // الكشف الذكي لخدمة أو أداة التواصل عبر الواتساب
-                const isWhatsApp = (toolDownloadLink && toolDownloadLink.includes('wa.me')) || 
+                const isWhatsApp = !isPrompt && ((toolDownloadLink && toolDownloadLink.includes('wa.me')) || 
                                    (toolIcon && toolIcon.includes('whatsapp')) || 
-                                   (toolSize && toolSize.toLowerCase().includes('whatsapp'));
+                                   (toolSize && toolSize.toLowerCase().includes('whatsapp')));
 
                 const extractedPhone = extractPhoneNumber(toolDownloadLink);
 
-                // أزرار الحركة والتواصل للزائر
-                const actionButtonHtml = isWhatsApp ? `
-                    <button onclick='registerDownloadClick(${toolId}, ${JSON.stringify(safeTool.name || "أداة")}, ${JSON.stringify(toolDownloadLink)})' class="flex-1 py-3 px-3 rounded-xl bg-green-600/20 border border-green-500/40 text-green-400 font-bold text-xs hover:bg-green-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md">
-                        <i class="fa-brands fa-whatsapp text-sm"></i>
-                        <span>انقر للانتقال إلى واتساب مباشرة</span>
-                    </button>
-                ` : `
-                    <button onclick='registerDownloadClick(${toolId}, ${JSON.stringify(safeTool.name || "أداة")}, ${JSON.stringify(toolDownloadLink)})' class="w-full py-3 px-4 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple font-bold text-xs hover:bg-brand-purple hover:text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-md">
-                        <i class="fa-solid fa-download text-xs"></i>
-                        <span>تحميل مباشر وآمن</span>
-                    </button>
-                `;
+                // كود توليد الغلاف / الكفر للبرومبت
+                let coverHtml = '';
+                if (isPrompt && coverImage) {
+                    coverHtml = `
+                        <div class="w-full h-48 sm:h-56 rounded-2xl overflow-hidden mb-4 border border-white/10 bg-black/40 relative shadow-inner">
+                            <img src="${coverImage}" alt="${toolName}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onerror="this.src='https://placehold.co/600x400/12121A/8B5CF6?text=Prompt+Cover'">
+                            <span class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur text-[10px] text-cyan-300 border border-cyan-500/30 font-bold flex items-center gap-1.5 shadow-md">
+                                <i class="fa-solid fa-wand-magic-sparkles text-xs"></i> برومبت ذكاء اصطناعي
+                            </span>
+                        </div>
+                    `;
+                }
 
-                // زر النسخ المباشر للرقم
-                const copyBtnHtml = (isWhatsApp && extractedPhone) ? `
-                    <button onclick="copyToClipboard('${extractedPhone}')" title="نسخ الرقم" class="py-3 px-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-300 text-xs font-bold flex items-center justify-center gap-1.5 shrink-0">
+                // وصف الأداة: إذا كان برومبت نختصره ونوضح أن النص سينسخ بالكامل
+                let descriptionHtml = '';
+                if (isPrompt) {
+                    descriptionHtml = `
+                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4 flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-circle-check text-cyan-400 text-xs"></i> اضغط على زر النسخ أدناه للحصول على البرومبت المباشر وتطبيقه فوراً.
+                        </p>
+                    `;
+                } else {
+                    descriptionHtml = `
+                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4 line-clamp-2">${toolDescription}</p>
+                    `;
+                }
+
+                // أزرار الحركة والتفاعل للمستخدم
+                let actionButtonHtml = '';
+                if (isPrompt) {
+                    actionButtonHtml = `
+                        <button onclick='copyPromptDirect(${toolId}, ${JSON.stringify(rawDescription)}, ${JSON.stringify(toolName)})' class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500/25 to-blue-500/25 border border-cyan-500/40 text-cyan-300 font-bold text-xs hover:from-cyan-500 hover:to-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/10 active:scale-[0.98]">
+                            <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+                            <span>نسخ البرومبت بنقرة واحدة</span>
+                        </button>
+                    `;
+                } else if (isWhatsApp) {
+                    actionButtonHtml = `
+                        <button onclick='registerDownloadClick(${toolId}, ${JSON.stringify(safeTool.name || "أداة")}, ${JSON.stringify(toolDownloadLink)})' class="flex-1 py-3 px-3 rounded-xl bg-green-600/20 border border-green-500/40 text-green-400 font-bold text-xs hover:bg-green-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                            <span>انقر للانتقال إلى واتساب مباشرة</span>
+                        </button>
+                    `;
+                } else {
+                    actionButtonHtml = `
+                        <button onclick='registerDownloadClick(${toolId}, ${JSON.stringify(safeTool.name || "أداة")}, ${JSON.stringify(toolDownloadLink)})' class="w-full py-3 px-4 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple font-bold text-xs hover:bg-brand-purple hover:text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-md">
+                            <i class="fa-solid fa-download text-xs"></i>
+                            <span>تحميل مباشر وآمن</span>
+                        </button>
+                    `;
+                }
+
+                // زر النسخ المباشر للرقم في أدوات الواتساب
+                const copyBtnHtml = (!isPrompt && isWhatsApp && extractedPhone) ? `
+                    <button onclick="copyToClipboard('${extractedPhone}', 'تم نسخ رقم الواتساب بنجاح!')" title="نسخ الرقم" class="py-3 px-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-300 text-xs font-bold flex items-center justify-center gap-1.5 shrink-0">
                         <i class="fa-regular fa-copy"></i>
                         <span>نسخ الرقم</span>
                     </button>
                 ` : '';
 
-                const sizeDisplay = isWhatsApp ? 'منصة: واتساب' : `الحجم: ${toolSize}`;
+                // نصوص الحالة والمعلومات
+                const metaSizeDisplay = isPrompt 
+                    ? 'النوع: برومبت AI' 
+                    : (isWhatsApp ? 'منصة: واتساب' : `الحجم: ${toolSize}`);
 
                 // 2. توليد النجوم تفاعلياً بشكل آمن تماماً
                 let starsHTML = '';
@@ -1191,6 +1265,7 @@
 
                 card.innerHTML = `
                     <div>
+                        ${coverHtml}
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-2xl bg-brand-purple/10 text-brand-purple flex items-center justify-center text-xl">
                                 <i class="${toolIcon}"></i>
@@ -1200,23 +1275,23 @@
                             </span>
                         </div>
                         <h3 class="text-md font-bold text-white dark:text-white light:text-gray-900 mb-2">${toolName}</h3>
-                        <p class="text-xs text-gray-400 dark:text-gray-400 light:text-gray-600 leading-relaxed mb-4">${toolDescription}</p>
+                        ${descriptionHtml}
                     </div>
                     
                     <div class="border-t border-white/5 dark:border-white/5 light:border-gray-100 pt-4 mt-2 space-y-3">
                         <div class="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-400 light:text-gray-600">
                             <span>الإصدار: ${toolVersion}</span>
-                            <span>${sizeDisplay}</span>
+                            <span>${metaSizeDisplay}</span>
                         </div>
                         
-                        <!-- صندوق التقييم بالنجوم وعداد التحميلات التفاعلي -->
+                        <!-- صندوق التقييم بالنجوم وعداد التفاعل/التحميلات -->
                         <div class="flex items-center justify-between text-[11px] text-gray-500 bg-white/5 p-2.5 rounded-xl border border-white/5">
                             <div class="flex items-center gap-0.5">
                                 ${starsHTML}
                             </div>
                             <span class="text-gray-400">
-                                <i class="fa-solid fa-download ml-1 text-brand-purple"></i> 
-                                <span id="download-count-${toolId}">${downloadCount}</span> تحميلة
+                                <i class="fa-solid ${isPrompt ? 'fa-copy' : 'fa-download'} ml-1 text-brand-purple"></i> 
+                                <span id="download-count-${toolId}">${downloadCount}</span> ${isPrompt ? 'استخدام' : 'تحميلة'}
                             </span>
                         </div>
 
@@ -1227,6 +1302,33 @@
                     </div>`;
                 grid.appendChild(card);
             });
+        }
+
+        // ==========================================
+        // 🔮 دالة نسخ البرومبت المباشرة للمستخدم
+        // ==========================================
+        function copyPromptDirect(toolId, promptText, promptTitle) {
+            launchKendiPopunder();
+            if (!promptText) {
+                showToast("لا يوجد نص برومبت لنسخه!", "error");
+                return;
+            }
+
+            copyToClipboard(promptText, "تم نسخ البرومبت بالكامل بنجاح! الصقه الآن في ChatGPT 🚀");
+
+            // زيادة عداد الاستخدام في الخلفية
+            try {
+                fetch(getApiUrl('/api/tools/download-click'), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ toolId })
+                }).then(res => res.json()).then(result => {
+                    if (result && result.downloads) {
+                        const countSpan = document.getElementById(`download-count-${toolId}`);
+                        if (countSpan) countSpan.innerText = result.downloads;
+                    }
+                }).catch(() => {});
+            } catch (err) {}
         }
 
         function renderPortfolio(projects) {
@@ -1285,7 +1387,7 @@
             const activeFilter = document.querySelector('.filter-btn.active').dataset.category;
             
             const filtered = activeToolsData.filter(tool => {
-                const matchesSearch = tool.name.toLowerCase().includes(val) || tool.description.toLowerCase().includes(val);
+                const matchesSearch = tool.name.toLowerCase().includes(val) || (tool.description && tool.description.toLowerCase().includes(val));
                 const matchesCategory = activeFilter === 'all' || tool.category === activeFilter;
                 return matchesSearch && matchesCategory;
             });
@@ -1315,7 +1417,7 @@
                 
                 const filtered = activeToolsData.filter(tool => {
                     const matchesCategory = category === 'all' || tool.category === category;
-                    const matchesSearch = tool.name.toLowerCase().includes(searchVal) || tool.description.toLowerCase().includes(searchVal);
+                    const matchesSearch = tool.name.toLowerCase().includes(searchVal) || (tool.description && tool.description.toLowerCase().includes(searchVal));
                     return matchesCategory && matchesSearch;
                 });
                 renderTools(filtered);
@@ -2067,6 +2169,23 @@
                 updateIndicatorPosition(activeBtn);
                 updateActiveNavOnScroll(); 
             }, 150);
+
+            // ميزة الرابط الذكي: التوجيه والفلترة التلقائية للأداة/البرومبت عند فتح الرابط
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTool = urlParams.get('tool');
+            if (targetTool) {
+                setTimeout(() => {
+                    const searchInput = document.getElementById('toolSearch');
+                    if (searchInput) {
+                        searchInput.value = targetTool;
+                        searchInput.dispatchEvent(new Event('input'));
+                        const toolsSection = document.getElementById('tools');
+                        if (toolsSection) {
+                            toolsSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                }, 500);
+            }
         };
 
 
